@@ -1,0 +1,33 @@
+program PTANMENU;
+
+uses
+  Forms,
+  Windows,
+  UTANMENU in 'UTANMENU.pas' {FTANMENU},
+  ULIBGRAL in '..\..\..\Imagen Ib Libs\Libs\ULIBGRAL.pas',
+  ULIBPRINT in '..\..\..\Imagen Ib Libs\Libs\ULIBPRINT.pas',
+  ULIBDATABASE in '..\..\..\Imagen Ib Libs\Libs\ULIBDATABASE.pas',
+  ULIBLICENCIAS in '..\..\..\Imagen Ib Libs\Libs\ULibLicencias.pas',
+  UFormaPreverTxt in '..\..\..\Imagen Ib Libs\Util\UFormaPreverTxt.pas' {FormaPreverTxt},
+  UAutoriza2 in '..\..\..\Imagen Ib Libs\Util\UAutoriza2.pas' {FAutoriza2},
+  DDMCONS in '..\Dispensarios\DDMCONS.pas' {DMCONS: TDataModule},
+  DDMCONS2 in '..\Dispensarios\DDMCONS2.pas' {DMCONS2: TDataModule};
+
+var
+  Mutex : THandle;
+
+
+{$R *.RES}
+
+begin
+  Mutex := CreateMutex(nil, True, 'Monitor de Tanques');
+  if (Mutex = 0) or (GetLastError <> 0) then
+    exit;
+  Application.Initialize;
+  Application.CreateForm(TFTANMENU, FTANMENU);
+  Application.CreateForm(TFormaPreverTxt, FormaPreverTxt);
+  Application.CreateForm(TFAutoriza2, FAutoriza2);
+  Application.CreateForm(TDMCONS, DMCONS);
+  Application.CreateForm(TDMCONS2, DMCONS2);
+  Application.Run;
+end.

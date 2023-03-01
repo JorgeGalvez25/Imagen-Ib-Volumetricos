@@ -1,0 +1,2061 @@
+unit UTANMENU;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, ComCtrls, StdCtrls, OoMisc, AdPort, ExtCtrls, Menus, RXShell,
+  Buttons, Mask, DBCtrls, Grids, DBGrids, VrControls, VrAngularMeter,
+  _GClass, AbTank, VrThermoMeter, VrLabel, VrCalendar, VrMatrix, VrEdit,
+  {AbClock,} CellEditors, Registry, AbGradient, WinSkinData, {Collection,}
+  {PageView,} dxNavBarBase, dxNavBarCollns, dxNavBar, vrLedClock, ImgList, DBTables,
+  DB, dxmdaset, VrThreads, ULibGral, cxClasses;
+
+const Version='3.1';
+
+      idSOH = #1;
+      idSTX = #2;
+      idETX = #3;
+      idACK = #6;
+      idNAK = #21;
+      MaxTmpDifCorte=0.5*tmHora;
+
+type
+  TFTANMENU = class(TForm)
+    ApdComPort1: TApdComPort;
+    RxTrayIcon1: TRxTrayIcon;
+    PopupMenu1: TPopupMenu;
+    Restaurar1: TMenuItem;
+    Panel1: TPanel;
+    Panel2: TPanel;
+    PageControl1: TPageControl;
+    TabSheet1: TTabSheet;
+    TabSheet2: TTabSheet;
+    StaticText1: TStaticText;
+    Memo1: TMemo;
+    StaticText2: TStaticText;
+    Bevel1: TBevel;
+    TabSheet3: TTabSheet;
+    Panel9: TPanel;
+    Panel10: TPanel;
+    Label1: TLabel;
+    DBEdit1: TDBEdit;
+    Panel11: TPanel;
+    Panel12: TPanel;
+    Panel13: TPanel;
+    Panel14: TPanel;
+    Panel15: TPanel;
+    DBGrid3: TDBGrid;
+    DBGrid4: TDBGrid;
+    VrCalendar1: TVrCalendar;
+    PageControl2: TPageControl;
+    TabSheet4: TTabSheet;
+    TabSheet5: TTabSheet;
+    TabSheet6: TTabSheet;
+    TabSheet7: TTabSheet;
+    Panel3: TPanel;
+    DBGrid1: TDBGrid;
+    Panel4: TPanel;
+    Label2: TLabel;
+    Panel5: TPanel;
+    Label3: TLabel;
+    DBGrid2: TDBGrid;
+    Panel6: TPanel;
+    Label4: TLabel;
+    Panel7: TPanel;
+    Label5: TLabel;
+    PopupMenu2: TPopupMenu;
+    VerTrfico1: TMenuItem;
+    OcultarTrfico1: TMenuItem;
+    SkinData1: TSkinData;
+    Panel8: TPanel;
+    PanelA2: TPanel;
+    AbTank2: TAbTank;
+    VrLabelNom2: TVrLabel;
+    vrThermoMeter2: TvrThermoMeter;
+    VrMatrix2: TVrMatrix;
+    VrLabel3x: TVrLabel;
+    VrLabel10: TVrLabel;
+    VrLabel11: TVrLabel;
+    VrLabel12: TVrLabel;
+    VrLabel13: TVrLabel;
+    VrLabel14: TVrLabel;
+    VrLabel16: TVrLabel;
+    NumericEditor1_2: TNumericEditor;
+    NumericEditor2_2: TNumericEditor;
+    NumericEditor3_2: TNumericEditor;
+    NumericEditor4_2: TNumericEditor;
+    NumericEditor5_2: TNumericEditor;
+    NumericEditor6_2: TNumericEditor;
+    PanelA1: TPanel;
+    AbGradient1: TAbGradient;
+    AbTank1: TAbTank;
+    VrLabelNom1: TVrLabel;
+    vrThermoMeter1: TvrThermoMeter;
+    VrMatrix1: TVrMatrix;
+    VrLabel4x: TVrLabel;
+    VrLabel5x: TVrLabel;
+    VrLabel6x: TVrLabel;
+    VrLabel7x: TVrLabel;
+    VrLabel8x: TVrLabel;
+    VrLabel9: TVrLabel;
+    VrLabel15: TVrLabel;
+    NumericEditor1_1: TNumericEditor;
+    NumericEditor2_1: TNumericEditor;
+    NumericEditor3_1: TNumericEditor;
+    NumericEditor4_1: TNumericEditor;
+    NumericEditor5_1: TNumericEditor;
+    NumericEditor6_1: TNumericEditor;
+    Panel16: TPanel;
+    dxNavBar1: TdxNavBar;
+    dxNavBar1Group1: TdxNavBarGroup;
+    dxNavBar1Item1: TdxNavBarItem;
+    dxNavBar1Item2: TdxNavBarItem;
+    dxNavBar1Item3: TdxNavBarItem;
+    dxNavBar1Item4: TdxNavBarItem;
+    VrLedClock1: TVrLedClock;
+    Panel17: TPanel;
+    VrMatrix9: TVrMatrix;
+    Panel18: TPanel;
+    PanelA3: TPanel;
+    AbTank3: TAbTank;
+    VrLabelNom3: TVrLabel;
+    vrThermoMeter3: TvrThermoMeter;
+    VrMatrix3: TVrMatrix;
+    VrLabel18: TVrLabel;
+    VrLabel19: TVrLabel;
+    VrLabel20: TVrLabel;
+    VrLabel21: TVrLabel;
+    VrLabel22: TVrLabel;
+    VrLabel23: TVrLabel;
+    VrLabel24: TVrLabel;
+    NumericEditor1_3: TNumericEditor;
+    NumericEditor2_3: TNumericEditor;
+    NumericEditor3_3: TNumericEditor;
+    NumericEditor4_3: TNumericEditor;
+    NumericEditor5_3: TNumericEditor;
+    NumericEditor6_3: TNumericEditor;
+    PanelA4: TPanel;
+    AbTank4: TAbTank;
+    VrLabelNom4: TVrLabel;
+    vrThermoMeter4: TvrThermoMeter;
+    VrMatrix4: TVrMatrix;
+    VrLabel26: TVrLabel;
+    VrLabel27: TVrLabel;
+    VrLabel28: TVrLabel;
+    VrLabel29: TVrLabel;
+    VrLabel30: TVrLabel;
+    VrLabel31: TVrLabel;
+    VrLabel32: TVrLabel;
+    NumericEditor1_4: TNumericEditor;
+    NumericEditor2_4: TNumericEditor;
+    NumericEditor3_4: TNumericEditor;
+    NumericEditor4_4: TNumericEditor;
+    NumericEditor5_4: TNumericEditor;
+    NumericEditor6_4: TNumericEditor;
+    Panel19: TPanel;
+    PanelA5: TPanel;
+    AbTank5: TAbTank;
+    VrLabelNom5: TVrLabel;
+    vrThermoMeter5: TvrThermoMeter;
+    VrMatrix5: TVrMatrix;
+    VrLabel34: TVrLabel;
+    VrLabel35: TVrLabel;
+    VrLabel36: TVrLabel;
+    VrLabel37: TVrLabel;
+    VrLabel38: TVrLabel;
+    VrLabel39: TVrLabel;
+    VrLabel40: TVrLabel;
+    NumericEditor1_5: TNumericEditor;
+    NumericEditor2_5: TNumericEditor;
+    NumericEditor3_5: TNumericEditor;
+    NumericEditor4_5: TNumericEditor;
+    NumericEditor5_5: TNumericEditor;
+    NumericEditor6_5: TNumericEditor;
+    PanelA6: TPanel;
+    AbTank6: TAbTank;
+    VrLabelNom6: TVrLabel;
+    vrThermoMeter6: TvrThermoMeter;
+    VrMatrix6: TVrMatrix;
+    VrLabel42: TVrLabel;
+    VrLabel43: TVrLabel;
+    VrLabel44: TVrLabel;
+    VrLabel45: TVrLabel;
+    VrLabel46: TVrLabel;
+    VrLabel47: TVrLabel;
+    VrLabel48: TVrLabel;
+    NumericEditor1_6: TNumericEditor;
+    NumericEditor2_6: TNumericEditor;
+    NumericEditor3_6: TNumericEditor;
+    NumericEditor4_6: TNumericEditor;
+    NumericEditor5_6: TNumericEditor;
+    NumericEditor6_6: TNumericEditor;
+    Panel20: TPanel;
+    PanelA7: TPanel;
+    AbTank7: TAbTank;
+    VrLabelNom7: TVrLabel;
+    vrThermoMeter7: TvrThermoMeter;
+    VrMatrix7: TVrMatrix;
+    VrLabel50: TVrLabel;
+    VrLabel51: TVrLabel;
+    VrLabel52: TVrLabel;
+    VrLabel53: TVrLabel;
+    VrLabel54: TVrLabel;
+    VrLabel55: TVrLabel;
+    VrLabel56: TVrLabel;
+    NumericEditor1_7: TNumericEditor;
+    NumericEditor2_7: TNumericEditor;
+    NumericEditor3_7: TNumericEditor;
+    NumericEditor4_7: TNumericEditor;
+    NumericEditor5_7: TNumericEditor;
+    NumericEditor6_7: TNumericEditor;
+    PanelA8: TPanel;
+    AbTank8: TAbTank;
+    VrLabelNom8: TVrLabel;
+    vrThermoMeter8: TvrThermoMeter;
+    VrMatrix8: TVrMatrix;
+    VrLabel58: TVrLabel;
+    VrLabel59: TVrLabel;
+    VrLabel60: TVrLabel;
+    VrLabel61: TVrLabel;
+    VrLabel62: TVrLabel;
+    VrLabel63: TVrLabel;
+    VrLabel64: TVrLabel;
+    NumericEditor1_8: TNumericEditor;
+    NumericEditor2_8: TNumericEditor;
+    NumericEditor3_8: TNumericEditor;
+    NumericEditor4_8: TNumericEditor;
+    NumericEditor5_8: TNumericEditor;
+    NumericEditor6_8: TNumericEditor;
+    Panel21: TPanel;
+    BitBtn3: TBitBtn;
+    ImageList1: TImageList;
+    AbGradient2: TAbGradient;
+    AbGradient3: TAbGradient;
+    StaticText3: TStaticText;
+    Mem_CortesFijos: TdxMemData;
+    Mem_CortesFijosClave: TSmallintField;
+    Mem_CortesFijosHoraCorte: TTimeField;
+    Mem_CortesFijosActivo: TBooleanField;
+    Ql_UltimoCorte: TQuery;
+    Ql_UltimoCorteCORTE: TIntegerField;
+    Ql_UltimoCorteFECHAHORAFINAL: TDateTimeField;
+    Mem_CorteManual: TdxMemData;
+    Mem_CorteManualCorte: TBooleanField;
+    Timer1: TVrTimer;
+    Timer3: TVrTimer;
+    VrTimer1: TVrTimer;
+    Label6: TLabel;
+    StaticText4: TStaticText;
+    StaticText5: TStaticText;
+    Memo2: TMemo;
+    SpeedButton1: TSpeedButton;
+    StaticText6: TStaticText;
+    Button1: TButton;
+    Label4x: TLabel;
+    CheckBox1: TCheckBox;
+    ProgressBar1: TProgressBar;
+    procedure FormShow(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
+    procedure ApdComPort1TriggerAvail(CP: TObject; Count: Word);
+    procedure Timer1Timer(Sender: TObject);
+    procedure Restaurar1Click(Sender: TObject);
+    procedure BitBtn3Click(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure Timer3Timer(Sender: TObject);
+    procedure VerTrfico1Click(Sender: TObject);
+    procedure OcultarTrfico1Click(Sender: TObject);
+    procedure dxNavBar1Item1Click(Sender: TObject);
+    procedure dxNavBar1Item2Click(Sender: TObject);
+    procedure dxNavBar1Item3Click(Sender: TObject);
+    procedure dxNavBar1Item4Click(Sender: TObject);
+    procedure RxTrayIcon1DblClick(Sender: TObject);
+    procedure VrTimer1Timer(Sender: TObject);
+    procedure SpeedButton1Click(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
+    procedure AbTank1DblClick(Sender: TObject);
+  private
+    { Private declarations }
+    SwAux:boolean;
+    ContValCorte,
+    ContAux,
+    TanqueActual,
+    NumTanques,
+    CicloEnt,
+    ContRec,
+    NumPaso:integer;
+    SwConsulta,
+    SwInicio,
+    SwCerrar,
+    SwCorte,
+    SwEeco,
+    ErrorInic:boolean;
+    LineaBuff,
+    LineaProc,
+    LineaEmular:string;
+    xFechaHoraIni :string[10];
+    xFechaHoraFin :string[10];
+    xValores:array[1..10] of real;
+    CorteInicial,
+    ContadorAlarma:integer;
+    ContadorAlarma2:integer;
+    FechaTimer1,
+    FechaHoraExec,
+    SiguienteFechaHoraTurno:TDateTime;
+    SiguienteFechaHoraCmnd:TDateTime;
+    ContErroresCom:integer;
+    TiempoCorteAntes:real;
+    function CalculaAgua(VolTotal,Diametro,AlturaAgua:real):real;
+  public
+    { Public declarations }
+    procedure IniciaBaseDeDatos;
+    procedure IniciaEstacion;
+    procedure DespliegaTanque(xtan:integer);
+    procedure ComandoConsola(ss:string);
+    procedure ProcesaLinea1;
+    procedure ProcesaLinea2;
+    procedure ProcesaLinea3;
+    procedure ProcesaLinea4;
+    procedure ProcesaLineaConsulta;
+    procedure registro(valor:integer;variable:string);
+    procedure lee_registro; //Maximiza la aplicación
+    procedure nombre_db;
+    procedure DespliegaMemo1(xstr:string);
+    procedure ReiniciaTanques;
+    procedure ValidaCorte;
+  end;
+
+const MaxTanques=8;
+type TipoTanque = record
+       Combustible   :integer;
+       NombreComb    :string[20];
+       Altura,
+       Capacidad,
+       VolumenFondaje,
+       VolumenAnterior,
+       VolumenUtil,       // VolumenDisponible-VolumenFondaje
+       Volumen,           // Volumen Total (Incluye Agua)
+       VolumenDisponible, // Volumen-VolumenAgua
+       PorLlenar,
+       VolumenAgua   :real;
+       Porciento     :real;
+       Temperatura   :real;
+       Estado        :string[1];      // A-Activo I-Inactivo
+       Estatus       :String[15];
+       SwTiempo,
+       SwActivo,
+       SwLevantado   :boolean;
+     end;
+
+var
+  FTANMENU: TFTANMENU;
+  TTanques:array[1..MaxTanques] of TipoTanque;
+  ruta_db:string;
+
+implementation
+
+uses DDMCONS, UAutoriza2, ULIBLICENCIAS,ULibDataBase;
+
+{
+  Timer1: Maneja un ciclo de lectura
+    Numpaso: 1.- Lee inventarios x tanque (comado i201)
+    Numpaso: 2.- Lee Entradas al tanque x tanque (comando i202)
+    Valida Cortes (BD)
+
+  AdpComPort1: Recibe la respuesta del VeederRoot y la interpreta
+    Acumula los caracteres en LineaBuff (SOH es el inicio y ETX es el final)
+    Pasa el resultado a LineaProc e invoca el Procedimiento PROCESALINEA
+
+
+  ProcesaLinea: Interpreta la información  (BD)
+
+  DespliegaTanque: Despliega la información de los tanques (BD)
+}
+
+{$R *.dfm}
+
+function TFTANMENU.CalculaAgua(VolTotal,Diametro,AlturaAgua:real):real;
+var Radio,Base,Altura,Angulo,AreaTot,AreaArco,AreaAgua,VolAgua:real;
+begin
+  try
+    Memo1.Lines.Clear;
+    Radio:=Diametro/2;
+    Altura:=Radio-AlturaAgua;
+    Base:=Sqrt(Radio*Radio-Altura*Altura);
+    if Abs(Altura)>0.0001 then
+      Angulo:=ArcTan(Base/Altura)*360/Pi
+    else
+      Angulo:=180;
+    AreaTot:=Pi*Radio*Radio;
+    AreaArco:=AreaTot*Angulo/360;
+    AreaAgua:=AreaArco-Base*Altura;
+    VolAgua:=VolTotal*AreaAgua/AreaTot;
+  except
+  end;
+end;
+
+procedure TFTANMENU.ProcesaLinea1;  // VeederRoot
+var lin,line,xfechor:string;
+    xtan,xcant,xent,xval,xnum:integer;
+    xFechaHora,
+    xFechaHoraI,
+    xFechaHoraEnt:TDateTime;
+begin
+  with DMCONS do begin
+    try
+      if LineaProc='' then
+        exit;
+      lin:=LineaProc;
+      DespliegaMemo1(lin);
+      if (copy(Lin,1,4)='i201') then begin // INVANTARIO TANQUES
+        xtan:=StrToIntDef(copy(lin,5,2),0);
+        if (xtan in [1..NumTanques]) then with TTanques[xtan] do begin
+          if TTanques[xtan].Estado='I' then begin
+            // Cambia Estado  a activo
+            Estado:='A';
+            T_Ctan.Insert;
+            T_CtanFecha.AsDateTime:=Q_CvolFecha.AsDateTime;
+            T_CtanCorte.AsInteger:=Q_CvolCorte.AsInteger;
+            T_CtanTanque.AsInteger:=xtan;
+            T_CtanCombustible.AsInteger:=Combustible;
+            T_CtanNuevoEstado.AsString:=Estado;
+            T_Ctan.Post;
+          end;
+          Estatus:=copy(lin,20,4);
+          VolumenAnterior:=Volumen;
+          Volumen:=IeeeToFloat(copy(lin,26,8));
+          VolumenAgua:=IeeeToFloat(copy(lin,74,8));
+          PorLlenar:=IeeeToFloat(copy(lin,42,8));
+          Temperatura:=IeeeToFloat(copy(lin,66,8));
+          VolumenDisponible:=Volumen-VolumenAgua;
+          VolumenUtil:=Volumen-VolumenFondaje;
+          Capacidad:=Volumen+PorLlenar;
+          SwLevantado:=true;
+          DespliegaTanque(xtan);
+          if (not SwEmular)and(not SwConsulta) then begin
+            xfechor:='20'+copy(lin,7,10);
+            xFechaHora:=StrToFechaHora(xfechor);
+            if SwFechaHoraTM then begin
+              SwFechaHoraTM:=false;
+              UltimaFechaHoraTM:=xFechaHora;
+            end
+            else if abs(xfechahora-UltimaFechaHoraTM)<=1 then begin
+              UltimaFechaHoraTM:=xFechaHora;
+              if abs(xfechahora-UltimaFechaHoraTM)>2*tmMinuto then begin
+                //** UltimaFechaHora:=xfechahora;
+                //** FechaHoraToSystem(UltimaFechaHora);
+              end;
+            end;
+          end;
+        end;
+      end
+      else if copy(Lin,1,4)='i202' then begin // ENTRADAS AL TANQUES
+        Memo2.Clear;
+        xtan:=StrToIntDef(copy(lin,5,2),0);
+        Memo2.Lines.Add('Tanque '+inttostr(xtan));
+        if (xtan in [1..NumTanques]) then with TTanques[xtan] do begin
+          xCant:=StrToInt(copy(lin,20,2));
+          Memo2.Lines.Add('Cant '+inttostr(xcant));
+          delete(lin,1,21);
+          for xent:=1 to xCant do begin
+            line:=copy(lin,1,102);
+            xfechahoraini:=copy(line,1,10);
+            xfechahorafin:=copy(line,11,10);
+            xnum:=hextoint(copy(line,21,2));
+            xFechaHoraI:=StrToFechaHora('20'+xfechahoraini);
+            xFechaHoraEnt:=StrToFechaHora('20'+xfechahorafin);
+            Memo2.Lines.Add('Fecha-Hora '+'20'+xfechahorafin);
+            if abs(xfechahoraent-xfechahorai)<2 then begin
+              if (xfechaHoraEnt>=Trunc(Q_CvolFecha.AsDateTime))or(CheckBox1.Checked) then begin
+                Memo2.Lines.Add('Entra...');
+                T_Etan.Active:=true;
+                try
+                  Memo2.Lines.Add('Valida si existe...'+inttostr(xtan)+' '+xFechaHoraFin);
+                  if not LocalizaTabla(T_Etan,'Tanque;FechaHoraDisp',VarArrayOf([xtan,xFechaHoraFin])) then begin
+                    Memo2.Lines.Add('No esta registrada...');
+                    delete(line,1,22);
+                    for xval:=1 to 8 do begin
+                      if (length(line)>=8) then begin
+                        xvalores[xval]:=IeeeToFloat(copy(line,1,8));
+                        delete(line,1,8);
+                      end
+                      else xvalores[xval]:=0;
+                    end;
+                    Q_Cvol.Active:=false;Q_Cvol.Active:=true;
+                    if not Q_Cvol.IsEmpty then with TTanques[xtan] do begin
+                      T_Etan.Insert;
+                      if (xfechaHoraEnt>=Trunc(Q_CvolFecha.AsDateTime)) then begin
+                        T_EtanFecha.AsDateTime:=Q_CvolFecha.AsDateTime;
+                        T_EtanCorte.AsInteger:=Q_CvolCorte.AsInteger;
+                      end
+                      else begin
+                        T_EtanFecha.AsDateTime:=trunc(xfechaHoraEnt);
+                        if copy(xfechahorafin,7,4)<='0400' then
+                          T_EtanCorte.AsInteger:=1
+                        else if copy(xfechahorafin,7,4)<='0800' then
+                          T_EtanCorte.AsInteger:=2
+                        else if copy(xfechahorafin,7,4)<='1200' then
+                          T_EtanCorte.AsInteger:=3
+                        else if copy(xfechahorafin,7,4)<='1600' then
+                          T_EtanCorte.AsInteger:=4
+                        else if copy(xfechahorafin,7,4)<='2000' then
+                          T_EtanCorte.AsInteger:=5
+                        else
+                          T_EtanCorte.AsInteger:=6;
+                      end;
+                      T_EtanTanque.AsInteger:=xtan;
+                      T_EtanCombustible.AsInteger:=Combustible;
+                      T_EtanVolumenInicial.AsFloat:=AjustaFloat(xValores[1],3);
+                      T_EtanVolumenFinal.AsFloat:=AjustaFloat(xValores[5],3);
+                      T_EtanVolumenRecepcion.AsFloat:=AjustaFloat(T_EtanVolumenFinal.AsFloat-T_EtanVolumenInicial.AsFloat,3);
+                      T_EtanTemperatura.AsFloat:=AjustaFloat(xValores[8],3);
+                      T_EtanFechaHoraDisp.AsString:=xFechaHoraFin;
+                      T_EtanFechaHoraInicial.AsDateTime:=StrToFechaHora('20'+xFechaHoraIni);
+                      T_EtanFechaHoraFinal.AsDateTime:=StrToFechaHora('20'+xFechaHoraFin);
+                      Memo2.Lines.Add('Vol Recep '+FormatoMoneda(T_EtanVolumenRecepcion.AsFloat));
+                      if (T_EtanVolumenRecepcion.AsFloat>=1)and(T_EtanVolumenRecepcion.AsFloat<100000) then begin
+                        T_Etan.Post;
+                        Memo2.Lines.Add('Registro exitoso');
+                        T_Etan.Refresh;
+                        if T_Etan.Locate('Tanque;FechaHoraDisp',VarArrayOf([xtan,xFechaHoraFin]),[]) then begin
+                          DMCONS.SP_Calcula_Ventas_Etan.ParamByName('P_FOLIO').AsInteger:=T_EtanFolio.AsInteger;
+                          DMCONS.SP_Calcula_Ventas_Etan.ExecProc;
+                        end;
+                      end
+                      else begin
+                        T_Etan.Cancel;
+                        Memo2.Lines.Add('Registro erroneo');
+                      end;
+                    end;
+                  end
+                  else
+                    Memo2.Lines.Add('Entrada ya existe..');
+                except
+                  T_Etan.Active:=false;
+                end;
+              end;
+            end;
+            delete(lin,1,22+xnum*8);
+          end;
+        end;
+      end
+      else if (copy(lin,1,8)='9999FF1B')and(NumPaso=1) then with TTanques[TanqueActual] do begin
+        if Estado='A' then begin
+          // Cambia Estado a inactivo
+          Estado:='I';
+          T_Ctan.Insert;
+          T_CtanFecha.AsDateTime:=Q_CvolFecha.AsDateTime;
+          T_CtanCorte.AsInteger:=Q_CvolCorte.AsInteger;
+          T_CtanTanque.AsInteger:=TanqueActual;
+          T_CtanCombustible.AsInteger:=Combustible;
+          T_CtanNuevoEstado.AsString:=Estado;
+          T_Ctan.Post;
+        end;
+      end;
+    except
+      if (T_Ctan.State=dsInsert)or(T_Ctan.State=dsEdit) then
+        T_Ctan.Cancel;
+      if (T_Etan.State=dsInsert)or(T_Etan.State=dsEdit) then
+        T_Etan.Cancel;
+    end;
+  end;
+end;
+
+procedure TFTANMENU.ProcesaLinea2;  // EecoSystems
+var lin,line,xfechor:string;
+    xtan,xcant,xent:integer;
+    xFechaHora,
+    xFechaHoraEnt:TDateTime;
+begin
+  with DMCONS do begin
+    try
+      if LineaProc='' then
+        exit;
+      lin:=LineaProc;
+      DespliegaMemo1(lin);
+      if (copy(Lin,1,3)='E97') then begin // INVANTARIO TANQUES
+        xtan:=StrToIntDef(copy(lin,4,1),0);
+        if (xtan in [1..NumTanques]) then with TTanques[xtan] do begin
+          if TTanques[xtan].Estado='I' then begin
+            // Cambia Estado  a activo
+            Estado:='A';
+            T_Ctan.Insert;
+            T_CtanFecha.AsDateTime:=Q_CvolFecha.AsDateTime;
+            T_CtanCorte.AsInteger:=Q_CvolCorte.AsInteger;
+            T_CtanTanque.AsInteger:=xtan;
+            T_CtanCombustible.AsInteger:=Combustible;
+            T_CtanNuevoEstado.AsString:=Estado;
+            T_Ctan.Post;
+          end;
+          VolumenAnterior:=Volumen;
+          Volumen:=StrToFloat(limpiastr(copy(lin,17,12)));
+          VolumenAgua:=StrToFloat(limpiastr(copy(lin,65,12)));
+          PorLlenar:=StrToFloat(limpiastr(copy(lin,53,12)));
+          Temperatura:=StrToFloat(limpiastr(copy(lin,41,12)));
+          VolumenDisponible:=Volumen-VolumenAgua;
+          VolumenUtil:=Volumen-VolumenFondaje;
+          Capacidad:=Volumen+PorLlenar;
+          SwLevantado:=true;
+          DespliegaTanque(xtan);
+        end;
+      end
+      else if copy(Lin,1,2)='10' then begin // fecha y hora
+        if (not SwEmular)and(not SwConsulta) then begin
+          xfechor:='20'+IntToClaveNum(GetAnoFromFecha(date),2)+copy(lin,4,8);
+          xFechaHora:=StrToFechaHora(xfechor);
+          if xFechaHora>(date+1) then begin
+            xfechor:='20'+IntToClaveNum(GetAnoFromFecha(date)-1,2)+copy(lin,4,8);
+            xFechaHora:=StrToFechaHora(xfechor);
+          end;
+          if SwFechaHoraTM then begin
+            SwFechaHoraTM:=false;
+            UltimaFechaHoraTM:=xFechaHora;
+          end
+          else if abs(xfechahora-UltimaFechaHoraTM)<=1 then begin
+            UltimaFechaHoraTM:=xFechaHora;
+          end;
+        end;
+      end
+      else if copy(Lin,1,2)='15' then begin // ENTRADAS AL TANQUES
+        xtan:=StrToIntDef(copy(lin,3,1),0);
+        if (xtan in [1..NumTanques]) then with TTanques[xtan] do begin
+          xCant:=StrToInt(copy(lin,6,2));
+          delete(lin,1,7);
+          for xent:=1 to xCant do begin
+            line:=copy(lin,1,38);
+            xfechahoraini:=IntToClaveNum(GetAnoFromFecha(date),2)+copy(line,1,8);
+            xfechahorafin:=IntToClaveNum(GetAnoFromFecha(date),2)+copy(line,20,8);
+            xFechaHoraEnt:=StrToFechaHora('20'+xfechahorafin);
+            if xFechaHoraEnt>(date+1) then begin
+              xfechahoraini:=IntToClaveNum(GetAnoFromFecha(date)-1,2)+copy(line,1,8);
+              xfechahorafin:=IntToClaveNum(GetAnoFromFecha(date)-1,2)+copy(line,20,8);
+              xFechaHoraEnt:=StrToFechaHora('20'+xfechahorafin);
+            end;
+            if (xfechaHoraEnt>=Trunc(Q_CvolFecha.AsDateTime)) then begin
+              T_Etan.Active:=true;
+              try
+                if not T_Etan.Locate('Tanque;FechaHoraDisp',VarArrayOf([xtan,xFechaHoraFin]),[]) then begin
+                  Q_Cvol.Active:=false;Q_Cvol.Active:=true;
+                  if not Q_Cvol.IsEmpty then with TTanques[xtan] do begin
+                    T_Etan.Insert;
+                    T_EtanFecha.AsDateTime:=Q_CvolFecha.AsDateTime;
+                    T_EtanCorte.AsInteger:=Q_CvolCorte.AsInteger;
+                    T_EtanTanque.AsInteger:=xtan;
+                    T_EtanCombustible.AsInteger:=Combustible;
+                    T_EtanVolumenInicial.AsFloat:=StrToFloat(copy(lin,9,6));
+                    T_EtanVolumenFinal.AsFloat:=StrToFloat(copy(lin,28,6));
+                    T_EtanVolumenRecepcion.AsFloat:=AjustaFloat(T_EtanVolumenFinal.AsFloat-T_EtanVolumenInicial.AsFloat,3);
+                    T_EtanTemperatura.AsFloat:=StrToFloat(copy(lin,34,5))/10;
+                    T_EtanFechaHoraDisp.AsString:=xFechaHoraFin;
+                    T_EtanFechaHoraInicial.AsDateTime:=StrToFechaHora('20'+xFechaHoraIni);
+                    T_EtanFechaHoraFinal.AsDateTime:=StrToFechaHora('20'+xFechaHoraFin);
+                    if (T_EtanVolumenRecepcion.AsFloat>=1)and(T_EtanVolumenRecepcion.AsFloat<100000) then begin
+                      T_Etan.Post;
+                      T_Etan.Refresh;
+                      if T_Etan.Locate('Tanque;FechaHoraDisp',VarArrayOf([xtan,xFechaHoraFin]),[]) then begin
+                        DMCONS.SP_Calcula_Ventas_Etan.ParamByName('P_FOLIO').AsInteger:=T_EtanFolio.AsInteger;
+                        DMCONS.SP_Calcula_Ventas_Etan.ExecProc;
+                      end;
+                    end
+                    else
+                      T_Etan.Cancel;
+                  end;
+                end;
+              except
+                T_Etan.Active:=false;
+              end;
+            end;
+            delete(lin,1,38);
+          end;
+        end;
+      end
+      else if (pos('?',lin)>0)and(NumPaso=1) then with TTanques[TanqueActual] do begin
+        if Estado='A' then begin
+          // Cambia Estado a inactivo
+          Estado:='I';
+          T_Ctan.Insert;
+          T_CtanFecha.AsDateTime:=Q_CvolFecha.AsDateTime;
+          T_CtanCorte.AsInteger:=Q_CvolCorte.AsInteger;
+          T_CtanTanque.AsInteger:=TanqueActual;
+          T_CtanCombustible.AsInteger:=Combustible;
+          T_CtanNuevoEstado.AsString:=Estado;
+          T_Ctan.Post;
+        end;
+      end;
+    except
+      if (T_Ctan.State=dsInsert)or(T_Ctan.State=dsEdit) then
+        T_Ctan.Cancel;
+      if (T_Etan.State=dsInsert)or(T_Etan.State=dsEdit) then
+        T_Etan.Cancel;
+    end;
+  end;
+end;
+
+procedure TFTANMENU.ProcesaLinea3;  // AutoStik
+var lin,line,xfechor:string;
+    xtan,xcant,xent,i:integer;
+    xFechaHora,
+    xFechaHoraEnt:TDateTime;
+    AlturaAgua:Real;
+begin
+  with DMCONS do begin
+    try
+      if LineaProc='' then
+        exit;
+      lin:=LineaProc;
+      DespliegaMemo1(lin);
+      if (copy(Lin,1,2)='10') then begin // INVANTARIO TANQUES
+        xtan:=StrToIntDef(copy(lin,3,1),0);
+        if (xtan in [1..NumTanques]) then with TTanques[xtan] do begin
+          if TTanques[xtan].Estado='I' then begin
+            // Cambia Estado  a activo
+            Estado:='A';
+            T_Ctan.Insert;
+            T_CtanFecha.AsDateTime:=Q_CvolFecha.AsDateTime;
+            T_CtanCorte.AsInteger:=Q_CvolCorte.AsInteger;
+            T_CtanTanque.AsInteger:=xtan;
+            T_CtanCombustible.AsInteger:=Combustible;
+            T_CtanNuevoEstado.AsString:=Estado;
+            T_Ctan.Post;
+          end;
+          VolumenAnterior:=Volumen;
+          Volumen:=StrToFloat(limpiastr(copy(lin,26,6)));
+          PorLlenar:=StrToFloat(limpiastr(copy(lin,37,6)));
+          Temperatura:=StrToFloat(limpiastr(copy(lin,33,4)))/100;
+          AlturaAgua:=StrToFloat(limpiastr(copy(lin,43,3)))/100;
+          if AutostikEnGalones='Si' then begin
+            Volumen:=Volumen*LitrosXGalon;
+            PorLlenar:=PorLlenar*LitrosXGalon;
+          end;
+          if Altura>1 then
+            VolumenAgua:=CalculaAgua(Volumen+PorLlenar,Altura,AlturaAgua)
+          else
+            VolumenAgua:=0;
+          VolumenDisponible:=Volumen-VolumenAgua;
+          VolumenUtil:=Volumen-VolumenFondaje;
+          Capacidad:=Volumen+PorLlenar;
+          SwLevantado:=true;
+          DespliegaTanque(xtan);
+          if (not SwEmular)and(not SwConsulta) then begin
+            xfechor:='20'+IntToClaveNum(GetAnoFromFecha(date),2)+copy(lin,4,8);
+            xFechaHora:=StrToFechaHora(xfechor);
+            if xFechaHora>(date+1) then begin
+              xfechor:='20'+IntToClaveNum(GetAnoFromFecha(date)-1,2)+copy(lin,4,8);
+              xFechaHora:=StrToFechaHora(xfechor);
+            end;
+          end;
+        end;
+      end
+      else if copy(Lin,1,2)='15' then begin // ENTRADAS AL TANQUES
+        xtan:=StrToIntDef(copy(lin,3,1),0);
+        if (xtan in [1..NumTanques]) then with TTanques[xtan] do begin
+          xCant:=StrToInt(copy(lin,6,2));
+          delete(lin,1,7);
+          for xent:=1 to xCant do begin
+            line:=copy(lin,1,38);
+            for i:=1 to 8 do if not(line[i] in ['0'..'9']) then
+              line[i]:='0';
+            for i:=20 to 27 do if not(line[i] in ['0'..'9']) then
+              line[i]:='0';
+            xfechahoraini:=IntToClaveNum(GetAnoFromFecha(date),2)+copy(line,1,8);
+            xfechahorafin:=IntToClaveNum(GetAnoFromFecha(date),2)+copy(line,20,8);
+            xFechaHoraEnt:=StrToFechaHora('20'+xfechahorafin);
+            if xFechaHoraEnt>(date+1) then begin
+              xfechahoraini:=IntToClaveNum(GetAnoFromFecha(date)-1,2)+copy(line,1,8);
+              xfechahorafin:=IntToClaveNum(GetAnoFromFecha(date)-1,2)+copy(line,20,8);
+              xFechaHoraEnt:=StrToFechaHora('20'+xfechahorafin);
+            end;
+            if (xfechaHoraEnt>=Trunc(Q_CvolFecha.AsDateTime))or(CheckBox1.Checked) then begin
+              T_Etan.Active:=true;
+              try
+                if not T_Etan.Locate('Tanque;FechaHoraDisp',VarArrayOf([xtan,xFechaHoraFin]),[]) then begin
+                  Q_Cvol.Active:=false;Q_Cvol.Active:=true;
+                  if not Q_Cvol.IsEmpty then with TTanques[xtan] do begin
+                    T_Etan.Insert;
+                    T_EtanFecha.AsDateTime:=Q_CvolFecha.AsDateTime;
+                    T_EtanCorte.AsInteger:=Q_CvolCorte.AsInteger;
+                    T_EtanTanque.AsInteger:=xtan;
+                    T_EtanCombustible.AsInteger:=Combustible;
+                    T_EtanVolumenInicial.AsFloat:=StrToFloat(copy(lin,9,6));
+                    T_EtanVolumenFinal.AsFloat:=StrToFloat(copy(lin,28,6));
+                    if AutostikEnGalones='Si' then begin
+                      T_EtanVolumenInicial.AsFloat:=T_EtanVolumenInicial.AsFloat*LitrosXGalon;
+                      T_EtanVolumenFinal.AsFloat:=T_EtanVolumenFinal.AsFloat*LitrosXGalon;
+                    end;
+                    T_EtanVolumenRecepcion.AsFloat:=AjustaFloat(T_EtanVolumenFinal.AsFloat-T_EtanVolumenInicial.AsFloat,3);
+                    T_EtanTemperatura.AsFloat:=StrToFloat(copy(lin,35,4))/100;
+                    T_EtanFechaHoraDisp.AsString:=xFechaHoraFin;
+                    T_EtanFechaHoraInicial.AsDateTime:=StrToFechaHora('20'+xFechaHoraIni);
+                    T_EtanFechaHoraFinal.AsDateTime:=StrToFechaHora('20'+xFechaHoraFin);
+                    if (T_EtanVolumenRecepcion.AsFloat>=1)and(T_EtanVolumenRecepcion.AsFloat<100000) then begin
+                      T_Etan.Post;
+                      T_Etan.Refresh;
+                      if T_Etan.Locate('Tanque;FechaHoraDisp',VarArrayOf([xtan,xFechaHoraFin]),[]) then begin
+                        DMCONS.SP_Calcula_Ventas_Etan.ParamByName('P_FOLIO').AsInteger:=T_EtanFolio.AsInteger;
+                        DMCONS.SP_Calcula_Ventas_Etan.ExecProc;
+                      end;
+                    end
+                    else
+                      T_Etan.Cancel;
+                  end;
+                end;
+              except
+                T_Etan.Active:=false;
+              end;
+            end;
+            delete(lin,1,38);
+          end;
+        end;
+      end
+      else if (pos('?',lin)>0)and(NumPaso=1) then with TTanques[TanqueActual] do begin
+        if Estado='A' then begin
+          // Cambia Estado a inactivo
+          Estado:='I';
+          T_Ctan.Insert;
+          T_CtanFecha.AsDateTime:=Q_CvolFecha.AsDateTime;
+          T_CtanCorte.AsInteger:=Q_CvolCorte.AsInteger;
+          T_CtanTanque.AsInteger:=TanqueActual;
+          T_CtanCombustible.AsInteger:=Combustible;
+          T_CtanNuevoEstado.AsString:=Estado;
+          T_Ctan.Post;
+        end;
+      end;
+    except
+      if (T_Ctan.State=dsInsert)or(T_Ctan.State=dsEdit) then
+        T_Ctan.Cancel;
+      if (T_Etan.State=dsInsert)or(T_Etan.State=dsEdit) then
+        T_Etan.Cancel;
+    end;
+  end;
+end;
+
+procedure TFTANMENU.ProcesaLinea4;  // Red Jacket
+var lin,line,xfechor:string;
+    xtan,xcant,xent,xval,xnum:integer;
+    xFechaHora,
+    xFechaHoraEnt:TDateTime;
+begin
+  with DMCONS do begin
+    try
+      if LineaProc='' then
+        exit;
+      lin:=LineaProc;
+      DespliegaMemo1(lin);
+      if (copy(Lin,1,4)='i201') then begin // INVANTARIO TANQUES
+        xtan:=StrToIntDef(copy(lin,5,2),0);
+        if (xtan in [1..NumTanques]) then with TTanques[xtan] do begin
+          if TTanques[xtan].Estado='I' then begin
+            // Cambia Estado  a activo
+            Estado:='A';
+            T_Ctan.Insert;
+            T_CtanFecha.AsDateTime:=Q_CvolFecha.AsDateTime;
+            T_CtanCorte.AsInteger:=Q_CvolCorte.AsInteger;
+            T_CtanTanque.AsInteger:=xtan;
+            T_CtanCombustible.AsInteger:=Combustible;
+            T_CtanNuevoEstado.AsString:=Estado;
+            T_Ctan.Post;
+          end;
+          Estatus:=copy(lin,20,4);
+          VolumenAnterior:=Volumen;
+          Volumen:=IeeeToFloat(copy(lin,26,8));
+          VolumenAgua:=IeeeToFloat(copy(lin,74,8));
+          PorLlenar:=IeeeToFloat(copy(lin,42,8));
+          Temperatura:=IeeeToFloat(copy(lin,66,8));
+          VolumenDisponible:=Volumen-VolumenAgua;
+          VolumenUtil:=Volumen-VolumenFondaje;
+          Capacidad:=Volumen+PorLlenar;
+          SwLevantado:=true;
+          DespliegaTanque(xtan);
+          if (not SwEmular)and(not SwConsulta) then begin
+            xfechor:='20'+copy(lin,7,10);
+            xFechaHora:=StrToFechaHora(xfechor);
+            if SwFechaHoraTM then begin
+              SwFechaHoraTM:=false;
+              UltimaFechaHoraTM:=xFechaHora;
+            end
+            else if abs(xfechahora-UltimaFechaHoraTM)<=1 then begin
+              UltimaFechaHoraTM:=xFechaHora;
+              if abs(xfechahora-UltimaFechaHoraTM)>2*tmMinuto then begin
+                //** UltimaFechaHora:=xfechahora;
+                //** FechaHoraToSystem(UltimaFechaHora);
+              end;
+            end;
+          end;
+        end;
+      end
+      else if copy(Lin,1,4)='i202' then begin // ENTRADAS AL TANQUES
+        xtan:=StrToIntDef(copy(lin,5,2),0);
+        if (xtan in [1..NumTanques]) then with TTanques[xtan] do begin
+          xCant:=StrToInt(copy(lin,20,2));
+          delete(lin,1,21);
+          for xent:=1 to xCant do begin
+            line:=copy(lin,1,102);
+            xfechahoraini:=copy(line,1,10);
+            xfechahorafin:=copy(line,11,10);
+            xnum:=hextoint(copy(line,21,2));
+            xFechaHoraEnt:=StrToFechaHora('20'+xfechahorafin);
+            if (xfechaHoraEnt>=Trunc(Q_CvolFecha.AsDateTime)) then begin
+              T_Etan.Active:=true;
+              try
+                if not T_Etan.Locate('Tanque;FechaHoraDisp',VarArrayOf([xtan,xFechaHoraFin]),[]) then begin
+                  delete(line,1,22);
+                  for xval:=1 to 8 do begin
+                    if (length(line)>=8) then begin
+                      xvalores[xval]:=IeeeToFloat(copy(line,1,8));
+                      delete(line,1,8);
+                    end
+                    else xvalores[xval]:=0;
+                  end;
+                  Q_Cvol.Active:=false;Q_Cvol.Active:=true;
+                  if not Q_Cvol.IsEmpty then with TTanques[xtan] do begin
+                    T_Etan.Insert;
+                    T_EtanFecha.AsDateTime:=Q_CvolFecha.AsDateTime;
+                    T_EtanCorte.AsInteger:=Q_CvolCorte.AsInteger;
+                    T_EtanTanque.AsInteger:=xtan;
+                    T_EtanCombustible.AsInteger:=Combustible;
+                    T_EtanVolumenInicial.AsFloat:=AjustaFloat(xValores[1],3);
+                    T_EtanVolumenFinal.AsFloat:=AjustaFloat(xValores[5],3);
+                    T_EtanVolumenRecepcion.AsFloat:=AjustaFloat(T_EtanVolumenFinal.AsFloat-T_EtanVolumenInicial.AsFloat,3);
+                    T_EtanTemperatura.AsFloat:=AjustaFloat(xValores[8],3);
+                    T_EtanFechaHoraDisp.AsString:=xFechaHoraFin;
+                    T_EtanFechaHoraInicial.AsDateTime:=StrToFechaHora('20'+xFechaHoraIni);
+                    T_EtanFechaHoraFinal.AsDateTime:=StrToFechaHora('20'+xFechaHoraFin);
+                    if (T_EtanVolumenRecepcion.AsFloat>=1)and(T_EtanVolumenRecepcion.AsFloat<100000) then begin
+                      T_Etan.Post;
+                      T_Etan.Refresh;
+                      if T_Etan.Locate('Tanque;FechaHoraDisp',VarArrayOf([xtan,xFechaHoraFin]),[]) then begin
+                        DMCONS.SP_Calcula_Ventas_Etan.ParamByName('P_FOLIO').AsInteger:=T_EtanFolio.AsInteger;
+                        DMCONS.SP_Calcula_Ventas_Etan.ExecProc;
+                      end;
+                    end
+                    else begin
+                      T_Etan.Cancel;
+                    end;
+                  end;
+                end;
+              except
+                T_Etan.Active:=false;
+              end;
+            end;
+            delete(lin,1,22+xnum*8);
+          end;
+        end;
+      end
+      else if (copy(lin,1,8)='9999FF1B')and(NumPaso=1) then with TTanques[TanqueActual] do begin
+        if Estado='A' then begin
+          // Cambia Estado a inactivo
+          Estado:='I';
+          T_Ctan.Insert;
+          T_CtanFecha.AsDateTime:=Q_CvolFecha.AsDateTime;
+          T_CtanCorte.AsInteger:=Q_CvolCorte.AsInteger;
+          T_CtanTanque.AsInteger:=TanqueActual;
+          T_CtanCombustible.AsInteger:=Combustible;
+          T_CtanNuevoEstado.AsString:=Estado;
+          T_Ctan.Post;
+        end;
+      end;
+    except
+      if (T_Ctan.State=dsInsert)or(T_Ctan.State=dsEdit) then
+        T_Ctan.Cancel;
+      if (T_Etan.State=dsInsert)or(T_Etan.State=dsEdit) then
+        T_Etan.Cancel;
+    end;
+  end;
+end;
+
+procedure TFTANMENU.ProcesaLineaConsulta;
+var lin:string;
+    xtan:integer;
+begin
+  with DMCONS do begin
+    if LineaProc='' then
+      exit;
+    lin:=LineaProc;
+    DespliegaMemo1(lin);
+    if (copy(Lin,1,4)='i201')or(NumPaso=1) then begin // INVANTARIO TANQUES
+      xtan:=StrToIntDef(copy(lin,5,2),0);
+      if (xtan in [1..NumTanques]) then with TTanques[xtan] do begin
+        if T_Cvolt.Locate('Tanque',xtan,[]) then begin
+          VolumenAnterior:=Volumen;
+          Volumen:=T_CvoltVolumen.AsFloat;
+          VolumenAgua:=T_CvoltVolumenAgua.AsFloat;
+          PorLlenar:=T_CvoltPorLlenar.AsFloat;
+          Temperatura:=T_CvoltTemperatura.AsFloat;
+          VolumenDisponible:=Volumen-VolumenAgua;
+          VolumenUtil:=Volumen-VolumenFondaje;
+          Capacidad:=Volumen+PorLlenar;
+          DespliegaTanque(xtan);
+        end;
+      end;
+    end
+    else if copy(Lin,1,4)='i202' then begin // ENTRADAS AL TANQUES
+    end
+    else if (copy(lin,1,8)='9999FF1B')and(NumPaso=1) then with TTanques[TanqueActual] do begin
+    end;
+  end;
+end;
+
+procedure TFTANMENU.ComandoConsola(ss:string);
+var s1:string;
+begin
+  try
+    StaticText1.Caption:='Paso: '+inttostr(NumPaso)+'   Tanque: '+inttostr(TanqueActual)+'    '+inttostr(contrec);
+    if SwConsulta then begin
+      LineaProc:=ss;
+      ProcesaLineaConsulta;
+      exit;
+    end;
+    if DMCONS.SwEmular then begin
+      LineaEmular:=ss;
+      DMCONS.AgregaLog('E '+ss);
+      inc(ContRec);
+      exit;
+    end;
+    inc(ContadorAlarma);
+    inc(ContadorAlarma2);
+    Timer1.Enabled:=false;
+    try
+      s1:=idSOH+ss;
+      DespliegaMemo1(s1);
+      if ApdComPort1.OutBuffFree >= Length(S1) then begin
+        DMCONS.AgregaLog('E '+s1);
+        inc(ContRec);
+        ApdComPort1.PutString(s1);
+      end;
+    finally
+      if NumPaso=2 then
+        Timer1.Interval:=3000
+      else
+        Timer1.Interval:=1000;
+      Timer1.Enabled:=true;
+    end;
+  except
+  end;
+end;
+
+procedure TFTANMENU.DespliegaTanque(xtan:integer);
+var num:integer;
+begin
+  try
+    with TTanques[xtan] do begin
+      Porciento:=dividefloat(VolumenDisponible,Capacidad)*100;
+      num:=Trunc(Porciento/5+0.5);
+      TvrMatrix(FindComponent('vrMatrix'+IntToStr(xtan))).Text:=' TANQUE '+IntToStr(xtan)+ ' CAP. '+FormatoNumero(Capacidad,7,0)+' Lts';
+      TAbTank(FindComponent('AbTank'+IntToStr(xtan))).Value:=porciento;
+      if NombreComb[1]='M' then
+        TAbTank(FindComponent('AbTank'+IntToStr(xtan))).TankSettings.Color:=clLime
+      else if NombreComb[1]='P' then
+        TAbTank(FindComponent('AbTank'+IntToStr(xtan))).TankSettings.Color:=clRed
+      else if NombreComb[1]='D' then
+        TAbTank(FindComponent('AbTank'+IntToStr(xtan))).TankSettings.Color:=clYellow;
+      TvrThermoMeter(FindComponent('vrThermoMeter'+IntToStr(xtan))).Scale.Min:=0;
+      TvrThermoMeter(FindComponent('vrThermoMeter'+IntToStr(xtan))).Scale.Max:=50;
+      TvrThermoMeter(FindComponent('vrThermoMeter'+IntToStr(xtan))).Caption:=FormatoNumero(Temperatura,6,2)+' °C';
+      TvrThermoMeter(FindComponent('vrThermoMeter'+IntToStr(xtan))).Value.Value:=Temperatura;
+      TvrThermoMeter(FindComponent('vrThermoMeter'+IntToStr(xtan))).Refresh;
+      TvrLabel(FindComponent('VrLabelNom'+IntToStr(xtan))).Caption:=NombreComb;
+      if not swactivo then
+        TvrLabel(FindComponent('VrLabelNom'+IntToStr(xtan))).Caption:='Inactivo';
+      TvrLabel(FindComponent('vrLabelNom'+IntToStr(xtan))).Refresh;
+      TAbTank(FindComponent('AbTank'+IntToStr(xtan))).Value:=porciento;
+      TNumericEditor(FindComponent('NumericEditor1_'+IntToStr(xtan))).Text:=FormatFloat('#,##0.00',VolumenFondaje);
+      TNumericEditor(FindComponent('NumericEditor2_'+IntToStr(xtan))).Text:=FormatFloat('#,##0.00',Volumen);
+      TNumericEditor(FindComponent('NumericEditor3_'+IntToStr(xtan))).Text:=FormatFloat('#,##0.00',PorLlenar);
+      TNumericEditor(FindComponent('NumericEditor4_'+IntToStr(xtan))).Text:=FormatFloat('#,##0.00',VolumenAgua);
+      TNumericEditor(FindComponent('NumericEditor5_'+IntToStr(xtan))).Text:=FormatFloat('#,##0.00',VolumenDisponible);
+      TNumericEditor(FindComponent('NumericEditor6_'+IntToStr(xtan))).Text:=FormatFloat('#,##0.00',VolumenUtil);
+      if (not SwConsulta)and(SwActivo) then begin
+        if SwLevantado then begin
+          if (abs(Volumen-VolumenAnterior)>=0.01)or(SwCorte)or(SwTiempo) then with DMCONS do begin
+            SwTiempo:=false;
+            Q_Cvol.Active:=false;Q_Cvol.Active:=true;
+            if not Q_Cvol.IsEmpty then begin
+              try
+                T_Cvolt.Active:=true;
+                if not T_Cvolt.Locate('Tanque',xTan,[]) then begin
+                  T_Cvolt.Insert;
+                  T_CvoltFecha.AsDateTime:=Q_CvolFecha.AsDateTime;
+                  T_CvoltCorte.AsInteger:=Q_CvolCorte.AsInteger;
+                  T_CvoltTanque.AsInteger:=xtan;
+                end
+                else T_Cvolt.Edit;
+                T_CvoltFechaHora.AsDateTime:=Now;
+                T_CvoltCombustible.AsInteger:=Combustible;
+                T_CvoltVolumen.AsFloat:=AjustaFloat(Volumen,2);
+                T_CvoltPorLlenar.AsFloat:=AjustaFloat(PorLlenar,2);
+                T_CvoltNivel.AsFloat:=AjustaFloat(Altura,3);
+                T_CvoltVolumenAgua.AsFloat:=AjustaFloat(VolumenAgua,3);
+                T_CvoltTemperatura.AsFloat:=AjustaFloat(Temperatura,2);
+                T_CvoltVolumenFondaje.AsFloat:=AjustaFloat(VolumenFondaje,3);
+                T_Cvolt.Post;
+              except
+                T_Cvolt.Active:=false;
+                T_Cvolt.Active:=true;
+              end;
+            end;
+          end;
+        end;
+      end
+      else with DMCONS do begin
+        Q_Cvol.Active:=false;
+        Q_Cvol.Active:=true;
+      end;
+    end;
+  except
+    with DMCONS do if (T_Cvolt.State=dsInsert)or(T_Cvolt.State=dsEdit) then
+      T_Cvolt.Cancel;
+  end;
+end;
+
+procedure TFTANMENU.IniciaBaseDeDatos;
+var swok:boolean;
+begin
+  with DMCONS do begin
+    Screen.Cursor:=crHourGlass;
+    try
+      ConectaBaseDatos;
+      if not SwEmular then begin
+        if not LicenciaValida2(T_EmprIbRazonSocial.asstring,'CVOL','3.1','Abierta',lcLicencia,1,lcLicTemporal,lcLicVence) then
+          raise Exception.Create('Licencia del sistema no válida: '+lcLicencia);
+      end;
+      if (not swemular)and(not Swconsulta) then begin
+        ApdComPort1.Open:=false;
+        ApdComPort1.ComNumber:=ptPuerto;
+        ApdComPort1.Baud:=ptBaudios;
+        case ptParidad[1] of
+          'N':ApdComPort1.Parity:=pNone;
+          'E':ApdComPort1.Parity:=pEven;
+          'O':ApdComPort1.Parity:=pOdd;
+        end;
+        ApdComPort1.DataBits:=ptBitsDatos;
+        ApdComPort1.StopBits:=ptBitsParada;
+        ApdComPort1.Open:=true;
+      end;
+      if not SwConsulta then begin
+        CalculaFechasCorte;
+        CorteInicial:=Q_CvolCorte.AsInteger;
+        StaticText2.Caption:='Próximo Corte: '+FechaHoraToStr(FechaSiguienteCorte);
+      end;
+    finally
+      Screen.Cursor:=crDefault;
+    end;
+  end;
+end;
+
+procedure TFTANMENU.IniciaEstacion;
+var i,xtan:integer;
+begin
+  with DMCONS do begin
+    NumTanques:=0;
+    for i:=1 to MaxTanques do with TTanques[i] do begin
+      Combustible:=0;
+      Altura:=0;
+      Capacidad:=0;
+      VolumenFondaje:=0;
+      VolumenAnterior:=0;
+      Volumen:=0;
+      VolumenAgua:=0;
+      Temperatura:=0;
+      SwLevantado:=false;
+      SwTiempo:=false;
+    end;
+    T_Tanq.Active:=true;
+    Q_CombIb.Active:=true;
+    while not T_Tanq.Eof do begin
+      try
+        xtan:=T_TanqTanque.AsInteger;
+        if xtan in [1..MaxTanques] then with TTanques[xtan] do begin
+          NumTanques:=xtan;
+          Combustible:=T_TanqCombustible.asinteger;
+          NombreComb:=T_TanqNombreComb.AsString;
+          Capacidad:=T_TanqCapacidad.AsFloat;
+          VolumenFondaje:=T_TanqVolumenFondaje.AsFloat;
+          Altura:=T_TanqAltura.AsFloat;
+          Estado:=UltimoEstadoTanque(xtan);
+          Estatus:='';
+          SwActivo:=T_TanqActivo.AsString='Si';
+          DespliegaTanque(xtan);
+        end;
+      except
+      end;
+      T_Tanq.Next;
+    end;
+  end;
+  xtan:=NumTanques+1;
+  if (NumTanques>=7) then
+    dxNavBar1Item4.Visible:=true;
+  if (NumTanques>=5) then
+    dxNavBar1Item3.Visible:=true;
+  if (NumTanques>=3) then
+    dxNavBar1Item2.Visible:=true;
+  if (NumTanques>=1) then
+    dxNavBar1Item1.Visible:=true;
+  while xtan<=MaxTanques do begin
+    TPanel(FindComponent('PanelA'+IntToStr(xtan))).Visible:=false;
+    inc(xtan);
+  end;
+end;
+
+procedure TFTANMENU.FormShow(Sender: TObject);
+var xfec:string;
+begin
+  if SwInicio then with DMCONS do begin
+    SwEmular:=false;
+    SiguienteFechaHoraTurno:=now;
+    SiguienteFechaHoraCmnd:=now;
+    //Memo1.Lines.Add('Inicio 01');
+    AliasConsolaEsts:=ParamStr(1);
+    SwEmular:=StrMayuscIguales(Paramstr(2),'Emular');
+    SwConsulta:=StrMayuscIguales(Paramstr(2),'Consulta');
+    CicloEnt:=0;
+    DMCONS.ModuloActual:='TANQ';  // Logs
+    SwInicio:=false;
+    SwCorte:=false;
+    ErrorInic:=true;
+    IniciaBaseDeDatos;
+    IniciaEstacion;
+    if (not SwEmular)and(not swconsulta) then
+      PlanMDog_Ver31_INTERBASE(DMCONS.lcSerie);
+    TanqueActual:=1;
+    NumPaso:=0;
+    if SwConsulta then
+      Timer1.Interval:=2000;
+      (*
+    if DMCONS.T_EstsIbTIPOTANQUES.AsInteger=4 then
+      Timer1.Interval:=3000;
+      *)
+    Timer1.Enabled:=true;
+    Timer3.Enabled:=SwEmular;
+    VrTimer1.Enabled:=(not SwConsulta);
+    if DMCONS.SwEmular then
+      Label4x.Visible:=true;
+    ErrorInic:=false;
+  end;
+end;
+
+procedure TFTANMENU.FormCreate(Sender: TObject);
+begin
+  SwCerrar:=false;
+  SwAux:=false;
+  ContadorAlarma:=0;
+  ContadorAlarma2:=0;
+  TiempoCorteAntes:=0;
+  SwInicio:=true;
+  SwConsulta:=false;
+  ContErroresCom:=0;
+  FechaHoraExec:=now;
+  FechaTimer1:=now;
+  ContRec:=0;
+  StaticText5.Caption:='Ejecutando desde: '+FechaHoraToStr(FechaHoraExec);
+  ContValCorte:=0;
+end;
+
+procedure TFTANMENU.FormActivate(Sender: TObject);
+begin
+  if ErrorInic then begin
+    DMCONS.DBGasCon.Connected:=false;
+    Application.Terminate;
+  end;
+end;
+
+function CheckSumVeederRoot(Cadena:string):boolean;
+var i,bin1,bin2:integer;
+    ss1,ss2:string;
+begin
+  ss1:=copy(Cadena,1,length(Cadena)-4);
+  ss2:=copy(Cadena,length(Cadena)-3,4);
+
+  // Calcula cadena
+  bin1:=1;
+  for i:=1 to length(ss1) do
+    bin1:=bin1+ord(ss1[i]);
+
+  // Cacula checksum
+  bin2:=BinaryToInt(HexLongToBinary(ss2));
+
+  // calcula sumatoria
+  result:=IntToBinary(bin1+bin2,16)='0000000000000000';
+end;
+
+procedure TFTANMENU.ApdComPort1TriggerAvail(CP: TObject; Count: Word);
+var I:Word;
+    C:Char;
+begin
+  Timer1.Enabled:=false;
+  try
+    ContadorAlarma:=0;
+    try
+      case DMCONS.T_EstsIbTIPOTANQUES.AsInteger of
+        1:begin // VeederRoot
+            for I := 1 to Count do begin
+              C:=ApdComPort1.GetChar;
+              case c of
+                idSOH:begin
+                        LineaBuff:='';
+                      end;
+                idETX:begin
+                        LineaProc:=LineaBuff; // 815 7562 Y 566833
+                        if CheckSumVeederRoot(LineaProc) then begin
+                          ContadorAlarma2:=0;
+                          DMCONS.AgregaLog('R '+LineaProc);
+                          ContRec:=0;
+                          ProcesaLinea1;
+                        end
+                        else begin
+                          inc(conterrorescom);
+                          StaticText4.Caption:='Errores de Comunicación: '+inttostr(conterrorescom);
+                        end;
+                      end;
+                else LineaBuff:=LineaBuff+C;
+              end;
+            end;
+          end;
+        2:begin // EecoSystems
+            for I := 1 to Count do begin
+              C:=ApdComPort1.GetChar;
+              case c of
+                idSOH:begin
+                        LineaBuff:='';
+                      end;
+                idETX:begin
+                        LineaProc:=LineaBuff;
+                        ContadorAlarma2:=0;
+                        DMCONS.AgregaLog('R '+LineaProc);
+                        ContRec:=0;
+                        ProcesaLinea2;
+                      end;
+                else LineaBuff:=LineaBuff+C;
+              end;
+            end;
+          end;
+        3:begin // AutoStik
+            for I := 1 to Count do begin
+              C:=ApdComPort1.GetChar;
+              case c of
+                idSOH:begin
+                        LineaBuff:='';
+                      end;
+                idETX:begin
+                        LineaProc:=LineaBuff;
+                        ContadorAlarma2:=0;
+                        DMCONS.AgregaLog('R '+LineaProc);
+                        ContRec:=0;
+                        ProcesaLinea3;
+                      end;
+                else LineaBuff:=LineaBuff+C;
+              end;
+            end;
+          end;
+        4:begin // Red Jacket
+            for I := 1 to Count do begin
+              C:=ApdComPort1.GetChar;
+              case c of
+                idSOH:begin
+                        LineaBuff:='';
+                      end;
+                idETX:begin
+                        LineaProc:=LineaBuff; // 815 7562 Y 566833
+                        if CheckSumVeederRoot(LineaProc) then begin
+                          ContadorAlarma2:=0;
+                          DMCONS.AgregaLog('R '+LineaProc);
+                          ContRec:=0;
+                          ProcesaLinea1;
+                        end
+                        else begin
+                          inc(conterrorescom);
+                          StaticText4.Caption:='Errores de Comunicación: '+inttostr(conterrorescom);
+                        end;
+                      end;
+                else LineaBuff:=LineaBuff+C;
+              end;
+            end;
+          end;
+      end;
+    except
+    end;
+  finally
+    Timer1.Enabled:=true;
+  end;
+end;
+
+procedure TFTANMENU.Timer1Timer(Sender: TObject);
+var i:integer;
+begin
+  try
+    ContAux:=1;
+    FechaTimer1:=Now;
+    ValidaCorte;
+    if (ContadorAlarma>=10)or(ContadorAlarma2>=10)or(SwAux) then begin
+      StaticText3.Caption:='Error de Comunicación';
+      if not StaticText3.Visible then
+        Beep;
+      StaticText3.Visible:=not StaticText3.Visible;
+    end
+    else StaticText3.Visible:=false;
+    ContAux:=2;
+    lee_registro;
+    ContAux:=3;
+    if (Now-DMCONS.FechaHoraRefLog)>tmMinuto then
+      DMCONS.RefrescaConexion;
+    ContAux:=4;
+    if NumPaso=0 then begin   // Solo en el 1er ciclo de reloj
+      TanqueActual:=0;
+      NumPaso:=1;
+    end;
+    ContAux:=5;
+    if NumPaso=1 then begin
+      if TanqueActual<NumTanques then with DMCONS do begin
+        inc(TanqueActual);
+        T_Tanq.Active;
+        if T_Tanq.Locate('Tanque',TanqueActual,[]) then
+          if T_TanqActivo.AsString='Si' then
+            case DMCONS.T_EstsIbTIPOTANQUES.AsInteger of
+              1:ComandoConsola(DMCONS.CodigoSeguridadVeederRoot+'i201'+inttoclavenum(TanqueActual,2)); // VeederRoot
+              2:ComandoConsola('E97'+inttostr(TanqueActual));  // EecoSystems
+              3:ComandoConsola('10'+inttostr(TanqueActual));  // AutoStik
+              4:ComandoConsola(DMCONS.CodigoSeguridadVeederRoot+'i201'+inttoclavenum(TanqueActual,2)); // Red Jacket
+            end;
+      end
+      else begin
+        if CicloEnt=0 then begin
+          inc(CicloEnt);
+          NumPaso:=2;
+          TanqueActual:=0;
+        end
+        else begin
+          TanqueActual:=0;
+          inc(CicloEnt);
+          if CicloEnt>=10 then
+            CicloEnt:=0;
+        end;
+      end;
+    end;
+    ContAux:=6;
+    if NumPaso=2 then begin
+      for i:=1 to NumTanques do
+        TTanques[i].SwTiempo:=true;
+      SwCorte:=false;
+      if TanqueActual<NumTanques then with DMCONS do begin
+        inc(TanqueActual);
+        T_Tanq.Active;
+        if T_Tanq.Locate('Tanque',TanqueActual,[]) then
+          if T_TanqActivo.AsString='Si' then
+            case DMCONS.T_EstsIbTIPOTANQUES.AsInteger of
+              1:ComandoConsola(DMCONS.CodigoSeguridadVeederRoot+'i202'+inttoclavenum(TanqueActual,2)); // VeederRoot
+              2:begin   // EecoSystems
+                  if sweeco then
+                    ComandoConsola('15'+inttostr(TanqueActual))
+                  else
+                    ComandoConsola('10'+inttostr(TanqueActual));
+                end;
+              3:begin   // AutoStik
+                  ComandoConsola('15'+inttostr(TanqueActual));
+                end;
+              4:ComandoConsola(DMCONS.CodigoSeguridadVeederRoot+'i202'+inttoclavenum(TanqueActual,2)); // Red Jacket
+            end;
+      end
+      else begin
+        NumPaso:=1;
+        TanqueActual:=0;
+        SwEeco:=not SwEeco;
+      end;
+    end;
+    ContAux:=7;
+    if RxTrayIcon1.Tag=0 then begin   // Solo en el 1er ciclo de reloj
+      RxTrayIcon1.Tag:=1;
+      if not SwConsulta then begin
+        FTanMenu.Visible:=false;
+        RxTrayIcon1.Show;
+      end;
+    end;
+  except
+  end;
+end;
+
+procedure TFTANMENU.Restaurar1Click(Sender: TObject);
+begin
+  FTanMenu.Visible:=true;
+end;
+
+procedure TFTANMENU.BitBtn3Click(Sender: TObject);
+begin
+  FTanMenu.Visible:=false;
+  RxTrayIcon1.Show;
+end;
+
+procedure TFTANMENU.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+  if SwCerrar then begin
+    CanClose:=true;
+  end
+  else if (not SwConsulta)and(not DMCONS.SwEmular) then begin
+    canClose:=False;
+  end
+  else canClose:=True
+end;
+
+procedure TFTANMENU.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  if not SwConsulta then
+    ApdComPort1.Open:=false;
+end;
+
+procedure TFTANMENU.Timer3Timer(Sender: TObject);
+var lin:string;
+begin
+  ValidaCorte;
+  Timer1.Enabled:=false;
+  try
+    if LineaEmular<>'' then begin
+      Lin:=LineaEmular;
+      LineaEmular:='';
+      case DMCONS.T_EstsIbTIPOTANQUES.AsInteger of
+        1:begin // VeederRoot
+            if copy(lin,1,6)='i20101' then begin
+              lineaproc:='i2010105060408450110000074722B9B6471FD3DA4765B44B44B004530000000041ECCD1800000000&&EEB8';
+            end
+            else if copy(lin,1,6)='i20102' then begin
+              lineaproc:='i201020506040845022000007463BE3C8463893F147402E0E444C70210000000041EA16E400000000&&EEE1';
+            end
+            else if copy(lin,1,6)='i20103' then begin
+              lineaproc:='i201030506040846033000007461D5F8B461A79AE46ECB63B4459371C0000000041F0FF3C00000000&&EE80';
+            end
+            else if copy(lin,1,6)='i20201' then begin
+              lineaproc:='i20201080723120101210'+
+                         '080722231708072223430A453079C3452D667B000000004204421F46B265D046AFD3390000000041FBB14C43611FB744746619'+
+                         '080721101808072110420A45D7A07145D3F5C30000000042052E5446CF9CF946CC3DFE0000000042038B1043CFCBEA4489148E'+
+                         '080718134208071814060A46B52D6446B20AF9000000004206D0724727F59A47251750000000004206016244773D2144CAC54A'+
+                         '080717120508071712270A468CD057468A81E2000000004203CA6C4714076C47116D43000000004207899F444D24D844B5E0EE'+
+                         '080716182908071618520A45DF325D45DB69670000000042054A7046D19FBB46CE319D000000004203AA4743D4D1F2448A191F'+
+                         '080714141208071414340A46AA625746A7A25500000000420286CC4722E35947201432000000004206C087446C1E7344C56179'+
+                         '080712182408071218460A46B1F44346AF344000000000420101884726111F4723861A00000000420082A04473F17C44C8C133'+
+                         '080712090108071209230A4645C4294642560B000000004206AA6946FCCBEF46F8FB670000000041FEC8B4441F0499449FDDE7'+
+                         '080709162608070916480A46C88BBE46C53455000000004204D9CB47312BA8472DDF9A00000000420B179444857E1344D4CB20'+
+                         '080708185608070819200A468453C046822B2400000000420318B1470F2DF1470CBD6A000000004205B6134444106644B0E72F&&24CA';
+            end
+            else
+              lineaproc:=lin;
+            if CheckSumVeederRoot(LineaProc) then begin
+              ContadorAlarma2:=0;
+              DMCONS.AgregaLog('R '+LineaProc);
+              ContRec:=0;
+              ProcesaLinea1;
+            end
+            else begin
+              //inc(ContadorAlarma2);
+              inc(conterrorescom);
+              StaticText4.Caption:='Errores de Comunicación: '+inttostr(conterrorescom);
+            end;
+          end;
+        2:begin // EecoSystem
+            if copy(lin,1,3)='E97' then begin
+              if TanqueActual=1 then
+                lineaproc:='E971239.45      47558.52    47208.52    24.56       12473.62    0.00        0.00        F176'
+                //lineaproc:='101020216201101D110017738033340002300266920009F6E9'
+              else
+                lineaproc:='E972187.12      27217.98    26987.84    23.21       13603.45    0.00        0.00        F175';
+                //lineaproc:='102020216281102M110009908011885002550289360009F6C2';
+            end
+            else if copy(lin,1,2)='15' then begin
+              lineaproc:='1511D10'+
+                         '02030936022606002570203095404284200223'+
+                         '01261918031320002570126193405172600251'+
+                         '01201239041754002550120125806142100252'+
+                         '01191413025477002530119143104576400255'+
+                         '011514380290600025001151500049430002480112154503174300247'+
+                         '011216050521690024501080913040920002470108093106179300236'+
+                         '010609220381780025501060939056889002420105160702139800260'+
+                         '010516260413960025312311303026534002621231132304691600251'+
+                         '9B305';
+            end
+            else
+              lineaproc:=lin;
+            ContadorAlarma2:=0;
+            DMCONS.AgregaLog('R '+LineaProc);
+            ContRec:=0;
+            ProcesaLinea2;
+          end;
+        3:begin //AutoStik
+            if copy(lin,1,2)='10' then begin
+              if TanqueActual=1 then
+                lineaproc:='101020216201101D110017738033340002300266920009F6E9'
+              else
+                lineaproc:='102020216281102M110009908011885002550289360009F6C2';
+            end
+            else if copy(lin,1,2)='15' then begin
+              lineaproc:='1511006'+
+                         '01020949006888007650102101002699200598'+
+                         '12311037009944007441231104101126000735'+
+                         '12260937006400007111226095502644900531'+
+                         '12191048012599007121219110503255200639'+
+                         '12121133015051007171212115603502100638'+
+                         '120509540181350071912051014038100006449D124';
+              (*
+              lineaproc:='1511006'+
+                         '07261103025084-270007261131044958-2723'+
+                         '07280922031073-270507280950050858-2723'+
+                         '07300754034530-270407300818054463-2728'+
+                         '08021604021721-269508021626041555-2719'+
+                         '08041016027322-270108041038047162-2723'+
+                         '08101334010390-268608101358030274-2715'+
+                         '9D102';
+              lineaproc:='1511D10'+
+                         '02030936022606002570203095404284200223'+
+                         '01261918031320002570126193405172600251'+
+                         '01201239041754002550120125806142100252'+
+                         '01191413025477002530119143104576400255'+
+                         '011514380290600025001151500049430002480112154503174300247'+
+                         '011216050521690024501080913040920002470108093106179300236'+
+                         '010609220381780025501060939056889002420105160702139800260'+
+                         '010516260413960025312311303026534002621231132304691600251'+
+                         '9B305';
+                         *)
+
+            end
+            else
+              lineaproc:=lin;
+            ContadorAlarma2:=0;
+            DMCONS.AgregaLog('R '+LineaProc);
+            ContRec:=0;
+            ProcesaLinea3;
+          end;
+        4:begin // Red Jacket
+            if copy(lin,1,6)='i20101' then begin
+              lineaproc:='i2010105060408450110000074722B9B6471FD3DA4765B44B44B004530000000041ECCD1800000000&&EEB8';
+            end
+            else if copy(lin,1,6)='i20102' then begin
+              lineaproc:='i201020506040845022000007463BE3C8463893F147402E0E444C70210000000041EA16E400000000&&EEE1';
+            end
+            else if copy(lin,1,6)='i20103' then begin
+              lineaproc:='i201030506040846033000007461D5F8B461A79AE46ECB63B4459371C0000000041F0FF3C00000000&&EE80';
+            end
+            else if copy(lin,1,6)='i20201' then begin
+              lineaproc:='i20201080510130401110'+
+                         '080722231708072223430A453079C3452D667B000000004204421F46B265D046AFD3390000000041FBB14C43611FB744746619'+
+                         '080422063808042207210A46C8387946C5F9270000000041C36E3A4733949C4731D9C40000000041B9611E44CDD642452DED0E'+
+                         '080411113008041111550A46B5BD3946B3D8BE0000000041BEB8704729CAF1472817AB0000000041BBE91244BED6A44523645B'+
+                         '080329132808032913580A46C211E946C069FE0000000041B2694C4730630D472EBEEB0000000041B7389C44C8DD61452A564F'+
+                         '080324124108032413050A46525CFB465096C80000000041B079AC47032C8547023E110000000041A901BF447E115A45005D2B'+
+                         '080310080608031008290A467C96F1467A75E70000000041B1E8CF470E4AD7470E24FE000000004182A168449121CE4509CF53'+
+                         '080228080108022808230A4680DE10467F6DA90000000041B5A16A470F5002470EBC64000000004195D8D544934FDE450AB19E'+
+                         '080216121708021612450A467E4E00467C1DD20000000041B36F21470EE9D0470DF7920000000041A5ECE44491DC30450A577E'+
+                         '080131151508013115390A46B9BB2C46B84FD00000000041AC7FC4472C7075472B85C900000000419DEA9044C213B345261D72'+
+                         '080124080608012408330A467DC5BE467B77480000000041B66890470E3BB3470DC65E00000000419068F54491A2D04509C0C6&&2341';
+            end
+            else
+              lineaproc:=lin;
+            if CheckSumVeederRoot(LineaProc) then begin
+              ContadorAlarma2:=0;
+              DMCONS.AgregaLog('R '+LineaProc);
+              ContRec:=0;
+              ProcesaLinea4;
+            end
+            else begin
+              inc(conterrorescom);
+              StaticText4.Caption:='Errores de Comunicación: '+inttostr(conterrorescom);
+            end;
+          end;
+      end;
+    end;
+  finally
+    Timer1.Enabled:=true;
+  end;
+end;
+
+procedure TFTANMENU.VerTrfico1Click(Sender: TObject);
+begin
+  Memo1.Visible:=true;
+  Memo2.Visible:=true;
+  SpeedButton1.Visible:=true;
+end;
+
+procedure TFTANMENU.OcultarTrfico1Click(Sender: TObject);
+begin
+  Memo1.Visible:=false;
+  Memo2.Visible:=false;
+  SpeedButton1.Visible:=false;
+end;
+
+procedure TFTANMENU.lee_registro;
+var
+  Registry: TRegistry;
+  estado:integer;
+begin
+  try
+    Registry := TRegistry.Create(KEY_READ);
+    try
+      Registry.RootKey := HKEY_LOCAL_MACHINE;
+      if Registry.OpenKey('\SOFTWARE\IMAGEN\VOL\TANQ', True) then
+         Estado:=Registry.ReadInteger('Estado');
+      if Estado=1 then begin
+        Self.Visible:=true;
+        Self.WindowState:=wsMaximized;
+        Self.BringToFront;
+        registro(0,'Estado');
+      end;
+    finally
+      Registry.CloseKey;
+      Registry.Free;
+      registro(0,'Estado');
+    end;
+  except
+  end;
+end;
+
+procedure TFTANMENU.registro(valor:integer;variable:string);
+var
+  Registry: TRegistry;
+begin
+  try
+    Registry := TRegistry.Create(KEY_WRITE);
+    try
+      Registry.RootKey := HKEY_LOCAL_MACHINE;
+      if Registry.OpenKey('\SOFTWARE\IMAGEN\VOL\TANQ', True) then
+         Registry.WriteInteger(variable,Valor)
+    finally
+      Registry.CloseKey;
+      Registry.Free;
+    end;
+  except
+  end;
+end;
+
+
+procedure TFTANMENU.dxNavBar1Item1Click(Sender: TObject);
+begin
+   PageControl2.ActivePageIndex:=0;
+end;
+
+procedure TFTANMENU.dxNavBar1Item2Click(Sender: TObject);
+begin
+    PageControl2.ActivePageIndex:=1;
+end;
+
+procedure TFTANMENU.dxNavBar1Item3Click(Sender: TObject);
+begin
+  PageControl2.ActivePageIndex:=2;
+end;
+
+procedure TFTANMENU.dxNavBar1Item4Click(Sender: TObject);
+begin
+    PageControl2.ActivePageIndex:=3;
+end;
+
+
+procedure TFTANMENU.nombre_db;
+var sMaybeAlias : string;
+    DBPath      : string;
+    ParamList   : TStringList;
+begin
+  sMaybeAlias := ParamStr(1);
+  if Session.isAlias(sMaybeAlias) then
+  begin
+    ParamList := TStringList.Create;
+    try
+      Session.GetAliasParams(sMaybeAlias, ParamList);
+      DBPath := ParamList.Values['SERVER NAME'];
+    finally
+      ParamList.Free;
+    end;
+    ruta_db:=DBPath;
+  end
+  else ShowMessage(sMaybeAlias+' is not an alias!');
+end;
+
+
+procedure TFTANMENU.RxTrayIcon1DblClick(Sender: TObject);
+begin
+  FTanMenu.Visible:=true;
+end;
+
+procedure TFTANMENU.ReiniciaTanques;
+begin
+  if DMCONS.StLevanta='Si' then begin
+    try
+      DMCONS.DBGasCon.Connected:=false;
+      esperamiliseg(1000);
+      Application.Terminate;
+    finally
+      FechaTimer1:=now;
+    end;
+  end
+  else begin
+    ContRec:=0;
+    FechaTimer1:=now;
+    Self.Visible:=true;
+    Self.WindowState:=wsMaximized;
+    Self.BringToFront;
+    StaticText3.Caption:='Error en Monitor de Tanques';
+    StaticText3.Visible:=true;
+    Beep;
+  end;
+end;
+
+procedure TFTANMENU.ValidaCorte;
+var swreinicia:boolean;
+begin
+  with DMCONS do begin
+    inc(ContValCorte);
+    if ContValCorte>1000 then begin
+      ContValCorte:=0;
+      Swreinicia:=false;
+      Q_Cvol.Active:=false;Q_Cvol.Active:=true;
+      if not Q_Cvol.IsEmpty then begin
+        Q_Cvol.Last;
+        if (now-Q_CvolFechaHoraInicial.AsDateTime)>4.3/24 then
+          swreinicia:=true;
+      end
+      else Swreinicia:=true;
+      if Swreinicia then
+        ReiniciaTanques;
+    end;
+    ProgressBar1.Position:=ContValCorte;
+  end;
+end;
+
+procedure TFTANMENU.VrTimer1Timer(Sender: TObject);
+var xFecha:TDateTime;
+    lin,ss,rsp:string;
+    tiempo1,tiempo2,tiempo3:string;
+    CualCorte:String;
+    swcierraturno:boolean;
+    MinAjuste,CorteAnt:integer;
+    FechaCorteAnt:TDateTime;
+begin
+  ValidaCorte;
+  try
+    with DMCONS do begin
+      xFecha:=Now;
+      if (abs(xFecha-FechaTimer1)>20*tmMinuto)or(ContRec>80) then
+        ReiniciaTanques;
+      if abs(xFecha-UltimaFechaHora)>tmMinuto then begin
+        if abs(xFecha-UltimaFechaHora)>1.2*TmHora then begin
+          if not SwPermiteCambioFechaHora then
+            FechaHoraToSystem(UltimaFechaHora);
+        end;
+        SiguienteFechaHoraTurno:=now;
+        SiguienteFechaHoraCmnd:=now;
+      end;
+      UltimaFechaHora:=Now;
+      // Corte cada 4 horas
+      if (xFecha>=FechaSiguienteCorte)or(xFecha>=FechaSiguienteCorte2)or(xFecha-FechaUltimoCorte>(1/CortesPorDia)) then begin // checa si hay que hacer un corte
+        if (now-FechaHoraLog)>20*tmSegundo then begin
+          FechaCorteAnt:=Q_CvolFecha.AsDateTime;
+          CorteAnt:=Q_CvolCorte.AsInteger;
+          SP_Corte.ParamByName('P_Fecha').AsDateTime:=Date;
+          SP_Corte.ExecProc;
+          CalculaFechasCorte;
+          if (FechaCorteAnt=Q_CvolFecha.AsDateTime)and(CorteAnt=Q_CvolCorte.AsInteger) then begin
+            if (DMCONS.StLevanta='Si')and(CorteInicial<6) then begin
+              try
+                (*
+                DBGasCon.Connected:=false;
+                esperamiliseg(1000);
+                Application.Terminate;*)
+              finally
+                FechaTimer1:=now;
+              end;
+            end;
+          end;
+          StaticText2.Caption:='Próximo Corte: '+FechaHoraToStr(FechaSiguienteCorte);
+          SwCorte:=true;
+        end;
+      end;
+      // Corte de Turno
+      xfecha:=now;
+      if xFecha>=SiguienteFechaHoraTurno then with DMCONS do begin
+        Memo2.Clear;
+        SiguienteFechaHoraTurno:=now+tmMinuto;
+        swcierraturno:=false;
+        CalculaTurnoActual(Now); // FechaTurnoActual y TurnoActual
+        Memo2.Lines.Add(FechaToStr(FechaTurnoActual)+' '+inttostr(TurnoActual));
+        Memo2.Lines.Add(FechaHoraToStr(IniTurnoActual)+' '+FechaHoraToStr(FinTurnoActual));
+        if Q_Turn.IsEmpty then begin
+          swcierraturno:=true;
+        end
+        else begin
+          if (FechaToStr(FechaTurnoActual)+inttostr(TurnoActual)>FechaToStr(Q_TurnFecha.AsDateTime)+inttostr(Q_TurnTurno.AsInteger)) then
+            swcierraturno:=true
+          else if TurnoActual=0 then
+            swcierraturno:=true;
+        end;
+        if SwCierraTurno then begin
+          if not Q_Turn.IsEmpty then begin
+            Q_Auxi.Active:=false;
+            Q_Auxi.SQL.Clear;
+            Q_Auxi.SQL.Add('EXECUTE PROCEDURE TURN_REALIZA_CORTE');
+            Q_Auxi.ExecSQL;
+          end;
+          if TurnoActual>0 then begin
+            T_Turn.Active:=true;
+            try
+              T_Turn.Insert;
+              T_TurnFecha.AsDateTime:=FechaTurnoActual;
+              T_TurnTurno.AsInteger:=TurnoActual;
+              T_Turn.Post;
+            finally
+              T_Turn.Active:=false;
+            end;
+          end;
+        end;
+      end;
+      // CHECA COMANDOS
+      xfecha:=now;
+      if xFecha>=SiguienteFechaHoraCmnd then with DMCONS do begin
+        SiguienteFechaHoraCmnd:=now+3*tmSegundo;
+        Q_Cmnd.Active:=false;
+        Q_Cmnd.ParamByName('pmodulo').AsString:='TANQ';
+        Q_Cmnd.Active:=true;
+        while not Q_Cmnd.Eof do begin
+          rsp:='OK';
+          try
+            ss:=ExtraeElemStrSep(Q_CmndComando.AsString,1,' ');
+            // CMND: CERRAR CONSOLA
+            if ss='CERRAR' then begin
+              rsp:='OK';
+              SwCerrar:=true;
+            end
+            else if ss='CORTETURNO' then begin
+              if (now-HoraUltimoCorte)>=MinimoHorasCorte*TmHora then begin
+                CalculaTurnoActual(Now); // FechaTurnoActual y TurnoActual
+                if not Q_Turn.IsEmpty then begin
+                  if (xFecha>=IniTurnoActual)and((xFecha-IniTurnoActual)<FinTurnoActualMargenPos) then begin
+                    CualCorte:='Anterior';
+                  end
+                  else if (xFecha<IniTurnoActual)and((IniTurnoActual-xFecha)<FinTurnoActualMargenAnt) then begin
+                    CualCorte:='Anterior';
+                  end
+                  else if (xFecha<=FinTurnoActual)and((FinTurnoActual-xFecha)<FinTurnoActualMargenAnt) then begin
+                    CualCorte:='Actual';
+                    // Si se adelantó la apertura del siguiente turno:
+                    if (FechaToStr(FechaTurnoActual)+inttostr(TurnoActual)<FechaToStr(Q_TurnFecha.AsDateTime)+inttostr(Q_TurnTurno.AsInteger)) then begin
+                      CualCorte:='Anterior';
+                      FechaTurnoActual:=Q_TurnFecha.AsDateTime;
+                      TurnoActual:=Q_TurnTurno.AsInteger;
+                    end;
+                  end
+                  else if (xFecha>FinTurnoActual)and((xFecha-FinTurnoActual)<FinTurnoActualMargenPos) then begin
+                    CualCorte:='Actual';
+                    // Si se adelantó la apertura del siguiente turno:
+                    if (FechaToStr(FechaTurnoActual)+inttostr(TurnoActual)<FechaToStr(Q_TurnFecha.AsDateTime)+inttostr(Q_TurnTurno.AsInteger)) then begin
+                      CualCorte:='Anterior';
+                      FechaTurnoActual:=Q_TurnFecha.AsDateTime;
+                      TurnoActual:=Q_TurnTurno.AsInteger;
+                    end;
+                  end
+                  else
+                    CualCorte:='Ninguno';
+                end
+                else CualCorte:='Anterior';
+                if (CualCorte='Anterior')and(not Q_Turn.IsEmpty) then begin
+                   if abs(now-Q_TurnFECHAHORAINICIAL.AsFloat)>tmHora then begin
+                     CualCorte:='Actual';
+                     FechaTurnoActual:=Q_TurnFecha.AsDateTime;
+                     TurnoActual:=Q_TurnTurno.AsInteger;
+                     FinTurnoActual:=now;
+                   end;
+                end;
+                if CualCorte='Anterior' then begin
+                  // REABRE ANERIOR Y LO CIERRA
+                  Q_Auxi.Active:=false;
+                  Q_Auxi.SQL.Clear;
+                  Q_Auxi.SQL.Add('EXECUTE PROCEDURE TURN_REABRE_ANTERIOR');
+                  Q_Auxi.ExecSQL;
+
+                  Q_Auxi.Active:=false;
+                  Q_Auxi.SQL.Clear;
+                  Q_Auxi.SQL.Add('EXECUTE PROCEDURE TURN_REALIZA_CORTE');
+                  Q_Auxi.ExecSQL;
+                  HoraUltimoCorte:=now;
+                  if TurnoActual>0 then begin
+                    T_Turn.Active:=true;
+                    try
+                      T_Turn.Insert;
+                      T_TurnFecha.AsDateTime:=FechaTurnoActual;
+                      T_TurnTurno.AsInteger:=TurnoActual;
+                      T_Turn.Post;
+                    finally
+                      T_Turn.Active:=false;
+                    end;
+                  end;
+                end
+                else if CualCorte='Actual' then begin
+                  //CortaTurnoActual;
+                  Q_Auxi.Active:=false;
+                  Q_Auxi.SQL.Clear;
+                  Q_Auxi.SQL.Add('EXECUTE PROCEDURE TURN_REALIZA_CORTE');
+                  Q_Auxi.ExecSQL;
+                  HoraUltimoCorte:=now;
+                  if xFecha<FinTurnoActual then begin
+                    CalculaTurnoActual(FinTurnoActual+tmMinuto);
+                    if TurnoActual>0 then begin
+                      T_Turn.Active:=true;
+                      try
+                        T_Turn.Insert;
+                        T_TurnFecha.AsDateTime:=FechaTurnoActual;
+                        T_TurnTurno.AsInteger:=TurnoActual;
+                        T_Turn.Post;
+                      finally
+                        T_Turn.Active:=false;
+                      end;
+                    end;
+                  end;
+                end
+                else rsp:='ERROR: Corte fuera de horario';
+              end
+              else rsp:='No se puede realizar otro corte antes de '+inttostr(MinimoHorasCorte)+' horas';
+            end;
+          except
+            rsp:='ERROR: Problema Interno';
+          end;
+          try
+            T_Cmnd.Active:=true;
+            if T_Cmnd.Locate('Folio',Q_CmndFolio.AsInteger,[]) then begin
+              T_Cmnd.Edit;
+              T_CmndAplicado.AsString:='Si';
+              T_CmndResultado.AsString:=rsp;
+              T_Cmnd.Post;
+            end;
+          except
+          end;
+          if SwCerrar then
+            Close;
+          Q_Cmnd.Next;
+        end;
+      end;
+    end;
+  except
+    with DMCONS do begin
+      if (T_Turn.State=dsInsert)or(T_Turn.State=dsEdit) then
+        T_Turn.Cancel;
+      if (T_Cmnd.State=dsInsert)or(T_Cmnd.State=dsEdit) then
+        T_Cmnd.Cancel;
+    end;
+  end;
+end;
+
+procedure TFTANMENU.SpeedButton1Click(Sender: TObject);
+begin
+  Memo1.Lines.SaveToFile('\TraficoTanques.txt');
+end;
+
+procedure TFTANMENU.Button1Click(Sender: TObject);
+begin
+  DMCONS.ListaLog.SaveToFile('\ImagenCo\Log'+FiltraStrNum(FechaHoraToStr(Now))+'.Txt');
+end;
+
+procedure TFTANMENU.AbTank1DblClick(Sender: TObject);
+begin
+  swaux:=not swaux;
+end;
+
+procedure TFTANMENU.DespliegaMemo1(xstr:string);
+begin
+  while Memo1.Lines.Count>50 do
+    Memo1.Lines.Delete(0);
+  Memo1.Lines.Add(xstr);
+end;
+
+end.
