@@ -6,7 +6,7 @@ uses Variants,
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   Db, DBTables, ULibGral, uROClient, uROServer,
   uROIndyTCPServer, uROIndyHTTPServer, uROBinMessage, ADODB, SIBEABase,
-  SIBFIBEA, FIBDatabase, pFIBDatabase;
+  SIBFIBEA, FIBDatabase, pFIBDatabase, IdHash, IdHashMessageDigest;
 
 
 const MaxComb=9;
@@ -789,6 +789,7 @@ type
     procedure AplicarUltimosPrecios;
     procedure CalculaFechasCorte;
     function UltimoEstadoTanque(xtan:integer):string;
+    function HashMd5(const Valor: string): string;
     procedure ConectaAplicacion;
     procedure RefrescaConexion;
     procedure RegistraBitacora(xUsuario:integer;xOperacion:string;xObserva:TStrings);
@@ -2363,6 +2364,16 @@ begin
         DBGasCon.Connected:=false;
     end;
   except
+  end;
+end;
+
+function TDMCONS.HashMd5(const Valor: string): string;
+begin
+  with TIdHashMessageDigest5.Create do
+  try
+      Result := TIdHash128.AsHex(HashValue(valor));
+  finally
+      Free;
   end;
 end;
 
