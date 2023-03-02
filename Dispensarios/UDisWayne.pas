@@ -886,6 +886,8 @@ var lin,ss,rsp,descrsp,
     ximporte,xvolumen,
     xprecio,xprec,
     xvalor,ximpo,xvol           :real;
+    folioBit                    :integer;
+    fecha                       :TDateTime;
 begin
   try
     saux:=LineaTimer;
@@ -1260,6 +1262,29 @@ begin
                Q_AplicaPrecioF.ParamByName('pError').AsString:='Si';
                Q_AplicaPrecioF.ExecSQL;
              end;
+
+             Q_Auxi.Close;
+             Q_Auxi.SQL.Clear;
+             Q_AuxiEntero1.FieldKind:=fkInternalCalc;
+             Q_Auxi.SQL.Add('SELECT COALESCE(MAX(FOLIO),0)+1 AS ENTERO1 FROM DPVGBTCC');
+             Q_Auxi.Prepare;
+             Q_Auxi.Open;
+             folioBit:=Q_AuxiEntero1.AsInteger;
+
+             Q_Auxi.Close;
+             Q_Auxi.SQL.Clear;
+             Q_Auxi.SQL.Add('INSERT INTO DPVGBTCC (FECHAHORA, TIPOEVENTO, INFOEVENTO, VALORANTERIOR, VALORNUEVO, HASH) '+
+                            'VALUES (:FECHAHORA, :TIPOEVENTO, :INFOEVENTO, :VALORANTERIOR, :VALORNUEVO, :HASH)');
+             fecha:=Now;
+             Q_Auxi.ParamByName('FECHAHORA').AsString:=FormatDateTime('mm/dd/yyyy hh:mm:ss',fecha);
+             Q_Auxi.ParamByName('TIPOEVENTO').AsString:='CMBP';
+             Q_Auxi.ParamByName('INFOEVENTO').AsString:='Producto: '+TabComb[PrecioCambioProc].Nombre;
+             Q_Auxi.ParamByName('VALORANTERIOR').AsString:=FormatoMoneda(TabComb[PrecioCambioProc].PrecioAnt);
+             Q_Auxi.ParamByName('VALORNUEVO').AsString:=FormatoMoneda(TabComb[PrecioCambioProc].PrecioNuevo);
+             Q_Auxi.ParamByName('HASH').AsString:=LowerCase(HashMd5(IntToStr(folioBit)+'|'+FormatDateTime('mm/dd/yyyy hh:mm:ss',fecha)+'|CMBP|Producto: '+TabComb[PrecioCambioProc].Nombre+'|'
+                                                         +FormatoMoneda(TabComb[PrecioCambioProc].PrecioAnt)+'|'+FormatoMoneda(TabComb[PrecioCambioProc].PrecioNuevo)));
+             Q_Auxi.ExecSQL;
+
              TabComb[PrecioCambioProc].SwLeePrecioFisico:=true;
              PrecioCambioProc:=0;
            end

@@ -2128,7 +2128,8 @@ begin
 end;
 
 procedure TFDISHONGJANG.Timer2Timer(Sender: TObject);
-var i:integer;
+var i,folioBit:integer;
+    fecha:TDateTime;
 begin
   try
     if ContadorAlarma>=10 then begin
@@ -2156,6 +2157,28 @@ begin
           Q_AplicaPrecioF.ParamByName('pCombustible').AsInteger:=i;
           Q_AplicaPrecioF.ParamByName('pError').AsString:='No';
           Q_AplicaPrecioF.ExecSQL;                                  // cambia estatus del precio a aplicado
+
+          Q_Auxi.Close;
+          Q_Auxi.SQL.Clear;
+          Q_AuxiEntero1.FieldKind:=fkInternalCalc;
+          Q_Auxi.SQL.Add('SELECT COALESCE(MAX(FOLIO),0)+1 AS ENTERO1 FROM DPVGBTCC');
+          Q_Auxi.Prepare;
+          Q_Auxi.Open;
+          folioBit:=Q_AuxiEntero1.AsInteger;
+
+          Q_Auxi.Close;
+          Q_Auxi.SQL.Clear;
+          Q_Auxi.SQL.Add('INSERT INTO DPVGBTCC (FECHAHORA, TIPOEVENTO, INFOEVENTO, VALORANTERIOR, VALORNUEVO, HASH) '+
+                         'VALUES (:FECHAHORA, :TIPOEVENTO, :INFOEVENTO, :VALORANTERIOR, :VALORNUEVO, :HASH)');
+          fecha:=Now;
+          Q_Auxi.ParamByName('FECHAHORA').AsString:=FormatDateTime('mm/dd/yyyy hh:mm:ss',fecha);
+          Q_Auxi.ParamByName('TIPOEVENTO').AsString:='CMBP';
+          Q_Auxi.ParamByName('INFOEVENTO').AsString:='Producto: '+TabComb[i].Nombre;
+          Q_Auxi.ParamByName('VALORANTERIOR').AsString:=FormatoMoneda(TabComb[i].PrecioAnt);
+          Q_Auxi.ParamByName('VALORNUEVO').AsString:=FormatoMoneda(TabComb[i].PrecioNuevo);
+          Q_Auxi.ParamByName('HASH').AsString:=LowerCase(HashMd5(IntToStr(folioBit)+'|'+FormatDateTime('mm/dd/yyyy hh:mm:ss',fecha)+'|CMBP|Producto: '+TabComb[i].Nombre+'|'
+                                                      +FormatoMoneda(TabComb[i].PrecioAnt)+'|'+FormatoMoneda(TabComb[i].PrecioNuevo)));
+          Q_Auxi.ExecSQL;
         end;
         CargaPreciosFH(Now,true); // carga el ultimpo recio aplicado
         Q_CombIb.Active:=false;
