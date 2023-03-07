@@ -7,7 +7,7 @@ uses
   Dialogs, ComCtrls, StdCtrls, OoMisc, AdPort, ExtCtrls, Menus, RXShell,
   Buttons, Mask, DBCtrls, Grids, DBGrids, VrControls, VrAngularMeter,
   _GClass, AbTank, VrThermoMeter, VrLabel, VrCalendar, VrMatrix, VrEdit,
-  CellEditors, Registry, AbGradient, WinSkinData, WinSvc,
+  CellEditors, Registry, AbGradient, WinSkinData, WinSvc, DateUtils,
   dxNavBarBase, dxNavBarCollns, dxNavBar, vrLedClock, ImgList, DBTables,
   DB, dxmdaset, VrThreads, ULibGral, cxClasses, ComObj, CRCLibC_TLB,
   ScktComp;
@@ -256,6 +256,7 @@ type
     procedure CheckBox3Click(Sender: TObject);
     procedure Socket1Read(Sender: TObject; Socket: TCustomWinSocket);
     function ServicioCorriendo(sService: PChar): Boolean;
+    procedure SetFolioOG(tanque, xfolioOG: Integer);
   private
     { Private declarations }
     SwPetrovend,
@@ -300,6 +301,7 @@ type
     SwEsperaPv:boolean;
     SwTimer1:boolean;
     ContTimer1:integer;
+    folioOGGen:Integer;
     function CalculaAgua(VolTotal,Diametro,AlturaAgua:real):real;
   public
     { Public declarations }
@@ -353,6 +355,7 @@ type TipoTanque = record
 
        EstadoActivo     :boolean;
        FechaHoraActivo :TDateTime;
+       folioOG:Integer;
      end;
 
 var
@@ -463,7 +466,7 @@ end;
 
 procedure TFTANMENU.ProcesaLineaVeederRoot;
 var lin,line,xfechor,ss:string;
-    xtan,xcant,xent,xval,xnum,hh:integer;
+    xtan,xcant,xent,xval,xnum,hh,folioNuevo:integer;
     xFechaHora,
     xFechaHoraI,
     xFechaHoraEnt:TDateTime;
@@ -662,6 +665,15 @@ begin
             DMCONS.DBGASCON.Connected:=false;
           end;
         end;
+      end
+      else if copy(lin,1,1)='R' then begin
+        xtan:=StrToIntDef(copy(lin,2,2),0);
+        if folioOGGen<StrToInt64Def(Copy(lin,4,10),0) then begin
+          TTanques[xtan].folioOG:=StrToInt64Def(Copy(lin,4,10),0);
+          SetFolioOG(xtan,TTanques[xtan].folioOG);
+        end
+        else
+          ComandoConsolaSocket('R'+IntToClaveNum(xtan,2));
       end;
     except
     end;
@@ -2343,100 +2355,100 @@ begin
             T_Tanq.Active:=true;
             with TTanques[TanqueActual] do if T_Tanq.Locate('Tanque',TanqueActual,[]) then begin
               if T_TanqActivo.AsString='Si' then
-                case TipoTanques of
-                  1:begin
-                      ComandoConsola(DMCONS.CodigoSeguridadVeederRoot+'i202'+inttoclavenum(TanqueActual,2)); // VeederRoot
-                    end;
-                  2:begin   // EecoSystems
-                      if sweeco then
-                        ComandoConsola('15'+inttostr(TanqueActual))
-                      else
-                        ComandoConsola('10'+inttostr(TanqueActual));
-                    end;
-                  3:begin   // AutoStik
-                      if not swalarma then
-                        ComandoConsola('15'+inttostr(TanqueActual))
-                      else if DMCONS.AutostikAlarmas='Si' then
-                        ComandoConsola('14'+inttostr(TanqueActual));
-                      swalarma:=not swalarma;
-                    end;
-                  4:ComandoConsola(DMCONS.CodigoSeguridadVeederRoot+'i202'+inttoclavenum(TanqueActual,2)); // Red Jacket
-                  6:begin      // Incon
-                      ss:='1a'+inttoclavenum(TanqueActual,1)+'0';
-                      ss2:=CalculoCrc(ss);
-                      ss:=idSoh+ss+ss2+idEtx;
-                      ComandoConsola(ss);
-                    end;
-                  7:with DMCONS do begin // TEAM
-                      AdoQueryEnt.Active:=false;
-                      AdoQueryEnt.Active:=true;
-                      cont:=0;
-                      while (not AdoQueryEnt.Eof)and(cont<10) do begin
-                        if AdoQueryEntTanque.AsInteger=TanqueActual then with TTanques[TanqueActual] do begin
-                          xfec:=AdoQueryEntFecha_Fin.AsString;
-                          xhor:=AdoQueryEntHoraF.AsString;
-                          if xhor[10]='p' then begin
-                            hh:=strtointdef(copy(xhor,1,2),0);
-                            if hh<12 then
-                              hh:=hh+12;
-                            xhor:=inttoclavenum(hh,2)+copy(xhor,3,10);
-                          end;
-                          xFechaHoraFin:=copy(xfec,7,2)+copy(xfec,4,2)+copy(xfec,1,2)+copy(xhor,1,2)+copy(xhor,4,2);
-                          xfec:=AdoQueryEntFecha_Ini.AsString;
-                          xhor:=AdoQueryEntHoraI.AsString;
-                          if xhor[10]='p' then begin
-                            hh:=strtointdef(copy(xhor,1,2),0);
-                            if hh<12 then
-                              hh:=hh+12;
-                            xhor:=inttoclavenum(hh,2)+copy(xhor,3,10);
-                          end;
-                          xFechaHoraIni:=copy(xfec,7,2)+copy(xfec,4,2)+copy(xfec,1,2)+copy(xhor,1,2)+copy(xhor,4,2);
-                          xFechaHoraEnt:=StrToFechaHora('20'+xfechahorafin);
-                          if (xfechaHoraEnt>=Trunc(X_CvolFecha))or(CheckBox1.Checked) then begin
-                              T_Etan.Active:=true;
-                              if not T_Etan.Locate('Tanque;FechaHoraDisp',VarArrayOf([TanqueActual,xFechaHoraFin]),[]) then begin
-                                Q_Cvol.Active:=false;
-                                Q_Cvol.Active:=true;
-                                if not Q_Cvol.IsEmpty then with TTanques[TanqueActual] do begin
-                                  X_CvolFecha:=Q_CvolFecha.AsDateTime;
-                                  X_CvolCorte:=Q_CvolCorte.AsInteger;
-                                  T_Etan.Insert;
-                                  T_EtanFecha.AsDateTime:=Q_CvolFecha.AsDateTime;
-                                  T_EtanCorte.AsInteger:=Q_CvolCorte.AsInteger;
-                                  T_EtanTanque.AsInteger:=TanqueActual;
-                                  T_EtanCombustible.AsInteger:=Combustible;
-                                  T_EtanVolumenInicial.AsFloat:=AdoQueryEntVol_Bruto_Ini.AsFloat;
-                                  T_EtanVolumenFinal.AsFloat:=AdoQueryEntVol_Bruto_Fin.AsFloat;
-                                  T_EtanVolumenRecepcion.AsFloat:=AjustaFloat(T_EtanVolumenFinal.AsFloat-T_EtanVolumenInicial.AsFloat,3);
-                                  T_EtanTemperatura.AsFloat:=AdoQueryEntTemperatura_Fin.AsFloat;
-                                  T_EtanFechaHoraDisp.AsString:=xFechaHoraFin;
-                                  T_EtanFechaHoraInicial.AsDateTime:=StrToFechaHora('20'+xFechaHoraIni);
-                                  T_EtanFechaHoraFinal.AsDateTime:=StrToFechaHora('20'+xFechaHoraFin);
-                                  if (T_EtanVolumenRecepcion.AsFloat>=1)and(T_EtanVolumenRecepcion.AsFloat<100000) then begin
-                                    T_Etan.Post;
-                                    T_Etan.Refresh;
-                                    if T_Etan.Locate('Tanque;FechaHoraDisp',VarArrayOf([TanqueActual,xFechaHoraFin]),[]) then begin
-                                      DMCONS.SP_Calcula_Ventas_Etan.ParamByName('P_FOLIO').AsInteger:=T_EtanFolio.AsInteger;
-                                      DMCONS.SP_Calcula_Ventas_Etan.ExecProc;
-                                    end;
-                                    if DMCONS.GuardaLogEntradaTanques='Si' then
-                                      Button1.Click;
-                                    CheckBox3.Checked:=false;
-                                  end
-                                  else
-                                    T_Etan.Cancel;
-                                end;
-                              end;
-                          end;
+              case TipoTanques of
+                1:begin
+                    ComandoConsola(DMCONS.CodigoSeguridadVeederRoot+'i202'+inttoclavenum(TanqueActual,2)); // VeederRoot
+                  end;
+                2:begin   // EecoSystems
+                    if sweeco then
+                      ComandoConsola('15'+inttostr(TanqueActual))
+                    else
+                      ComandoConsola('10'+inttostr(TanqueActual));
+                  end;
+                3:begin   // AutoStik
+                    if not swalarma then
+                      ComandoConsola('15'+inttostr(TanqueActual))
+                    else if DMCONS.AutostikAlarmas='Si' then
+                      ComandoConsola('14'+inttostr(TanqueActual));
+                    swalarma:=not swalarma;
+                  end;
+                4:ComandoConsola(DMCONS.CodigoSeguridadVeederRoot+'i202'+inttoclavenum(TanqueActual,2)); // Red Jacket
+                6:begin      // Incon
+                    ss:='1a'+inttoclavenum(TanqueActual,1)+'0';
+                    ss2:=CalculoCrc(ss);
+                    ss:=idSoh+ss+ss2+idEtx;
+                    ComandoConsola(ss);
+                  end;
+                7:with DMCONS do begin // TEAM
+                    AdoQueryEnt.Active:=false;
+                    AdoQueryEnt.Active:=true;
+                    cont:=0;
+                    while (not AdoQueryEnt.Eof)and(cont<10) do begin
+                      if AdoQueryEntTanque.AsInteger=TanqueActual then with TTanques[TanqueActual] do begin
+                        xfec:=AdoQueryEntFecha_Fin.AsString;
+                        xhor:=AdoQueryEntHoraF.AsString;
+                        if xhor[10]='p' then begin
+                          hh:=strtointdef(copy(xhor,1,2),0);
+                          if hh<12 then
+                            hh:=hh+12;
+                          xhor:=inttoclavenum(hh,2)+copy(xhor,3,10);
                         end;
-                        inc(cont);
-                        AdoQueryEnt.Next;
+                        xFechaHoraFin:=copy(xfec,7,2)+copy(xfec,4,2)+copy(xfec,1,2)+copy(xhor,1,2)+copy(xhor,4,2);
+                        xfec:=AdoQueryEntFecha_Ini.AsString;
+                        xhor:=AdoQueryEntHoraI.AsString;
+                        if xhor[10]='p' then begin
+                          hh:=strtointdef(copy(xhor,1,2),0);
+                          if hh<12 then
+                            hh:=hh+12;
+                          xhor:=inttoclavenum(hh,2)+copy(xhor,3,10);
+                        end;
+                        xFechaHoraIni:=copy(xfec,7,2)+copy(xfec,4,2)+copy(xfec,1,2)+copy(xhor,1,2)+copy(xhor,4,2);
+                        xFechaHoraEnt:=StrToFechaHora('20'+xfechahorafin);
+                        if (xfechaHoraEnt>=Trunc(X_CvolFecha))or(CheckBox1.Checked) then begin
+                            T_Etan.Active:=true;
+                            if not T_Etan.Locate('Tanque;FechaHoraDisp',VarArrayOf([TanqueActual,xFechaHoraFin]),[]) then begin
+                              Q_Cvol.Active:=false;
+                              Q_Cvol.Active:=true;
+                              if not Q_Cvol.IsEmpty then with TTanques[TanqueActual] do begin
+                                X_CvolFecha:=Q_CvolFecha.AsDateTime;
+                                X_CvolCorte:=Q_CvolCorte.AsInteger;
+                                T_Etan.Insert;
+                                T_EtanFecha.AsDateTime:=Q_CvolFecha.AsDateTime;
+                                T_EtanCorte.AsInteger:=Q_CvolCorte.AsInteger;
+                                T_EtanTanque.AsInteger:=TanqueActual;
+                                T_EtanCombustible.AsInteger:=Combustible;
+                                T_EtanVolumenInicial.AsFloat:=AdoQueryEntVol_Bruto_Ini.AsFloat;
+                                T_EtanVolumenFinal.AsFloat:=AdoQueryEntVol_Bruto_Fin.AsFloat;
+                                T_EtanVolumenRecepcion.AsFloat:=AjustaFloat(T_EtanVolumenFinal.AsFloat-T_EtanVolumenInicial.AsFloat,3);
+                                T_EtanTemperatura.AsFloat:=AdoQueryEntTemperatura_Fin.AsFloat;
+                                T_EtanFechaHoraDisp.AsString:=xFechaHoraFin;
+                                T_EtanFechaHoraInicial.AsDateTime:=StrToFechaHora('20'+xFechaHoraIni);
+                                T_EtanFechaHoraFinal.AsDateTime:=StrToFechaHora('20'+xFechaHoraFin);
+                                if (T_EtanVolumenRecepcion.AsFloat>=1)and(T_EtanVolumenRecepcion.AsFloat<100000) then begin
+                                  T_Etan.Post;
+                                  T_Etan.Refresh;
+                                  if T_Etan.Locate('Tanque;FechaHoraDisp',VarArrayOf([TanqueActual,xFechaHoraFin]),[]) then begin
+                                    DMCONS.SP_Calcula_Ventas_Etan.ParamByName('P_FOLIO').AsInteger:=T_EtanFolio.AsInteger;
+                                    DMCONS.SP_Calcula_Ventas_Etan.ExecProc;
+                                  end;
+                                  if DMCONS.GuardaLogEntradaTanques='Si' then
+                                    Button1.Click;
+                                  CheckBox3.Checked:=false;
+                                end
+                                else
+                                  T_Etan.Cancel;
+                              end;
+                            end;
+                        end;
                       end;
+                      inc(cont);
+                      AdoQueryEnt.Next;
                     end;
-                  8:begin
-                      ComandoConsolaSocket(DMCONS.CodigoSeguridadVeederRoot+'i202'+inttoclavenum(TanqueActual,2)); // Gateway
-                    end;
-                end;
+                  end;
+                8:begin
+                    ComandoConsolaSocket(DMCONS.CodigoSeguridadVeederRoot+'i202'+inttoclavenum(TanqueActual,2)); // Gateway
+                  end;
+              end;
             end;
           finally
             DMCONS.DBGASCON.Connected:=false;
@@ -2456,13 +2468,26 @@ begin
           8:ComandoConsolaSocket(DMCONS.CodigoSeguridadVeederRoot+'i50100');
         end;
       end;
-      NumPaso:=1;
+      NumPaso:=4;
       TanqueActual:=0;
 
 
       // FIN DE CICLO
 
 
+    end;
+    if (numpaso=4) and (TipoTanques=8) then with DMCONS do begin
+      Q_Auxi.Close;
+      Q_Auxi.SQL.Clear;
+      Q_AuxiEntero1.FieldKind:=fkInternalCalc;
+      Q_AuxiEntero2.FieldKind:=fkInternalCalc;
+      Q_Auxi.SQL.Add('select min(folio) as  Entero1, tanque as Entero2 from DPVGETAN WHERE fechahorafinal between '+QuotedStr(FormatDateTime('mm/dd/yyyy hh:nn:ss',IncSecond(Now,-180)))+
+                     'and '+QuotedStr(FormatDateTime('mm/dd/yyyy hh:nn:ss',IncSecond(Now,-8)))+' and IDRECEPCIONOG is null group by Entero2 order by Entero1');
+      Q_Auxi.Open;
+
+      if not Q_Auxi.IsEmpty then
+        ComandoConsolaSocket('R'+IntToClaveNum(Q_AuxiEntero2.AsInteger,2));
+      NumPaso:=1;
     end;
     if RxTrayIcon1.Tag=0 then begin   // Solo en el 1er ciclo de reloj
       RxTrayIcon1.Tag:=1;
@@ -3341,6 +3366,21 @@ begin
     CloseServiceHandle(SCManHandle);
   end;
   Result := SERVICE_RUNNING = dwStat;
+end;
+
+procedure TFTANMENU.SetFolioOG(tanque, xfolioOG: Integer);
+begin
+  with DMCONS do begin
+    try
+      Q_Auxi.Close;
+      Q_Auxi.SQL.Clear;
+      Q_Auxi.SQL.Add('UPDATE DPVGETAN SET IDRECEPCIONOG='+IntToStr(xfolioOG)+' WHERE FOLIO=(SELECT MAX(FOLIO) FROM DPVGETAN WHERE TANQUE='+IntToStr(tanque)+')');
+      Q_Auxi.ExecSQL;
+    finally
+      folioOGGen:=xfolioOG;
+      Q_Auxi.Close;
+    end;
+  end;
 end;
 
 end.
