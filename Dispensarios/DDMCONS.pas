@@ -790,6 +790,7 @@ type
     procedure CalculaFechasCorte;
     function UltimoEstadoTanque(xtan:integer):string;
     function HashMd5(const Valor: string): string;
+    procedure RegistraBitacoraCP(xprod:integer);
     procedure ConectaAplicacion;
     procedure RefrescaConexion;
     procedure RegistraBitacora(xUsuario:integer;xOperacion:string;xObserva:TStrings);
@@ -2375,6 +2376,35 @@ begin
   finally
       Free;
   end;
+end;
+
+procedure TDMCONS.RegistraBitacoraCP(xprod:integer);
+var
+  folioBit:Integer;
+  fecha:TDateTime;
+begin
+  Q_Auxi.Close;
+  Q_Auxi.SQL.Clear;
+  Q_AuxiEntero1.FieldKind:=fkInternalCalc;
+  Q_Auxi.SQL.Add('SELECT COALESCE(MAX(FOLIO),0)+1 AS ENTERO1 FROM DPVGBTCC');
+  Q_Auxi.Prepare;
+  Q_Auxi.Open;
+  folioBit:=Q_AuxiEntero1.AsInteger;
+
+
+  Q_Auxi.Close;
+  Q_Auxi.SQL.Clear;
+  Q_Auxi.SQL.Add('INSERT INTO DPVGBTCC (FECHAHORA, TIPOEVENTO, INFOEVENTO, VALORANTERIOR, VALORNUEVO, HASH) '+
+                 'VALUES (:FECHAHORA, :TIPOEVENTO, :INFOEVENTO, :VALORANTERIOR, :VALORNUEVO, :HASH)');
+  fecha:=Now;
+  Q_Auxi.ParamByName('FECHAHORA').AsString:=FormatDateTime('mm/dd/yyyy hh:mm:ss',fecha);
+  Q_Auxi.ParamByName('TIPOEVENTO').AsString:='CMBP';
+  Q_Auxi.ParamByName('INFOEVENTO').AsString:='Producto: '+TabComb[xprod].Nombre;
+  Q_Auxi.ParamByName('VALORANTERIOR').AsString:=FormatoMoneda(TabComb[xprod].PrecioAnt);
+  Q_Auxi.ParamByName('VALORNUEVO').AsString:=FormatoMoneda(TabComb[xprod].PrecioNuevo);
+  Q_Auxi.ParamByName('HASH').AsString:=LowerCase(HashMd5(IntToStr(folioBit)+'|'+FormatDateTime('mm/dd/yyyy hh:mm:ss',fecha)+'|CMBP|Producto: '+TabComb[xprod].Nombre+'|'
+                                              +FormatoMoneda(TabComb[xprod].PrecioAnt)+'|'+FormatoMoneda(TabComb[xprod].PrecioNuevo)));
+  Q_Auxi.ExecSQL;
 end;
 
 end.
