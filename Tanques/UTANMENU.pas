@@ -2449,6 +2449,16 @@ begin
                     ComandoConsolaSocket(DMCONS.CodigoSeguridadVeederRoot+'i202'+inttoclavenum(TanqueActual,2)); // Gateway
                   end;
               end;
+              Q_Auxi.Close;
+              Q_Auxi.SQL.Clear;
+              Q_AuxiEntero1.FieldKind:=fkInternalCalc;
+              Q_AuxiEntero2.FieldKind:=fkInternalCalc;
+              Q_Auxi.SQL.Add('select min(folio) as  Entero1, tanque as Entero2 from DPVGETAN WHERE fechahorafinal between '+QuotedStr(FormatDateTime('mm/dd/yyyy hh:nn:ss',IncSecond(Now,-180)))+
+                             ' and '+QuotedStr(FormatDateTime('mm/dd/yyyy hh:nn:ss',IncSecond(Now,-8)))+' and IDRECEPCIONOG is null group by Entero2 order by Entero1');
+              Q_Auxi.Open;
+
+              if not Q_Auxi.IsEmpty then
+                ComandoConsolaSocket('R'+IntToClaveNum(Q_AuxiEntero2.AsInteger,2));
             end;
           finally
             DMCONS.DBGASCON.Connected:=false;
@@ -2468,26 +2478,13 @@ begin
           8:ComandoConsolaSocket(DMCONS.CodigoSeguridadVeederRoot+'i50100');
         end;
       end;
-      NumPaso:=4;
+      NumPaso:=1;
       TanqueActual:=0;
 
 
       // FIN DE CICLO
 
 
-    end;
-    if (numpaso=4) and (TipoTanques=8) then with DMCONS do begin
-      Q_Auxi.Close;
-      Q_Auxi.SQL.Clear;
-      Q_AuxiEntero1.FieldKind:=fkInternalCalc;
-      Q_AuxiEntero2.FieldKind:=fkInternalCalc;
-      Q_Auxi.SQL.Add('select min(folio) as  Entero1, tanque as Entero2 from DPVGETAN WHERE fechahorafinal between '+QuotedStr(FormatDateTime('mm/dd/yyyy hh:nn:ss',IncSecond(Now,-180)))+
-                     'and '+QuotedStr(FormatDateTime('mm/dd/yyyy hh:nn:ss',IncSecond(Now,-8)))+' and IDRECEPCIONOG is null group by Entero2 order by Entero1');
-      Q_Auxi.Open;
-
-      if not Q_Auxi.IsEmpty then
-        ComandoConsolaSocket('R'+IntToClaveNum(Q_AuxiEntero2.AsInteger,2));
-      NumPaso:=1;
     end;
     if RxTrayIcon1.Tag=0 then begin   // Solo en el 1er ciclo de reloj
       RxTrayIcon1.Tag:=1;
