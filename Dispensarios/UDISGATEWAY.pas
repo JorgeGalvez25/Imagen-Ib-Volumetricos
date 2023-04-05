@@ -191,6 +191,7 @@ type
        ContOcc,
        FinVenta:integer;
        HoraOcc:TDateTime;
+       HoraFinv:TDateTime;
        CmndOcc:string[25];
        folioOG:Integer;
 
@@ -375,6 +376,7 @@ begin
           existe:=false;
           ModoOpera:=Q_BombIbModoOperacion.AsString;
           esDiesel:=False;
+          HoraFinv:=now;
           for i:=1 to NoComb do
             if TComb[i]=xcomb then
               existe:=true;
@@ -890,8 +892,7 @@ begin
                        descestat:='Fin de Venta';       // EOT
                        TPosCarga[xpos].HoraOcc:=now-1000*tmsegundo;
                      end;
-                   4:descestat:='Pistola Levantada';
-                   5:descestat:='Pistola Levantada';  // CALL
+                 4,5:descestat:='Pistola Levantada';  // CALL
                    6:begin
                        descestat:='Cerrada';            // CLOSED
                        ComandoConsola('L'+inttoclavenum(xpos,2));
@@ -949,6 +950,64 @@ begin
                      end;
                    2:xestado:=xestado+'2';
                    else xestado:=xestado+'1';
+                 end;
+               end;
+             end;
+
+             for xpos:=1 to MaxPosCargaActiva do begin
+               with TPosCarga[xpos] do begin
+                 case Estatus of
+                   6:if SwInicio then begin
+                       apeg:=15;
+                       ss:='L'+IntToClaveNum(xpos,2); // OPEN PUMP
+                       ComandoConsola(ss);
+                       EsperaMiliSeg(100);
+                       SwInicio:=false;
+                     end;
+                   4,5:if (not SwDesHabilitado)and(not swautorizada)and(SecondsBetween(now,HoraOcc)>5) then begin
+                       apeg:=16;
+                       if (ModoOpera='Normal')and(not swarosmag) then begin
+                         apeg:=17;
+//                         if (DMCONS.AjustePAMDiezMil='Si')or(DMCONS.ModoAutorizaBennett=0)or(DMCONS.VersionPam1000='1') then begin
+//                           ss:='S'+IntToClaveNum(xpos,2); // AUTHORIZATION FOR FILLUP
+//                           ComandoConsola(ss);
+//                           esperamiliseg(100);
+//                           TipoPago:=0;
+//                           SwAutorizando:=true;
+//                         end
+//                         else begin
+                           SnImporte:=0.00;
+                           SnLitros:=0;
+                           SnPosCarga:=xpos;
+                           TipoPago:=0;
+                           FinVenta:=1;
+                           EnviaPreset3(ss,0);
+//                         end;
+                         HoraOcc:=now;
+                         SwInicio:=false;
+                       end;
+                     end
+                     else if (swautorizada)and(DMCONS.ReautorizaPam='Si') then begin
+                       if (now-TPosCarga[xpos].HoraOcc)<=60*tmsegundo then begin
+                         DMCONS.AgregaLog('Reenvia: '+TPosCarga[xpos].CmndOcc);
+                         ComandoConsola(TPosCarga[xpos].CmndOcc);
+                         esperamiliseg(100);
+                         TPosCarga[xpos].HoraOcc:=now-1000*tmsegundo;
+                         exit;
+                       end;
+                     end;
+                   8:if (ModoOpera='Normal') then begin
+                       apeg:=20;
+                       if (not SwArosMag) then begin
+                         apeg:=21;
+                         ss:='G'+IntToClaveNum(xpos,2); // RESTART
+                         ComandoConsola(ss);
+                         EsperaMiliSeg(100);
+                         if CheckBox2.Checked then begin
+                           DMCONS.ListaLog.SaveToFile('\ImagenCo\Log'+FiltraStrNum(FechaHoraToStr(Now))+'.Txt');
+                         end;
+                       end;
+                     end;
                  end;
                end;
              end;
@@ -1036,16 +1095,14 @@ begin
                        end;
 
                        DespliegaPosCarga(xpos,true);
-                       xcomb:=CombustibleEnPosicion(xpos,PosActual);
-                       if (TPosCarga[xpos].finventa=0) then begin
-                         if Estatus=3 then begin // EOT
-                           TPosCarga[xpos].finventa:=0;
-                           ss:='R'+IntToClaveNum(xpos,2); // VENTA COMPLETA
-                           if DMCONS.swemular then
-                             EmularEstatus[xpos]:='1';
-                           ComandoConsola(ss);
-                           EsperaMiliSeg(100);
-                         end;
+                       if (Estatus=3) and (SecondsBetween(now,HoraFinv)>5) then begin // EOT
+                         TPosCarga[xpos].finventa:=0;
+                         ss:='R'+IntToClaveNum(xpos,2); // VENTA COMPLETA
+                         if DMCONS.swemular then
+                           EmularEstatus[xpos]:='1';
+                         ComandoConsola(ss);
+                         HoraFinv:=now;
+                         EsperaMiliSeg(100);
                        end;
                      except
                      end;
@@ -1933,7 +1990,6 @@ begin
           Socket1.Host:=DMCONS.ServidorGateway;
           Socket1.Port:=DMCONS.PuertoGatewayDisp;
           Socket1.Open;
-          MensajeInfo('Servidor Gateway: '+DMCONS.ServidorGateway+#13#10+'Puerto Gateway: '+IntToStr(DMCONS.PuertoGatewayDisp));
           Break;
         end
         else begin
