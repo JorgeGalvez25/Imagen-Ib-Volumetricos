@@ -183,6 +183,7 @@ type
        swautorizada,
        swautorizando,
        swcargando:boolean;
+       swAvanzoVenta:boolean;
        SwActivo,
        SwOCC,SwCmndB,
        SwDesHabilitado:boolean;
@@ -261,7 +262,7 @@ begin
       Q_BombIb.Active:=false;
       Q_BombIb.Active:=true;
       if Q_BombIb.IsEmpty then
-        raise Exception.Create('Estación no existe, o no tiene posiciones de carga configurados');
+        raise Exception.Create('Estaciï¿½n no existe, o no tiene posiciones de carga configurados');
 
       // Carga Combustibles
       for i:=1 to MaxComb do with TabComb[i] do begin
@@ -867,6 +868,7 @@ begin
                          SwArosMag:=false;
                          SwOcc:=false;
                          ContOcc:=0;
+                         swAvanzoVenta:=False;
                        end;
                      end;
                    2:begin              // BUSY
@@ -964,25 +966,16 @@ begin
                        EsperaMiliSeg(100);
                        SwInicio:=false;
                      end;
-                   4,5:if (not SwDesHabilitado)and(not swautorizada)and(SecondsBetween(now,HoraOcc)>5) then begin
+                   4,5:if (not SwDesHabilitado)and(not swautorizada)and((now-HoraOcc)>(tmsegundo*5)) then begin
                        apeg:=16;
                        if (ModoOpera='Normal')and(not swarosmag) then begin
                          apeg:=17;
-//                         if (DMCONS.AjustePAMDiezMil='Si')or(DMCONS.ModoAutorizaBennett=0)or(DMCONS.VersionPam1000='1') then begin
-//                           ss:='S'+IntToClaveNum(xpos,2); // AUTHORIZATION FOR FILLUP
-//                           ComandoConsola(ss);
-//                           esperamiliseg(100);
-//                           TipoPago:=0;
-//                           SwAutorizando:=true;
-//                         end
-//                         else begin
-                           SnImporte:=0.00;
-                           SnLitros:=0;
-                           SnPosCarga:=xpos;
-                           TipoPago:=0;
-                           FinVenta:=1;
-                           EnviaPreset3(ss,0);
-//                         end;
+                         SnImporte:=0.00;
+                         SnLitros:=0;
+                         SnPosCarga:=xpos;
+                         TipoPago:=0;
+                         FinVenta:=0;
+                         EnviaPreset3(ss,0);
                          HoraOcc:=now;
                          SwInicio:=false;
                        end;
@@ -994,18 +987,6 @@ begin
                          esperamiliseg(100);
                          TPosCarga[xpos].HoraOcc:=now-1000*tmsegundo;
                          exit;
-                       end;
-                     end;
-                   8:if (ModoOpera='Normal') then begin
-                       apeg:=20;
-                       if (not SwArosMag) then begin
-                         apeg:=21;
-                         ss:='G'+IntToClaveNum(xpos,2); // RESTART
-                         ComandoConsola(ss);
-                         EsperaMiliSeg(100);
-                         if CheckBox2.Checked then begin
-                           DMCONS.ListaLog.SaveToFile('\ImagenCo\Log'+FiltraStrNum(FechaHoraToStr(Now))+'.Txt');
-                         end;
                        end;
                      end;
                  end;
@@ -1032,9 +1013,11 @@ begin
                    swinicio2:=false;
                    importeant:=importe;
                    simp:=copy(lin,14,8);
-                   importe:=StrToFloat(simp)/100;
+                   importe:=StrToFloat(simp)/1000;
                    volumen:=0;
                    precio:=0;
+                   swAvanzoVenta:=importe>0;
+
                    if (DMCONS.ControlAros='Si')and(importe<0.01)and(not swarosmag)and(ModoOpera='Normal') then begin
                      swarosmag:=DMCONS.ControlArosMagneticos2(xpos,aros_mang,aros_cte,aros_vehi);
                      if swarosmag then begin
@@ -1068,16 +1051,14 @@ begin
                    else begin
                      try
                        swinicio2:=false;
-                       if TPosCarga[xpos].TDigvol[1]=1 then
-                         volumen:=StrToFloat(copy(lin,6,8))/100
-                       else
-                         volumen:=StrToFloat(copy(lin,6,8))/1000;
+                       volumen:=StrToFloat(copy(lin,6,8))/1000;
                        simp:=copy(lin,14,8);
                        spre:=copy(lin,22,5);
 
                        xcomb:=CombustibleEnPosicion(xpos,PosActual);
                        precio:=StrToFloat(spre)/100;
-                       importe:=StrToFloat(simp)/100;
+                       importe:=StrToFloat(simp)/1000;
+                       swAvanzoVenta:=importe>0;
                        if (2*volumen*precio<importe) then
                          importe:=importe/10;
                        if (2*importe<volumen*precio) then
@@ -1089,13 +1070,14 @@ begin
                            importe:=ximporte;
                        end;
 
-                       if ((Estatus=3) or (Estatus=1)) and (SwCargando) then begin// EOT
+                       if ((Estatus=3) or (Estatus=1)) and (SwCargando) {and (swAvanzoVenta)} then begin// EOT
                          SwCargando:=false;
+                         swAvanzoVenta:=False;
                          swdesp:=true;
                        end;
 
                        DespliegaPosCarga(xpos,true);
-                       if (Estatus=3) and (SecondsBetween(now,HoraFinv)>5) then begin // EOT
+                       if (TPosCarga[xpos].finventa=0) and (Estatus=3) and ((now-HoraFinv)>(tmsegundo*8)) then begin // EOT
                          TPosCarga[xpos].finventa:=0;
                          ss:='R'+IntToClaveNum(xpos,2); // VENTA COMPLETA
                          if DMCONS.swemular then
@@ -1171,14 +1153,7 @@ begin
                with TPosCarga[xpos] do begin
                  for i:=1 to nocomb do if IntToStr(TComb[i])=xgrade then begin
                    SwTotales[i]:=false;
-                   if DMCONS.LcSerie=321 then begin
-                     if TPosCarga[xpos].TDigvol[1]=1 then
-                       TotalLitros[i]:=StrToFloat(copy(lin,6,10))/10
-                     else
-                       TotalLitros[i]:=StrToFloat(copy(lin,6,10))/100;
-                   end
-                   else
-                     TotalLitros[i]:=StrToFloat(copy(lin,6,10))/100;
+                   TotalLitros[i]:=StrToFloat(copy(lin,6,10))/100;
                    DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
                    DespliegaPosCarga(xpos,true);
                  end;
@@ -1193,9 +1168,7 @@ begin
            if folioOGGen<StrToIntDef(Copy(lin,4,Length(lin)-3),0) then begin
              TPosCarga[xpos].folioOG:=StrToIntDef(Copy(lin,4,Length(lin)-3),0);
              SetFolioOG(xpos,TPosCarga[xpos].folioOG);
-           end
-           else
-             ComandoConsola('V'+IntToClaveNum(xpos,2));
+           end;
          end;
    idAck:if NumPaso=1 then begin
            if xPosT in [1..MaxPosCargaActiva] then
@@ -1295,10 +1268,7 @@ begin
                 0:xestado:=xestado+'0'; // Sin Comunicacion
                 1:xestado:=xestado+'1'; // Inactivo (Idle)
                 2:xestado:=xestado+'2'; // Cargando (In Use)
-                3:if not swcargando then
-                    xestado:=xestado+'3' // Fin de Carga (Used)
-                  else
-                    xestado:=xestado+'2';
+                3:xestado:=xestado+'3'; // Fin de Carga (Used)
                 5:xestado:=xestado+'5'; // Llamando (Calling) Pistola Levantada
                 9:xestado:=xestado+'9'; // Autorizado
                 8:xestado:=xestado+'8'; // Detenido (Stoped)
@@ -1421,21 +1391,21 @@ begin
         StaticText5.Caption:=IntToStr(NumPaso);
       end;
     end;
+//    if (NumPaso=5) then with DMCONS do begin
+//      Q_Auxi.Close;
+//      Q_Auxi.SQL.Clear;
+//      Q_AuxiEntero1.FieldKind:=fkInternalCalc;
+//      Q_AuxiEntero2.FieldKind:=fkInternalCalc;
+//      Q_Auxi.SQL.Add('select min(folio) as  Entero1, poscarga as Entero2 from DPVGMOVI WHERE hora between '+QuotedStr(FormatDateTime('mm/dd/yyyy hh:nn:ss',IncSecond(Now,-40)))+
+//                     ' and '+QuotedStr(FormatDateTime('mm/dd/yyyy hh:nn:ss',IncSecond(Now,-8)))+' and IDTRANSACCIONOG is null group by Entero2 order by Entero1');
+//      Q_Auxi.Open;
+//
+//      if not Q_Auxi.IsEmpty then
+//        ComandoConsola('V'+IntToClaveNum(Q_AuxiEntero2.AsInteger,2));
+//
+//      NumPaso:=6;
+//    end;
     if (NumPaso=5) then with DMCONS do begin
-      Q_Auxi.Close;
-      Q_Auxi.SQL.Clear;
-      Q_AuxiEntero1.FieldKind:=fkInternalCalc;
-      Q_AuxiEntero2.FieldKind:=fkInternalCalc;
-      Q_Auxi.SQL.Add('select min(folio) as  Entero1, poscarga as Entero2 from DPVGMOVI WHERE hora between '+QuotedStr(FormatDateTime('mm/dd/yyyy hh:nn:ss',IncSecond(Now,-40)))+
-                     'and '+QuotedStr(FormatDateTime('mm/dd/yyyy hh:nn:ss',IncSecond(Now,-8)))+' and IDTRANSACCIONOG is null group by Entero2 order by Entero1');
-      Q_Auxi.Open;
-
-      if not Q_Auxi.IsEmpty then
-        ComandoConsola('V'+IntToClaveNum(Q_AuxiEntero2.AsInteger,2));
-
-      NumPaso:=6;
-    end;
-    if (NumPaso=6) then with DMCONS do begin
       try
         // Checa Comandos
         with DMCONS do begin
