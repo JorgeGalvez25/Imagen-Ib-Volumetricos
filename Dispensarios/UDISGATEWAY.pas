@@ -221,7 +221,6 @@ var
   MaxPosCargaActiva:integer;
   ContDA     :integer;
   SwCerrar    :boolean;
-  PreciosInicio: Boolean;
   // CONTROL TRAFICO COMANDOS
   ListaCmnd     :TStrings;
   LinCmnd       :string;
@@ -235,7 +234,7 @@ var
 
 implementation
 
-uses ULIBGRAL, ULIBLICENCIAS, DDMCONS, UDISMENU;
+uses ULIBGRAL, ULIBLICENCIAS, DDMCONS, UDISMENU, StrUtils;
 
 {$R *.DFM}
 
@@ -292,7 +291,6 @@ begin
       end;
       CargaPreciosFH(Now,true); // guarda precio actual como fosico
       DBGrid3.Refresh;
-      PreciosInicio:=true;
       DespliegaPrecios;
     finally
       Screen.Cursor:=crDefault;
@@ -585,7 +583,7 @@ begin
           exit;
         TListBox(FindComponent('ListBoxPC'+IntToStr(ii))).Items.Clear;
         TListBox(FindComponent('ListBoxPC'+IntToStr(ii))).Items.Add('$ '+FormatFloat('###,##0.00',importe)+' Pesos');
-        if not SwCargando then begin
+        if precio>0 then begin
           TListBox(FindComponent('ListBoxPC'+IntToStr(ii))).Items.Add(FormatFloat('##,##0.00',precio)+' $/Lts');
           TListBox(FindComponent('ListBoxPC'+IntToStr(ii))).Items.Add('');
           TListBox(FindComponent('ListBoxPC'+IntToStr(ii))).Items.Add(FormatFloat('##,##0.000',volumen)+' Litros');
@@ -807,11 +805,13 @@ begin
              xestado:='';
              if MaxPosCargaActiva>MaxPosCarga then
                MaxPosCargaActiva:=MaxPosCarga;
-             if PreciosInicio then
+             if DMCONS.PreciosInicio then
                DMCONS.AplicarUltimosPrecios;
              apeg:=1;
              for xpos:=1 to MaxPosCargaActiva do begin
                with TPosCarga[xpos] do begin
+                 if NoComb=0 then
+                   Next;
                  SwAutorizando:=false;
                  SwCmndB:=true;
                  if estatusant<>estatus then
@@ -864,11 +864,9 @@ begin
                        descestat:='Inactivo';
                        if (estatusant<>estatus) then begin
                          FinVenta:=0;
-                         TipoPago:=0;
                          SwArosMag:=false;
                          SwOcc:=false;
                          ContOcc:=0;
-                         swAvanzoVenta:=False;
                        end;
                      end;
                    2:begin              // BUSY
@@ -1054,15 +1052,15 @@ begin
                        volumen:=StrToFloat(copy(lin,6,8))/1000;
                        simp:=copy(lin,14,8);
                        spre:=copy(lin,22,5);
-
+                       importeant:=importe;
                        xcomb:=CombustibleEnPosicion(xpos,PosActual);
                        precio:=StrToFloat(spre)/100;
                        importe:=StrToFloat(simp)/1000;
-                       swAvanzoVenta:=importe>0;
                        if (2*volumen*precio<importe) then
                          importe:=importe/10;
                        if (2*importe<volumen*precio) then
                          importe:=importe*10;
+                         
 
                        if DMCONS.AjustePAM='Si' then begin
                          ximporte:=AjustaFloat(volumen*precio,2);
@@ -1070,7 +1068,12 @@ begin
                            importe:=ximporte;
                        end;
 
-                       if ((Estatus=3) or (Estatus=1)) and (SwCargando) {and (swAvanzoVenta)} then begin// EOT
+                       if not swAvanzoVenta then begin
+                         swAvanzoVenta:=(importe<>importeant) and (Estatus=2) and (importe>0);
+                         DMCONS.AgregaLog(ifthen(swAvanzoVenta,'swAvanzoVenta','NOT')+' Estatus='+IntToStr(Estatus)+' ImporteAnt: '+FloatToStr(importeant)+' Importe: '+FloatToStr(importe));
+                       end;      
+
+                       if ((Estatus=3) or (Estatus=1)) and (SwCargando) and (swAvanzoVenta) then begin// EOT
                          SwCargando:=false;
                          swAvanzoVenta:=False;
                          swdesp:=true;
@@ -1079,6 +1082,7 @@ begin
                        DespliegaPosCarga(xpos,true);
                        if (TPosCarga[xpos].finventa=0) and (Estatus=3) and ((now-HoraFinv)>(tmsegundo*8)) then begin // EOT
                          TPosCarga[xpos].finventa:=0;
+                         TipoPago:=0;
                          ss:='R'+IntToClaveNum(xpos,2); // VENTA COMPLETA
                          if DMCONS.swemular then
                            EmularEstatus[xpos]:='1';
@@ -1492,10 +1496,10 @@ begin
                     Swerr:=false;
                     if (TPosCarga[SnPosCarga].SwOCC) then begin
                       if (TPosCarga[SnPosCarga].SwCmndB) then begin
-                        if (TPosCarga[SnPosCarga].estatus in [1,5])and(TPosCarga[SnPosCarga].ContOCC>0) then begin
+                        if (TPosCarga[SnPosCarga].estatus in [1,5,7])and(TPosCarga[SnPosCarga].ContOCC>0) then begin
                           TPosCarga[SnPosCarga].SwOCC:=false;
                         end
-                        else if (TPosCarga[SnPosCarga].estatus in [1,5])and(TPosCarga[SnPosCarga].ContOCC<=0) then begin
+                        else if (TPosCarga[SnPosCarga].estatus in [1,5,7])and(TPosCarga[SnPosCarga].ContOCC<=0) then begin
                           rsp:='Error al aplicar PRESET';
                           TPosCarga[SnPosCarga].SwOCC:=false;
                           TPosCarga[SnPosCarga].ContOCC:=0;
@@ -1655,7 +1659,7 @@ begin
               rsp:='OK';
               if (xpos in [1..MaxPosCarga]) then begin
                 TPosCarga[xpos].tipopago:=StrToIntDef(ExtraeElemStrSep(TabCmnd[xcmnd].Comando,3,' '),0);
-                if (TPosCarga[xpos].Estatus=3) then begin // EOT
+                if (TPosCarga[xpos].Estatus in [1,3]) then begin // EOT
                   if (not TPosCarga[xpos].swcargando) then begin
                     TPosCarga[xpos].finventa:=0;
                     ss:='R'+IntToClaveNum(xpos,2); // VENTA COMPLETA
@@ -1831,8 +1835,10 @@ begin
         if not SwEsperaRsp then
           NumPaso:=0;
       except
-        DMCONS.AgregaLog('ERROR PASO 5');
-        NumPaso:=0;
+        on e:Exception do begin
+          DMCONS.AgregaLog('ERROR PASO 5 COMANDO: '+ss+' '+e.Message);
+          NumPaso:=0;
+        end;
       end;
     end;
   except
@@ -2143,9 +2149,9 @@ begin
       if xcomb>0 then begin // un producto
         if TComb[xc]=xcomb then
           if xp in [1..6] then
-            xprodauto[xp]:='1';
+            xprodauto[xcomb]:='1';
       end
-      else xprodauto[xp]:='1';
+      else xprodauto[xcomb]:='1';
     end;
   end;
   if TPosCarga[xpos].FinVenta=1 then

@@ -719,6 +719,7 @@ type
     PuertoGatewayDisp,
     PuertoGatewayTanq,    
     emEstacionServicio            :integer;
+    PreciosInicio           :Boolean;
 
     TabComb:array[1..MaxComb] of RegComb;
     PrimeraCarga:boolean;
@@ -1572,8 +1573,9 @@ begin
       if Mayusculas(ss)='PUERTOGATEWAYDISP' then
         PuertoGatewayDisp:=StrToInt(ExtraeElemStrSep(lin,2,'='));
       if Mayusculas(ss)='PUERTOGATEWAYTANQ' then
-        PuertoGatewayTanq:=StrToInt(ExtraeElemStrSep(lin,2,'='));        
-
+        PuertoGatewayTanq:=StrToInt(ExtraeElemStrSep(lin,2,'='));
+      if Mayusculas(ss)='PRECIOSINICIO' then
+        PreciosInicio:=Mayusculas(ExtraeElemStrSep(lin,2,'='))='SI';
     end;
   finally
     lista.Free;
