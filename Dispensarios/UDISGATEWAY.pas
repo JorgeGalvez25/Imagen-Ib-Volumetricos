@@ -195,6 +195,7 @@ type
        HoraFinv:TDateTime;
        CmndOcc:string[25];
        folioOG:Integer;
+       TotsFinv:Boolean;
 
        swarosmag:boolean;
        aros_cont,
@@ -631,11 +632,9 @@ begin
         SwDesp:=false;
         if (importe>0.01)and(PosActual in [1..MCxP]) then begin
           SwAutorizada:=false;
-          SwTotales[1]:=true;
           apunt:=4;
-          SwTotales[2]:=true;
-          SwTotales[3]:=true;
-          SwTotales[4]:=true;
+          HoraFinv:=Now;
+          TotsFinv:=True;
           try
             try
               swcierrabd:=true;
@@ -867,6 +866,13 @@ begin
                          SwArosMag:=false;
                          SwOcc:=false;
                          ContOcc:=0;
+                       end;
+                       if (SecondsBetween(Now,HoraFinv)>5) and (TotsFinv) then begin
+                         SwTotales[1]:=true;
+                         SwTotales[2]:=true;
+                         SwTotales[3]:=true;
+                         SwTotales[4]:=true;
+                         TotsFinv:=False;
                        end;
                      end;
                    2:begin              // BUSY
@@ -1190,7 +1196,8 @@ begin
                  Q_AplicaPrecioF.ParamByName('pError').AsString:='No';
                  Q_AplicaPrecioF.ExecSQL;
                except
-                 DMCONS.AgregaLog('Error 1: '+inttostr(PrecioCombActual));
+                 on e:Exception do
+                  DMCONS.AgregaLog('Error 1: '+inttostr(PrecioCombActual)+' - '+e.Message);
                end;
                try
                  T_Tcmb.Active:=true;
@@ -1206,7 +1213,8 @@ begin
                    T_Tcmb.Active:=false;
                  end;
                except
-                 DMCONS.AgregaLog('Error 2: '+inttostr(PrecioCombActual));
+                 on e:Exception do
+                   DMCONS.AgregaLog('Error 2: '+inttostr(PrecioCombActual)+' - '+e.Message);
                end;
              end;
            except
@@ -1357,6 +1365,7 @@ begin
                     if precio>=0.01 then begin
                       EsperaMiliSeg(200);
                       ComandoConsola('X00'+ProductoPrecio+'100'+IntToClaveNum(Trunc(Precio*100+0.5),4)); // contado
+                      Sleep(50);
                       AplicaPrecio:=False;
                     end;
                   end;
@@ -1878,13 +1887,12 @@ begin
       s1:=#2+ss+#3+CC;
       DMCONS.AgregaLog('E '+s1);
       Socket1.Socket.SendText(s1);
-    finally
-      Timer1.Enabled:=true;
+    except
+      DMCONS.AgregaLog('ERROR CON SOCKET');
+      Button1Click(nil);
     end;
-  except
-    DMCONS.AgregaLog('ERROR CON SOCKET');
-    Button1Click(nil);
-    Application.Terminate;
+  finally
+    Timer1.Enabled:=true;
   end;
 end;
 
