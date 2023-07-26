@@ -125,6 +125,7 @@ type
     ContadorAlarma  :integer;
     HoraReset       :Tdatetime;
     folioOGGen:Integer;
+    primeraRespuesta:Boolean;
   public
     { Public declarations }
     function StringCom(ss:string):string;
@@ -847,7 +848,7 @@ begin
                        if (estatusant in [9,2])and(DMCONS.ReautorizaPam='Si') then begin
                          if (now-TPosCarga[xpos].HoraOcc)<=60*tmsegundo then begin
                            DMCONS.AgregaLog('Reenvia: '+TPosCarga[xpos].CmndOcc);
-                           ComandoConsola(TPosCarga[xpos].CmndOcc);
+                           ComandoConsolaBuff(TPosCarga[xpos].CmndOcc);
                            esperamiliseg(100);
                            TPosCarga[xpos].HoraOcc:=now-1000*tmsegundo;
                            exit;
@@ -867,7 +868,7 @@ begin
                          SwOcc:=false;
                          ContOcc:=0;
                        end;
-                       if (SecondsBetween(Now,HoraFinv)>5) and (TotsFinv) then begin
+                       if (SecondsBetween(Now,HoraFinv)>10) and (TotsFinv) then begin
                          SwTotales[1]:=true;
                          SwTotales[2]:=true;
                          SwTotales[3]:=true;
@@ -882,7 +883,7 @@ begin
                        if SwArosMag then begin
                          if (not DMCONS.ConexionArosActiva(xpos)) then with DMCONS do begin
                            ss:='E'+IntToClaveNum(xpos,2); // STOP
-                           ComandoConsola(ss);
+                           ComandoConsolaBuff(ss);
                            EsperaMiliSeg(100);
                            if DMCONS.ReautorizaPam='Si' then begin
                              TPosCarga[xpos].CmndOcc:='';
@@ -901,7 +902,7 @@ begin
                  4,5:descestat:='Pistola Levantada';  // CALL
                    6:begin
                        descestat:='Cerrada';            // CLOSED
-                       ComandoConsola('L'+inttoclavenum(xpos,2));
+                       ComandoConsolaBuff('L'+inttoclavenum(xpos,2));
                        EsperaMiliSeg(100);
                      end;
                    8:begin
@@ -910,7 +911,7 @@ begin
                          if DMCONS.ControlArosMagneticosRecon(xpos,xmang,xcte,xvehi) then begin
                            if (xmang=aros_mang)and(xcte=aros_cte)and(xvehi=aros_vehi)and(aros_cont<DMCONS.ReconexionesAros) then begin
                              ss:='G'+IntToClaveNum(xpos,2); // START
-                             ComandoConsola(ss);
+                             ComandoConsolaBuff(ss);
                              EsperaMiliSeg(100);
                              SwArosMag_Stop:=false;
                              inc(aros_cont);
@@ -938,7 +939,7 @@ begin
                        if SwArosMag then begin
                          if (not DMCONS.ConexionArosActiva(xpos)) then with DMCONS do begin
                            ss:='E'+IntToClaveNum(xpos,2); // STOP
-                           ComandoConsola(ss);
+                           ComandoConsolaBuff(ss);
                            EsperaMiliSeg(100);
                            if DMCONS.ReautorizaPam='Si' then begin
                              TPosCarga[xpos].CmndOcc:='';
@@ -966,7 +967,7 @@ begin
                    6:if SwInicio then begin
                        apeg:=15;
                        ss:='L'+IntToClaveNum(xpos,2); // OPEN PUMP
-                       ComandoConsola(ss);
+                       ComandoConsolaBuff(ss);
                        EsperaMiliSeg(100);
                        SwInicio:=false;
                      end;
@@ -987,7 +988,7 @@ begin
                      else if (swautorizada)and(DMCONS.ReautorizaPam='Si') then begin
                        if (now-TPosCarga[xpos].HoraOcc)<=60*tmsegundo then begin
                          DMCONS.AgregaLog('Reenvia: '+TPosCarga[xpos].CmndOcc);
-                         ComandoConsola(TPosCarga[xpos].CmndOcc);
+                         ComandoConsolaBuff(TPosCarga[xpos].CmndOcc);
                          esperamiliseg(100);
                          TPosCarga[xpos].HoraOcc:=now-1000*tmsegundo;
                          exit;
@@ -1013,8 +1014,8 @@ begin
                ContEsperaPaso2:=0;
                with TPosCarga[xpos] do begin
                  Mensaje:='';
+                 swinicio2:=false;
                  if lin[4]='0' then begin // POSICION ESTA CARGANDO
-                   swinicio2:=false;
                    importeant:=importe;
                    simp:=copy(lin,14,8);
                    importe:=StrToFloat(simp)/1000;
@@ -1025,7 +1026,7 @@ begin
                    if (DMCONS.ControlAros='Si')and(importe<0.01)and(not swarosmag)and(ModoOpera='Normal') then begin
                      swarosmag:=DMCONS.ControlArosMagneticos2(xpos,aros_mang,aros_cte,aros_vehi);
                      if swarosmag then begin
-                       ComandoConsola('E'+IntToClaveNum(xpos,2));
+                       ComandoConsolaBuff('E'+IntToClaveNum(xpos,2));
                        EsperaMiliSeg(100);
                        if DMCONS.ReautorizaPam='Si' then begin
                          TPosCarga[xpos].CmndOcc:='';
@@ -1054,7 +1055,6 @@ begin
                    end
                    else begin
                      try
-                       swinicio2:=false;
                        volumen:=StrToFloat(copy(lin,6,8))/1000;
                        simp:=copy(lin,14,8);
                        spre:=copy(lin,22,5);
@@ -1092,7 +1092,7 @@ begin
                          ss:='R'+IntToClaveNum(xpos,2); // VENTA COMPLETA
                          if DMCONS.swemular then
                            EmularEstatus[xpos]:='1';
-                         ComandoConsola(ss);
+                         ComandoConsolaBuff(ss);
                          HoraFinv:=now;
                          EsperaMiliSeg(100);
                        end;
@@ -1230,6 +1230,13 @@ begin
            ContEsperaPaso5:=0;
     end;
 
+    if (ListaCmnd.Count>0)and(not SwEsperaRsp) then begin
+      ss:=ListaCmnd[0];
+      ListaCmnd.Delete(0);
+      ComandoConsola(ss);
+      exit;
+    end;
+
     // checa lecturas de dispensarios
     if NumPaso=2 then begin
       try
@@ -1364,8 +1371,7 @@ begin
                   if ValidaCifra(precio,2,2)='OK' then begin
                     if precio>=0.01 then begin
                       EsperaMiliSeg(200);
-                      ComandoConsola('X00'+ProductoPrecio+'100'+IntToClaveNum(Trunc(Precio*100+0.5),4)); // contado
-                      Sleep(50);
+                      ComandoConsolaBuff('X00'+ProductoPrecio+'100'+IntToClaveNum(Trunc(Precio*100+0.5),4)); // contado
                       AplicaPrecio:=False;
                     end;
                   end;
@@ -1436,7 +1442,7 @@ begin
             // CMND: PARO TOTAL
             if ss='PAROTOTAL' then begin
               rsp:='OK';
-              ComandoConsola('E00');
+              ComandoConsolaBuff('E00');
               EsperaMiliSeg(100);
               if DMCONS.swemular then
                 for xpos:=1 to MaxPosCarga do
@@ -1462,13 +1468,13 @@ begin
                 for xpos:=1 to MaxPosCarga do
                   TPosCarga[xpos].ModoOpera:='Prepago';
                 ActivaModoPrepago(0);
-                ComandoConsola('U'+IntToClaveNum(0,2));
+                ComandoConsolaBuff('U'+IntToClaveNum(0,2));
                 rsp:='OK';
               end
               else if (xpos in [1..maxposcarga]) then begin
                 TPosCarga[xpos].ModoOpera:='Prepago';
                 ActivaModoPrepago(xpos);
-                ComandoConsola('U'+IntToClaveNum(xpos,2));
+                ComandoConsolaBuff('U'+IntToClaveNum(xpos,2));
                 rsp:='OK';
               end;
             end
@@ -1479,13 +1485,13 @@ begin
                 for xpos:=1 to MaxPosCarga do
                   TPosCarga[xpos].ModoOpera:='Normal';
                 DesActivaModoPrepago(0);
-                ComandoConsola('L'+IntToClaveNum(0,2));
+                ComandoConsolaBuff('L'+IntToClaveNum(0,2));
                 rsp:='OK';
               end
               else if (xpos in [1..maxposcarga]) then begin
                 TPosCarga[xpos].ModoOpera:='Normal';
                 DesActivaModoPrepago(xpos);
-                ComandoConsola('L'+IntToClaveNum(xpos,2));
+                ComandoConsolaBuff('L'+IntToClaveNum(xpos,2));
                 rsp:='OK';
               end;
             end
@@ -1672,10 +1678,8 @@ begin
                   if (not TPosCarga[xpos].swcargando) then begin
                     TPosCarga[xpos].finventa:=0;
                     ss:='R'+IntToClaveNum(xpos,2); // VENTA COMPLETA
-                    ComandoConsola(ss);
+                    ComandoConsolaBuff(ss);
                     EsperaMiliSeg(100);
-                    for i:=1 to 4 do
-                      TPosCarga[xpos].SwTotales[i]:=true;
                     if DMCONS.swemular then
                       EmularEstatus[xpos]:='1';
                     try
@@ -1753,7 +1757,7 @@ begin
               xpos:=strtointdef(ExtraeElemStrSep(TabCmnd[xcmnd].Comando,2,' '),0);
               if xpos in [1..MaxPosCarga] then begin
                 if (TPosCarga[xpos].estatus in [2,9]) then begin
-                  ComandoConsola('E'+IntToClaveNum(xpos,2));
+                  ComandoConsolaBuff('E'+IntToClaveNum(xpos,2));
                   EsperaMiliSeg(100);
                   if DMCONS.ReautorizaPam='Si' then begin
                     TPosCarga[xpos].CmndOcc:='';
@@ -1775,7 +1779,7 @@ begin
               xpos:=strtointdef(ExtraeElemStrSep(TabCmnd[xcmnd].Comando,2,' '),0);
               if xpos in [1..MaxPosCarga] then begin
                 if (TPosCarga[xpos].estatus in [2,8]) then begin
-                  ComandoConsola('G'+IntToClaveNum(xpos,2));
+                  ComandoConsolaBuff('G'+IntToClaveNum(xpos,2));
                   EsperaMiliSeg(100);
                   if DMCONS.swemular then
                     if xpos in [1..MaxPosCarga] then
@@ -1860,7 +1864,10 @@ end;
 
 procedure TFDISGATEWAY.ComandoConsolaBuff(ss:string);
 begin
-  ComandoConsola(ss);
+  if (ListaCmnd.Count=0)and(not SwEsperaRsp) then
+    ComandoConsola(ss)
+  else
+    ListaCmnd.Add(ss);
 end;
 
 procedure TFDISGATEWAY.ComandoConsola(ss:string);
@@ -1871,28 +1878,23 @@ begin
     exit;
   LinCmnd:=ss;
   CharCmnd:=LinCmnd[1];
-  SwEsperaRsp:=true;
+  SwError:=false;
+  if DMCONS.SwEmular then begin
+    LineaEmular:=ss;
+    DMCONS.AgregaLog('E '+ss);
+    exit;
+  end;
+  inc(ContadorAlarma);
   try
-    SwError:=false;
-    if DMCONS.SwEmular then begin
-      LineaEmular:=ss;
-      DMCONS.AgregaLog('E '+ss);
-      exit;
-    end;
-    inc(ContadorAlarma);
-    Timer1.Enabled:=false;
-    try
-      LineaBuff:='';
-      cc:=CalculaBCC(ss+#3);
-      s1:=#2+ss+#3+CC;
-      DMCONS.AgregaLog('E '+s1);
-      Socket1.Socket.SendText(s1);
-    except
-      DMCONS.AgregaLog('ERROR CON SOCKET');
-      Button1Click(nil);
-    end;
-  finally
-    Timer1.Enabled:=true;
+    LineaBuff:='';
+    cc:=CalculaBCC(ss+#3);
+    s1:=#2+ss+#3+CC;
+    DMCONS.AgregaLog('E '+s1);
+    Socket1.Socket.SendText(s1);
+    SwEsperaRsp:=primeraRespuesta;
+  except
+    DMCONS.AgregaLog('ERROR CON SOCKET');
+    Button1Click(nil);
   end;
 end;
 
@@ -2130,76 +2132,81 @@ var xpos,xc,xp:integer;
     ss,xprodauto,NivelPrec,efv:string;
     swlitros:boolean;
 begin
-  swlitros:=SnLitros>0.01;
-  rsp:='OK';
-  xpos:=SnPosCarga;
-  if TPosCarga[xpos].SwDesHabilitado then begin
-    rsp:='Posicion Deshabilitada';
-    exit;
-  end;
-  if not (TPosCarga[xpos].estatus in [1,5,7,9]) then begin
-    rsp:='Posicion no Disponible';
-    exit;
-  end;
-  if TPosCarga[xpos].estatus=9 then begin
-    ComandoConsola('E'+IntToClaveNum(xpos,2));
+  try
+    swlitros:=SnLitros>0.01;
+    rsp:='OK';
+    xpos:=SnPosCarga;
+    if TPosCarga[xpos].SwDesHabilitado then begin
+      rsp:='Posicion Deshabilitada';
+      exit;
+    end;
+    if not (TPosCarga[xpos].estatus in [1,5,7,9]) then begin
+      rsp:='Posicion no Disponible';
+      exit;
+    end;
+    if TPosCarga[xpos].estatus=9 then begin
+      ComandoConsolaBuff('E'+IntToClaveNum(xpos,2));
+      if DMCONS.ReautorizaPam='Si' then begin
+        TPosCarga[xpos].CmndOcc:='';
+        TPosCarga[xpos].HoraOcc:=now-1000*tmsegundo;
+      end;
+      Esperamiliseg(100);
+    end;
+    NivelPrec:='1';
+    xprodauto:='000000';
+    with TPosCarga[xpos] do begin
+      for xc:=1 to NoComb do if xc in [1..4] then begin
+        xp:=TPosx[xc];
+        if xcomb>0 then begin // un producto
+          if TComb[xc]=xcomb then
+            if xp in [1..6] then
+              xprodauto[xcomb]:='1';
+        end
+        else xprodauto[xp]:='1';
+      end;
+    end;
+    if TPosCarga[xpos].FinVenta=1 then
+      efv:='2'
+    else
+      efv:='1';
+    if not swlitros then begin // PRESET EN IMPORTE
+      ss:='@02'+'0'+IntToClaveNum(xpos,2)+'0'+efv+FiltraStrNum(FormatFloat('0000.00',snimporte))+xprodauto;
+      TPosCarga[xpos].ImportePreset:=SnImporte;
+      TPosCarga[xpos].MontoPreset:='$ '+FormatoMoneda(SnImporte);
+    end
+    else begin // PRESET EN LITROS
+      ss:='@02'+'0'+IntToClaveNum(xpos,2)+'1'+efv+FiltraStrNum(FormatFloat('0000.00',snlitros))+xprodauto;
+      TPosCarga[xpos].ImportePreset:=SnLitros;
+      TPosCarga[xpos].MontoPreset:=FormatoMoneda(SnLitros)+' lts';
+    end;
+    ComandoConsolaBuff(ss);
+    EsperaMiliSeg(300);
     if DMCONS.ReautorizaPam='Si' then begin
-      TPosCarga[xpos].CmndOcc:='';
-      TPosCarga[xpos].HoraOcc:=now-1000*tmsegundo;
+      TPosCarga[xpos].CmndOcc:=ss;
+      TPosCarga[xpos].HoraOcc:=now;
     end;
-    Esperamiliseg(100);
-  end;
-  NivelPrec:='1';
-  xprodauto:='000000';
-  with TPosCarga[xpos] do begin
-    for xc:=1 to NoComb do if xc in [1..4] then begin
-      xp:=TPosx[xc];
-      if xcomb>0 then begin // un producto
-        if TComb[xc]=xcomb then
-          if xp in [1..6] then
-            xprodauto[xcomb]:='1';
-      end
-      else xprodauto[xcomb]:='1';
+    if SwError then begin
+      rsp:='Error al Activar Posicion de Carga';
+      exit;
     end;
-  end;
-  if TPosCarga[xpos].FinVenta=1 then
-    efv:='2'
-  else
-    efv:='1';
-  if not swlitros then begin // PRESET EN IMPORTE
-    ss:='@02'+'0'+IntToClaveNum(xpos,2)+'0'+efv+FiltraStrNum(FormatFloat('0000.00',snimporte))+xprodauto;
-    TPosCarga[xpos].ImportePreset:=SnImporte;
-    TPosCarga[xpos].MontoPreset:='$ '+FormatoMoneda(SnImporte);
-  end
-  else begin // PRESET EN LITROS
-    ss:='@02'+'0'+IntToClaveNum(xpos,2)+'1'+efv+FiltraStrNum(FormatFloat('0000.00',snlitros))+xprodauto;
-    TPosCarga[xpos].ImportePreset:=SnLitros;
-    TPosCarga[xpos].MontoPreset:=FormatoMoneda(SnLitros)+' lts';
-  end;
-  ComandoConsolaBuff(ss);
-  EsperaMiliSeg(300);
-  if DMCONS.ReautorizaPam='Si' then begin
-    TPosCarga[xpos].CmndOcc:=ss;
-    TPosCarga[xpos].HoraOcc:=now;
-  end;
-  if SwError then begin
-    rsp:='Error al Activar Posicion de Carga';
-    exit;
-  end;
-  TPosCarga[xpos].SwPreset:=true;
-  if not swlitros then
-    DMCONS.AgregaLog('Importe Preset: '+Floattostr(SnImporte));
+    TPosCarga[xpos].SwPreset:=true;
+    if not swlitros then
+      DMCONS.AgregaLog('Importe Preset: '+Floattostr(SnImporte));
 
-  if DMCONS.swemular then begin
-    if EmularEstatus[xpos]='1' then begin
-      EmularEstatus[xpos]:='2';
-      TPosCarga[xpos].estatus:=2;
-      TPosCarga[xpos].volumen:=SnImporte/5;
-      TPosCarga[xpos].importe:=SnImporte;
-      TPosCarga[xpos].precio:=5;
-      TPosCarga[xpos].posactual:=1;
-      TPosCarga[xpos].hora:=time;
+    if DMCONS.swemular then begin
+      if EmularEstatus[xpos]='1' then begin
+        EmularEstatus[xpos]:='2';
+        TPosCarga[xpos].estatus:=2;
+        TPosCarga[xpos].volumen:=SnImporte/5;
+        TPosCarga[xpos].importe:=SnImporte;
+        TPosCarga[xpos].precio:=5;
+        TPosCarga[xpos].posactual:=1;
+        TPosCarga[xpos].hora:=time;
+      end;
     end;
+  except
+    on e:Exception do
+      DMCONS.AgregaLog('ERROR PRESET 3: '+e.Message);
   end;
 end;
 
@@ -2221,7 +2228,7 @@ begin
     exit;
   end;
   if TPosCarga[xpos].estatus=9 then begin
-    ComandoConsola('E'+IntToClaveNum(xpos,2));
+    ComandoConsolaBuff('E'+IntToClaveNum(xpos,2));
     if DMCONS.ReautorizaPam='Si' then begin
       TPosCarga[xpos].CmndOcc:='';
       TPosCarga[xpos].HoraOcc:=now-1000*tmsegundo;
@@ -2241,7 +2248,7 @@ begin
     TPosCarga[xpos].ImportePreset:=SnLitros;
     TPosCarga[xpos].MontoPreset:=FormatoMoneda(SnLitros)+' lts';
   end;
-  ComandoConsola(ss);
+  ComandoConsolaBuff(ss);
   EsperaMiliSeg(100);
   if DMCONS.ReautorizaPam='Si' then begin
     TPosCarga[xpos].CmndOcc:=ss;
@@ -2462,6 +2469,8 @@ procedure TFDISGATEWAY.Socket1Read(Sender: TObject;
 var C:Char;
 begin
   try
+    primeraRespuesta:=true;
+    SwEspera:=false;
     ContadorAlarma:=0;
     Timer1.Enabled:=false;
     try
@@ -2490,7 +2499,6 @@ begin
         SwError:=(lineaTimer=idNak);
         ProcesaLinea;
         LineaTimer:='';
-        SwEspera:=false;
       end
       else SwEspera:=true;
     finally
