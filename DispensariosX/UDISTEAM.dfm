@@ -428,7 +428,7 @@ object FDISTEAM: TFDISTEAM
   end
   object Timer1: TTimer
     Enabled = False
-    Interval = 300
+    Interval = 200
     OnTimer = Timer1Timer
     Left = 28
     Top = 240

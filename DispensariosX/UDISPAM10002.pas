@@ -1796,12 +1796,15 @@ begin
                                 end;
                                 if TPosCarga[SnPosCarga].swflujovehiculo then begin
                                   ValorPamF:='80'+inttostr(SnPosCarga)+inttostr(xp)+inttostr(TPosCarga[SnPosCarga].flujovehiculo);
-                                  ss:='P'+IntToClaveNum(SnPosCarga,2)+'0'+'1'+'000'+ValorPAMF+'0';
+                                  if DMCONS.VersionPam1000<>'3' then
+                                    ss:='P'+IntToClaveNum(SnPosCarga,2)+'0'+'1'+'000'+ValorPAMF+'0'
+                                  else
+                                    ss:='@020'+IntToClaveNum(SnPosCarga,2)+'0'+'1'+'0'+ValorPAMF+'100000';
                                   ComandoConsola(ss);
                                   EsperaMiliseg(500);
                                   ss:='E'+IntToClaveNum(SnPosCarga,2);
                                   ComandoConsola(ss);
-                                  EsperaMiliseg(500);
+                                  EsperaMiliseg(1000);
                                 end;
                               end;
                               // fin
@@ -1909,9 +1912,19 @@ begin
                                     TPosCarga[SnPosCarga].flujovehiculo:=StrToIntDef(ss,0);
                                   end;
                                 end;
+                                (*
+                                08/Jun/2023 12:35:23.908 OCC 07 9990.00 03 06 01 00 00
+                                08/Jun/2023 12:35:23.908 E <STX>P    07 0 1 000 80710 0<ETX>k
+                                13/Jun/2023 12:28:44.079 E <STX>@020 07 0 1 0   80710 100000<ETX>x
+                                08/Jun/2023 12:35:24.408 E <STX>E07<ETX>A
+                                08/Jun/2023 12:35:24.908 E <STX>@020 07 01 999000 100000<ETX>
+                                  *)
                                 if TPosCarga[SnPosCarga].swflujovehiculo then begin
                                   ValorPamF:='80'+inttostr(SnPosCarga)+inttostr(xp)+inttostr(TPosCarga[SnPosCarga].flujovehiculo);
-                                  ss:='P'+IntToClaveNum(SnPosCarga,2)+'0'+'1'+'000'+ValorPAMF+'0';
+                                  if DMCONS.VersionPam1000<>'3' then
+                                    ss:='P'+IntToClaveNum(SnPosCarga,2)+'0'+'1'+'000'+ValorPAMF+'0'
+                                  else
+                                    ss:='@020'+IntToClaveNum(SnPosCarga,2)+'0'+'1'+'0'+ValorPAMF+'100000';
                                   ComandoConsola(ss);
                                   EsperaMiliseg(500);
                                   ss:='E'+IntToClaveNum(SnPosCarga,2);
@@ -2167,7 +2180,7 @@ begin
                     else if TipoClb='5' then
                       ValorPam1:='93715'
                     else begin
-                      ValorPam1:='9573'+inttostr(tagx[1]);
+                      ValorPam1:='9573'+inttostr(tagx[1]); // on ====
                       ValorPam2:='9574'+inttostr(tagx[3]);
                     end;
                   finally
@@ -2293,7 +2306,7 @@ begin
                       ss:='E'+IntToClaveNum(xPosStop2,2);
                       ComandoConsola(ss);
                       EsperaMiliseg(500);
-                    end;                    
+                    end;
                   end
                   else xposstop:=0;
 

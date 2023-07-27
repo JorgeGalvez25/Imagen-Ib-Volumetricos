@@ -1,9 +1,9 @@
-object FDISPAM10002: TFDISPAM10002
-  Left = 206
-  Top = 125
-  Width = 727
+object FDISGILBARCO: TFDISGILBARCO
+  Left = 234
+  Top = 148
+  Width = 750
   Height = 556
-  Caption = 'Consola Gilbarco'
+  Caption = 'Consola de Dispensarios'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -21,32 +21,31 @@ object FDISPAM10002: TFDISPAM10002
   object Panel1: TPanel
     Left = 0
     Top = 481
-    Width = 719
+    Width = 742
     Height = 41
     Align = alBottom
     BevelOuter = bvNone
-    TabOrder = 1
-    object Label4x: TLabel
-      Left = 180
-      Top = 14
-      Width = 73
-      Height = 16
-      Caption = 'Emulaci'#243'n'
+    TabOrder = 0
+    object Label1: TLabel
+      Left = 16
+      Top = 8
+      Width = 124
+      Height = 20
+      Caption = 'GILBARCO 2W'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
-      Font.Height = -13
+      Font.Height = -16
       Font.Name = 'MS Sans Serif'
       Font.Style = [fsBold]
       ParentFont = False
-      Visible = False
     end
     object BitBtn3: TBitBtn
-      Left = 611
+      Left = 643
       Top = 8
       Width = 75
       Height = 25
       Caption = 'Minimizar'
-      TabOrder = 1
+      TabOrder = 0
       OnClick = BitBtn3Click
       Glyph.Data = {
         F6000000424DF600000000000000760000002800000010000000100000000100
@@ -59,28 +58,28 @@ object FDISPAM10002: TFDISPAM10002
         888C88888888844C888C88888888888CCCCC8888888888888888}
     end
     object StaticText17: TStaticText
-      Left = 236
+      Left = 292
       Top = 8
-      Width = 239
-      Height = 28
-      Caption = 'Error de Comunicacion !!'
+      Width = 186
+      Height = 24
+      Caption = 'Error de Comunicacion'
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = clMaroon
-      Font.Height = -19
+      Font.Color = clOlive
+      Font.Height = -16
       Font.Name = 'MS Sans Serif'
       Font.Style = [fsBold]
       ParentFont = False
-      TabOrder = 0
+      TabOrder = 1
     end
   end
   object PageControl1: TPageControl
     Left = 0
     Top = 0
-    Width = 719
+    Width = 742
     Height = 481
     ActivePage = TabSheet2
     Align = alClient
-    TabOrder = 0
+    TabOrder = 1
     object TabSheet2: TTabSheet
       Caption = 'Consola '
       ImageIndex = 1
@@ -95,19 +94,11 @@ object FDISPAM10002: TFDISPAM10002
           Left = 1
           Top = 1
           Width = 158
-          Height = 272
+          Height = 120
           Align = alTop
           ItemHeight = 13
           TabOrder = 0
           OnClick = ListBox1Click
-        end
-        object StaticText7: TStaticText
-          Left = 16
-          Top = 320
-          Width = 58
-          Height = 17
-          Caption = 'StaticText7'
-          TabOrder = 1
         end
       end
       object ListBoxPC1: TListBox
@@ -122,7 +113,7 @@ object FDISPAM10002: TFDISPAM10002
         Font.Style = []
         ItemHeight = 13
         ParentFont = False
-        TabOrder = 4
+        TabOrder = 1
       end
       object ListBoxPC2: TListBox
         Left = 375
@@ -136,7 +127,7 @@ object FDISPAM10002: TFDISPAM10002
         Font.Style = []
         ItemHeight = 13
         ParentFont = False
-        TabOrder = 5
+        TabOrder = 2
       end
       object ListBoxPC3: TListBox
         Left = 184
@@ -150,7 +141,7 @@ object FDISPAM10002: TFDISPAM10002
         Font.Style = []
         ItemHeight = 13
         ParentFont = False
-        TabOrder = 10
+        TabOrder = 3
       end
       object ListBoxPC4: TListBox
         Left = 375
@@ -164,35 +155,35 @@ object FDISPAM10002: TFDISPAM10002
         Font.Style = []
         ItemHeight = 13
         ParentFont = False
-        TabOrder = 11
+        TabOrder = 4
       end
       object PanelPC1: TPanel
         Left = 184
         Top = 151
         Width = 160
         Height = 20
-        TabOrder = 6
+        TabOrder = 5
       end
       object PanelPC2: TPanel
         Left = 375
         Top = 151
         Width = 160
         Height = 20
-        TabOrder = 7
+        TabOrder = 6
       end
       object PanelPC3: TPanel
         Left = 184
         Top = 328
         Width = 160
         Height = 20
-        TabOrder = 12
+        TabOrder = 7
       end
       object PanelPC4: TPanel
         Left = 375
         Top = 328
         Width = 160
         Height = 20
-        TabOrder = 13
+        TabOrder = 8
       end
       object StaticText1: TStaticText
         Left = 184
@@ -201,58 +192,7 @@ object FDISPAM10002: TFDISPAM10002
         Height = 24
         BorderStyle = sbsSunken
         Caption = '01'
-        Color = clGray
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWhite
-        Font.Height = -16
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
-        ParentColor = False
-        ParentFont = False
-        TabOrder = 2
-      end
-      object StaticText2: TStaticText
-        Left = 375
-        Top = 2
-        Width = 24
-        Height = 24
-        BorderStyle = sbsSunken
-        Caption = '01'
-        Color = clGray
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWhite
-        Font.Height = -16
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
-        ParentColor = False
-        ParentFont = False
-        TabOrder = 3
-      end
-      object StaticText3: TStaticText
-        Left = 184
-        Top = 177
-        Width = 24
-        Height = 24
-        BorderStyle = sbsSunken
-        Caption = '01'
-        Color = clGray
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWhite
-        Font.Height = -16
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
-        ParentColor = False
-        ParentFont = False
-        TabOrder = 8
-      end
-      object StaticText4: TStaticText
-        Left = 375
-        Top = 177
-        Width = 24
-        Height = 24
-        BorderStyle = sbsSunken
-        Caption = '01'
-        Color = clGray
+        Color = clOlive
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWhite
         Font.Height = -16
@@ -262,14 +202,92 @@ object FDISPAM10002: TFDISPAM10002
         ParentFont = False
         TabOrder = 9
       end
+      object StaticText2: TStaticText
+        Left = 375
+        Top = 2
+        Width = 24
+        Height = 24
+        BorderStyle = sbsSunken
+        Caption = '01'
+        Color = clOlive
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWhite
+        Font.Height = -16
+        Font.Name = 'MS Sans Serif'
+        Font.Style = [fsBold]
+        ParentColor = False
+        ParentFont = False
+        TabOrder = 10
+      end
+      object StaticText3: TStaticText
+        Left = 184
+        Top = 177
+        Width = 24
+        Height = 24
+        BorderStyle = sbsSunken
+        Caption = '01'
+        Color = clOlive
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWhite
+        Font.Height = -16
+        Font.Name = 'MS Sans Serif'
+        Font.Style = [fsBold]
+        ParentColor = False
+        ParentFont = False
+        TabOrder = 11
+      end
+      object StaticText4: TStaticText
+        Left = 375
+        Top = 177
+        Width = 24
+        Height = 24
+        BorderStyle = sbsSunken
+        Caption = '01'
+        Color = clOlive
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWhite
+        Font.Height = -16
+        Font.Name = 'MS Sans Serif'
+        Font.Style = [fsBold]
+        ParentColor = False
+        ParentFont = False
+        TabOrder = 12
+      end
       object Panel2: TPanel
-        Left = 559
+        Left = 582
         Top = 0
         Width = 152
         Height = 453
         Align = alRight
         BevelOuter = bvNone
-        TabOrder = 1
+        TabOrder = 13
+        object ListView1: TListView
+          Left = 8
+          Top = 0
+          Width = 144
+          Height = 453
+          Align = alRight
+          Columns = <
+            item
+              Caption = 'Posicion'
+              Width = 140
+            end>
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = [fsBold]
+          Items.Data = {
+            490000000300000001000000FFFFFFFFFFFFFFFF000000000000000002303100
+            000000FFFFFFFFFFFFFFFF00000000000000000000000000FFFFFFFFFFFFFFFF
+            000000000000000000}
+          ReadOnly = True
+          ParentFont = False
+          SmallImages = ImageList1
+          TabOrder = 0
+          ViewStyle = vsReport
+          OnDblClick = ListView1DblClick
+        end
       end
       object DBGrid3: TDBGrid
         Left = 247
@@ -301,132 +319,140 @@ object FDISPAM10002: TFDISPAM10002
     end
     object TabSheet1: TTabSheet
       Caption = 'Trafico'
-      object Label1: TLabel
-        Left = 528
-        Top = 48
-        Width = 115
+      object Label2: TLabel
+        Left = 456
+        Top = 56
+        Width = 49
         Height = 13
-        Caption = 'Reseteando PAM....'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
-        ParentFont = False
-        Visible = False
+        Caption = 'Pos Carga'
+      end
+      object Label3: TLabel
+        Left = 456
+        Top = 88
+        Width = 48
+        Height = 13
+        Caption = 'Manguera'
+      end
+      object Label4: TLabel
+        Left = 456
+        Top = 120
+        Width = 24
+        Height = 13
+        Caption = 'Valor'
+      end
+      object Label5: TLabel
+        Left = 552
+        Top = 92
+        Width = 61
+        Height = 13
+        Caption = '* 05 = Todas'
       end
       object StaticText5: TStaticText
-        Left = 4
-        Top = 82
-        Width = 37
+        Left = 12
+        Top = 10
+        Width = 69
         Height = 18
         AutoSize = False
         BorderStyle = sbsSingle
-        Caption = '0'
         TabOrder = 0
       end
       object StaticText6: TStaticText
-        Left = 44
-        Top = 82
-        Width = 61
+        Left = 12
+        Top = 34
+        Width = 77
         Height = 18
         AutoSize = False
         BorderStyle = sbsSingle
         TabOrder = 1
       end
-      object CheckBox2: TCheckBox
-        Left = 424
-        Top = 416
-        Width = 97
-        Height = 17
-        Caption = 'CheckBox2'
-        TabOrder = 2
-      end
-      object Memo1: TMemo
-        Left = 298
-        Top = 53
-        Width = 153
-        Height = 95
-        TabOrder = 3
-      end
       object StaticText18: TStaticText
-        Left = 296
-        Top = 168
+        Left = 56
+        Top = 328
         Width = 64
         Height = 17
         Caption = 'StaticText18'
-        TabOrder = 4
+        TabOrder = 2
       end
       object Button1: TButton
-        Left = 7
-        Top = 113
+        Left = 15
+        Top = 161
         Width = 98
         Height = 25
         Caption = 'Guardar Log'
-        TabOrder = 5
+        TabOrder = 3
         OnClick = Button1Click
       end
-      object Button2: TButton
-        Left = 504
-        Top = 16
-        Width = 161
-        Height = 25
-        Caption = 'RESET - PAM 1000/5000'
-        TabOrder = 6
-        OnClick = Button2Click
-      end
       object StaticText9: TStaticText
-        Left = 296
-        Top = 152
+        Left = 56
+        Top = 304
         Width = 58
         Height = 17
         Caption = 'StaticText9'
-        TabOrder = 7
+        TabOrder = 4
         Visible = False
       end
       object Button3: TButton
-        Left = 127
-        Top = 113
-        Width = 138
+        Left = 15
+        Top = 249
+        Width = 130
         Height = 25
         Caption = 'Guardar Log Comandos'
-        TabOrder = 8
+        TabOrder = 5
         OnClick = Button3Click
+      end
+      object Edit1: TEdit
+        Left = 512
+        Top = 56
+        Width = 25
+        Height = 21
+        TabOrder = 6
+        Text = '01'
+      end
+      object Edit2: TEdit
+        Left = 512
+        Top = 88
+        Width = 25
+        Height = 21
+        TabOrder = 7
+        Text = '05'
+      end
+      object Edit3: TEdit
+        Left = 512
+        Top = 120
+        Width = 25
+        Height = 21
+        TabOrder = 8
+        Text = '05'
+      end
+      object Button2: TButton
+        Left = 464
+        Top = 160
+        Width = 75
+        Height = 25
+        Caption = 'Enviar'
+        TabOrder = 9
+        OnClick = Button2Click
       end
     end
   end
-  object Ap1: TApdComPort
-    ComNumber = 4
-    Parity = pEven
-    DataBits = 7
-    AutoOpen = False
-    TraceName = 'APRO.TRC'
-    LogName = 'APRO.LOG'
-    OnTriggerAvail = Ap1TriggerAvail
-    Left = 24
-    Top = 40
-  end
   object Timer1: TTimer
     Enabled = False
-    Interval = 250
+    Interval = 100
     OnTimer = Timer1Timer
-    Left = 28
-    Top = 72
+    Left = 204
+    Top = 64
   end
   object PopupMenu1: TPopupMenu
-    Left = 64
-    Top = 42
+    Left = 208
+    Top = 26
     object Restaurar1: TMenuItem
       Caption = 'Abrir Consola'
       OnClick = Restaurar1Click
     end
-  end
-  object Timer3: TTimer
-    Enabled = False
-    Interval = 200
-    OnTimer = Timer3Timer
-    Left = 324
-    Top = 328
+    object AbrirUbicacin1: TMenuItem
+      Caption = 'Abrir Ubicaci'#243'n'
+      OnClick = Button4Click
+    end
   end
   object ImageList1: TImageList
     Left = 324
@@ -1002,8 +1028,8 @@ object FDISPAM10002: TFDISPAM10002
   object TL_Bomb: TTable
     DatabaseName = 'DBGASCONSOLA'
     TableName = 'DPVGBOMB'
-    Left = 455
-    Top = 80
+    Left = 287
+    Top = 64
     object TL_BombMANGUERA: TIntegerField
       FieldName = 'MANGUERA'
     end
@@ -1032,7 +1058,7 @@ object FDISPAM10002: TFDISPAM10002
   object TL_Tcmb: TTable
     DatabaseName = 'DBGASCONSOLA'
     TableName = 'DPVGTCMB'
-    Left = 455
+    Left = 279
     Top = 120
     object TL_TcmbCLAVE: TIntegerField
       FieldName = 'CLAVE'
@@ -1052,5 +1078,18 @@ object FDISPAM10002: TFDISPAM10002
     object TL_TcmbPRECIOFISICO: TFloatField
       FieldName = 'PRECIOFISICO'
     end
+  end
+  object PuertoSerial: TApdComPort
+    ComNumber = 1
+    Baud = 5700
+    Parity = pEven
+    Tracing = tlOn
+    TraceName = 'APRO.TRC'
+    TraceAllHex = True
+    LogName = 'APRO.LOG'
+    OnTriggerAvail = PuertoSerialTriggerAvail
+    OnTriggerData = PuertoSerialTriggerData
+    Left = 20
+    Top = 120
   end
 end

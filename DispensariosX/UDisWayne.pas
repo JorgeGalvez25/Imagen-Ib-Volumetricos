@@ -4,9 +4,9 @@ interface
 
 uses Variants,
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  OoMisc, AdPort, StdCtrls, Buttons, ComCtrls, ExtCtrls, Menus, DateUtils,
-  DB, DBTables, RXShell, ImgList, Grids, DBGrids, dxGDIPlusClasses,
-  Mask, ULibPrint, Registry;
+  OoMisc, AdPort, StdCtrls, Buttons, ComCtrls, ExtCtrls, Menus,
+  Mask, ImgList, Db, DBTables, Grids, ULibPrint, DBGrids, RXShell, Registry,
+  dxGDIPlusClasses;
 
 type
   TFDISWAYNE = class(TForm)
@@ -189,8 +189,6 @@ type
        Mensaje :string[12];
        ValorMapeo :string[10];
        ModoOpera:string[8];
-       SwAdic,
-       ContAdic:Integer;
 
        ContOcc,
        TipoPago,
@@ -207,7 +205,6 @@ type
        aros_vehi:integer;
        swarosmag_stop:boolean;
        importe_aros:real;
-       esDiesel:Boolean;
 
      end;
 
@@ -421,7 +418,6 @@ begin
         //CodigoEnllava:='01';
         SwDesp:=false;
         ModoOpera:=Q_BombIbModoOperacion.AsString;
-        esDiesel:=True;
         if DMCONS.InicializaWayne='Si' then
           RefrescaEnllavados:=true
         else
@@ -433,8 +429,6 @@ begin
         if not existe then begin
           inc(NoComb);
           TComb[NoComb]:=xcomb;
-          if (xcomb=1) or (xcomb=2) then
-            esDiesel:=False;
           if Q_BombIbCon_Posicion.AsInteger>0 then
             TPos[NoComb]:=Q_BombIbCon_Posicion.AsInteger
           else if NoComb<=4 then
@@ -827,12 +821,10 @@ var lin,ss,rsp,descrsp,xestado,xmodo,rsp2:string;
     SwOk:boolean;
     xprec,
     ximpo,
-    xPorcAdic,
     xvol:real;
     saux:string;
     contstop,contact:integer;
     xvalor:real;
-    segAdic:TDateTime;
 begin
   try
     saux:=LineaTimer;
@@ -927,10 +919,6 @@ begin
                        for xcomb:=1 to nocomb do
                          DMCONS.RegistraBitacora3(1,'Desconexión de Manguera','Pos Carga '+inttostr(xpos)+' / Combustible '+DMCONS.TabComb[TComb[xcomb]].Nombre,'U');
                      end;
-                     if ContAdic=3 then begin
-                       ContAdic:=0;
-                       SwAdic:=0;
-                     end;
                    end;
                  1:begin
                      descestat:='Inactivo';
@@ -946,28 +934,6 @@ begin
                      if estatusant=0 then begin
                        for xcomb:=1 to nocomb do
                          DMCONS.RegistraBitacora3(1,'Reconexión de Manguera','Pos Carga '+inttostr(xpos)+' / Combustible '+DMCONS.TabComb[TComb[xcomb]].Nombre,'U');
-                     end;
-                     if ContAdic=1 then
-                       ContAdic:=3;
-                     if (SwAdic=2) and (ContAdic=3) and (SecondsBetween(segAdic,now)>1) then begin
-                       segAdic:=Now;
-                       if DMCONS.TAdic31[xpos]>0 then
-                         xPorcAdic:=(DMCONS.TAdic31[xpos]/10)
-                       else
-                         xPorcAdic:=0;
-                       if esDiesel then
-                         DMCONS.EjecutaComando('OCL '+IntToStr(xpos)+' '+FloatToStr(964.6+xPorcAdic))
-                       else
-                         DMCONS.EjecutaComando('OCL '+IntToStr(xpos)+' '+FloatToStr(964.5+xPorcAdic));
-                       ContAdic:=2;
-                     end
-                     else if (SwAdic=1) and (ContAdic=3) and (SecondsBetween(segAdic,now)>1) then begin
-                       segAdic:=Now;
-                       if esDiesel then
-                         DMCONS.EjecutaComando('OCL '+IntToStr(xpos)+' 964.60')
-                       else
-                         DMCONS.EjecutaComando('OCL '+IntToStr(xpos)+' 964.50');
-                       ContAdic:=2;
                      end;
                    end;
                  2:begin
@@ -985,10 +951,6 @@ begin
                              EmularEstatus[xpos]:='8';
                          end;
                        end;
-                     end;
-                     if ContAdic=1 then begin
-                       ContAdic:=0;
-                       SwAdic:=0;
                      end;
                    end;
                  3:descestat:='Fin de Venta';
@@ -1042,12 +1004,6 @@ begin
                        ss:='E'+IntToClaveNum(xpos,2); // STOP
                        ComandoConsola(ss);
                      end;
-                     if (SwAdic>0) and (ContAdic=3) and (SecondsBetween(segAdic,now)>1) then begin
-                       segAdic:=Now;
-                       DMCONS.EjecutaComando('DVC '+IntToStr(xpos));
-                     end;
-                     if ContAdic=2 then
-                       ContAdic:=1;
                    end;
                end;
                if estatus in [1,2,3,5,9] then
@@ -1666,7 +1622,7 @@ end;
 procedure TFDISWAYNE.Timer1Timer(Sender: TObject);
 var ss,rsp,str1:string;
     i,xpos,xp,xcomb,xfolio,tag3,
-    xcmnd,sumAdi:integer;
+    xcmnd:integer;
     xlimite,
     xprecio:real;
     swok,swerr:boolean;
@@ -2003,53 +1959,6 @@ begin
           except
             rsp:='Comando Erroneo';
           end;
-        end
-        else if ss='FLUSTD' then begin
-          if Licencia3Ok then begin
-            for xpos:=1 to MaxPosCarga do begin
-              TPosCarga[xpos].swAdic:=2;
-              TPosCarga[xpos].ContAdic:=3
-            end;
-            rsp:='OK';
-            Q_Pcar.Active:=false;
-            Q_Pcar.Active:=true;
-            while not Q_Pcar.Eof do begin
-              xpos:=Q_PcarPosCarga.AsInteger;
-              if (xpos<=DMCONS.MaximoDePosiciones) then
-                TAdic31[xpos]:=Q_PcarSlowFlow.AsFloat;
-              Q_Pcar.Next;
-            end;
-          end
-          else begin
-            rsp:='Opción no Habilitada';
-          end;
-        end
-        else if ss='FLUMIN' then begin
-          if Licencia3Ok then begin
-            for xpos:=1 to MaxPosCarga do begin
-              TPosCarga[xpos].swAdic:=1;
-              TPosCarga[xpos].ContAdic:=3
-            end;
-            rsp:='OK';
-          end
-          else begin
-            rsp:='Opción no Habilitada';
-          end;           
-        end
-        else if ss='SIMADI' then begin
-          for xpos:=1 to MaxPosCarga do begin
-            TPosCarga[xpos].swAdic:=0;
-          end;
-          rsp:='OK';
-        end
-        else if ss='ESTADI' then begin
-          for xpos:=1 to MaxPosCarga do
-            sumAdi:=sumAdi+TPosCarga[xpos].swAdic;
-
-          if sumAdi=0 then
-            rsp:='OK'
-          else
-            rsp:='Comandos en proceso'
         end;
         if SwAplicaCmnd then begin
           TabCmnd[xcmnd].SwResp:=true;

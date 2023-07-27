@@ -19,9 +19,9 @@ uses
   DmSrv_Invk in 'DmSrv_Invk.pas',
   SrvDispensarios_Impl in 'SrvDispensarios_Impl.pas' {SrvDispensarios: TRORemoteDataModule},
   UDISPAM10002 in 'UDISPAM10002.pas' {FDISPAM10002},
-  UDISPAMPC in 'UDISPAMPC.pas' {FDISPAMPC},
-  UDISFUSION in 'UDISFUSION.pas' {FDISFUSION},
-  UDISOPENGAS in 'UDISOPENGAS.pas' {FDISOPENGAS};
+  UDISGILBARCO in 'UDISGILBARCO.pas' {FDISGILBARCO},
+  UDISGILBARCOKiros in 'UDISGILBARCOKiros.pas' {FDISGILBARCOKiros},
+  UDISGATEWAY in 'UDISGATEWAY.pas' {FDISGATEWAY};
 
 {#ROGEN:PDISMENU.rodl} // RemObjects: Careful, do not remove!
 {$R RODLFile.res}
@@ -43,7 +43,10 @@ begin
   Application.Title := 'Consola de Dispensarios';
   Application.CreateForm(TFDISMENU, FDISMENU);
   Application.CreateForm(TDMCONS, DMCONS);
-  Application.CreateForm(TFDISPAMPC, FDISPAMPC);
+  Application.CreateForm(TFDISPAM10002, FDISPAM10002);
+  Application.CreateForm(TFDISGILBARCO, FDISGILBARCO);
+  Application.CreateForm(TFDISGILBARCOKiros, FDISGILBARCOKiros);
+  Application.CreateForm(TFDISGATEWAY, FDISGATEWAY);
   Application.Run;
 end.
 
