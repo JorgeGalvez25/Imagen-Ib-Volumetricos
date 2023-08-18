@@ -238,7 +238,7 @@ var
 
 implementation
 
-uses ULIBGRAL, ULIBLICENCIAS, DDMCONS, UDISMENU;
+uses ULIBGRAL, ULIBLICENCIAS, DDMCONS, UDISMENU, StrUtils;
 
 {$R *.DFM}
 
@@ -949,45 +949,46 @@ begin
                        end;
                        if (FluAct) and (SwFlu) then begin
                          with DMCONS do begin
-                           if TAdic31[xpos]>0 then begin
-                             if VersionPam1000='3' then begin
+                           if (TAdic31[xpos]>0) or (FluMin) then begin
+                             if TipoClb='7' then
+                               ValorPam1:='957'+IfThen(esDiesel,'4','3')+FloatToStr(TAdic31[xpos])
+                             else
                                ValorPam1:='8'+IntToClaveNum(xpos,2)+'1'+FloatToStr(TAdic31[xpos]);
-                               ss:='@020'+IntToClaveNum(xpos,2)+'010'+ValorPam1+'111000';
-                             end
-                             else begin
-                               ValorPam1:='8'+IntToClaveNum(xpos,2)+'1'+FloatToStr(TAdic31[xpos]);
+                             if VersionPam1000='3' then
+                               ss:='@020'+IntToClaveNum(xpos,2)+'010'+ValorPam1+'111000'
+                             else
                                ss:='P'+IntToClaveNum(xpos,2)+'01000'+ValorPAM1+'0';
-                             end;
                              ComandoConsola(ss);
                              EsperaMiliseg(500);
                              ss:='E'+IntToClaveNum(xpos,2);
                              ComandoConsola(ss);
                              EsperaMiliseg(500);
+                             FluMin:=False;
                            end;
-                           if TAdic32[xpos]>0 then begin
-                             if VersionPam1000='3' then begin
+                           if (TAdic32[xpos]>0) or (FluMin) then begin
+                             if TipoClb='7' then
+                               ValorPam2:='957'+IfThen(esDiesel,'4','3')+FloatToStr(TAdic32[xpos])
+                             else
                                ValorPam2:='8'+IntToClaveNum(xpos,2)+'2'+FloatToStr(TAdic32[xpos]);
-                               ss:='@020'+IntToClaveNum(xpos,2)+'010'+ValorPam2+'111000';
-                             end
-                             else begin
-                               ValorPam2:='8'+IntToClaveNum(xpos,2)+'2'+FloatToStr(TAdic32[xpos]);
+                             if VersionPam1000='3' then
+                               ss:='@020'+IntToClaveNum(xpos,2)+'010'+ValorPam2+'111000'
+                             else
                                ss:='P'+IntToClaveNum(xpos,2)+'01000'+ValorPAM2+'0';
-                             end;
                              ComandoConsola(ss);
                              EsperaMiliseg(500);
                              ss:='E'+IntToClaveNum(xpos,2);
                              ComandoConsola(ss);
                              EsperaMiliseg(500);
                            end;
-                           if TAdic33[xpos]>0 then begin
-                             if VersionPam1000='3' then begin
+                           if (TAdic33[xpos]>0) or (FluMin) then begin
+                             if TipoClb='7' then
+                               ValorPam3:='957'+IfThen(esDiesel,'4','3')+FloatToStr(TAdic33[xpos])
+                             else
                                ValorPam3:='8'+IntToClaveNum(xpos,2)+'3'+FloatToStr(TAdic33[xpos]);
-                               ss:='@020'+IntToClaveNum(xpos,2)+'010'+ValorPam3+'111000';
-                             end
-                             else begin
-                               ValorPam3:='8'+IntToClaveNum(xpos,2)+'3'+FloatToStr(TAdic33[xpos]);
+                             if VersionPam1000='3' then
+                               ss:='@020'+IntToClaveNum(xpos,2)+'010'+ValorPam3+'111000'
+                             else
                                ss:='P'+IntToClaveNum(xpos,2)+'01000'+ValorPAM3+'0';
-                             end;
                              ComandoConsola(ss);
                              EsperaMiliseg(500);
                              ss:='E'+IntToClaveNum(xpos,2);
@@ -2138,6 +2139,24 @@ begin
                       TPosCarga[xpos].FluStd:=True;
                   until (xpos>MaxPosCarga);
                 end
+                else if tipoclb='7' then begin
+                  try
+                    Q_Pcar.Active:=false;
+                    Q_Pcar.Active:=true;
+                    while not Q_Pcar.Eof do begin
+                      xpos:=Q_PcarPosCarga.AsInteger;
+                      if (xpos<=DMCONS.MaximoDePosiciones) and (xpos mod 2 = 1) then begin
+                        TAdic31[xpos]:=Q_PcarSlowFlow.AsFloat*10;
+                        TAdic32[xpos]:=Q_PcarSlowFlow2.AsFloat*10;
+                        TAdic33[xpos]:=Q_PcarSlowFlow3.AsFloat*10;
+                        TPosCarga[xpos].FluAct:=True;
+                      end;
+                      Q_Pcar.Next;
+                    end;
+                  finally
+                    Q_CombIb.Active:=false;
+                  end;
+                end
                 else begin
                   // Carga valores pcar
                   Q_Pcar.Active:=false;
@@ -2264,6 +2283,26 @@ begin
                       TPosCarga[xpos].FluMin:=True;
                   until (xpos>MaxPosCarga);  
                 end
+                else if tipoclb='7' then begin
+                  try
+                    SwEspMin:=True;
+                    Q_Pcar.Active:=false;
+                    Q_Pcar.Active:=true;
+                    while not Q_Pcar.Eof do begin
+                      xpos:=Q_PcarPosCarga.AsInteger;
+                      if (xpos<=DMCONS.MaximoDePosiciones) and (xpos mod 2 = 1) then begin
+                        TAdic31[xpos]:=0;
+                        TAdic32[xpos]:=0;
+                        TAdic33[xpos]:=0;
+                        TPosCarga[xpos].FluAct:=True;
+                        TPosCarga[xpos].FluMin:=True;
+                      end;
+                      Q_Pcar.Next;
+                    end;
+                  finally
+                    Q_CombIb.Active:=false;
+                  end;
+                end
                 else begin
                   if tipoclb='2' then
                     ValorPam1:='95700'
@@ -2338,7 +2377,7 @@ begin
 //                if rsp='OK' then
 //                  ActualizaAdic(0);
 
-                if tipoclb<>'6' then
+                if not (tipoclb[1] in ['6','7']) then
                   SwCerrar:=true;
               end
               else begin // if licencia2ok
@@ -2358,14 +2397,10 @@ begin
                       TAdic31[xpos]:=Q_PcarSlowFlow.AsFloat*10;
                       TAdic32[xpos]:=Q_PcarSlowFlow2.AsFloat*10;
                       TAdic33[xpos]:=Q_PcarSlowFlow3.AsFloat*10;
+                      TPosCarga[xpos].FluAct:=True;
                     end;
                     Q_Pcar.Next;
                   end;
-                  xpos:=0;
-                  repeat
-                    inc(xpos);
-                    TPosCarga[xpos].FluAct:=True;
-                  until (xpos>MaxPosCarga);
                 finally
                   Q_CombIb.Active:=false;
                 end;
