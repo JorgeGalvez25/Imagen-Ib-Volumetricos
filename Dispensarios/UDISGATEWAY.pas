@@ -236,7 +236,7 @@ var
 
 implementation
 
-uses ULIBGRAL, ULIBLICENCIAS, DDMCONS, UDISMENU, StrUtils;
+uses ULIBGRAL, ULIBLICENCIAS, DDMCONS, UDISMENU, StrUtils, Math;
 
 {$R *.DFM}
 
@@ -668,6 +668,10 @@ begin
                 xdiflts:=xdiflts+(TotalLitros[ii]-TotalLitrosAnt[ii]);
                 TotalLitrosAnt[ii]:=TotalLitros[ii];
               end;
+              if xdiflts=0 then begin
+                Button1Click(nil);
+                Button3Click(nil);
+              end;
               T_MoviIbTag.AsInteger:=0;
               T_MoviIbManguera.AsInteger:=xmang;
               T_MoviIbTipoPago.asinteger:=TipoPago;
@@ -1066,7 +1070,7 @@ begin
                          importe:=importe/10;
                        if (2*importe<volumen*precio) then
                          importe:=importe*10;
-                         
+
 
                        if DMCONS.AjustePAM='Si' then begin
                          ximporte:=AjustaFloat(volumen*precio,2);
@@ -1075,7 +1079,7 @@ begin
                        end;
 
                        if not swAvanzoVenta then begin
-                         swAvanzoVenta:=(importe<>importeant) and (Estatus=2) and (importe>0);
+                         swAvanzoVenta:=(importe<>importeant) and (Estatus=2) and (importe>0) and (importe-importeant<IfThen(xcomb=3,80,20));
                          DMCONS.AgregaLog(ifthen(swAvanzoVenta,'swAvanzoVenta','NOT')+' Estatus='+IntToStr(Estatus)+' ImporteAnt: '+FloatToStr(importeant)+' Importe: '+FloatToStr(importe));
                        end;      
 
@@ -1092,7 +1096,7 @@ begin
                          ss:='R'+IntToClaveNum(xpos,2); // VENTA COMPLETA
                          if DMCONS.swemular then
                            EmularEstatus[xpos]:='1';
-                         ComandoConsolaBuff(ss);
+                         ComandoConsolaBuff(ss);                     
                          HoraFinv:=now;
                          EsperaMiliSeg(100);
                        end;
