@@ -3,7 +3,7 @@ object FDISHONGJANG: TFDISHONGJANG
   Top = 122
   Width = 814
   Height = 581
-  Caption = 'Consola de Dispensarios 4.3x'
+  Caption = 'Consola de Dispensarios 4.4x'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText

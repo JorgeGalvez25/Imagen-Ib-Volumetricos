@@ -197,6 +197,7 @@ type
        swflujovehiculo:boolean;
        flujovehiculo  :integer;
 
+       stflujo,
        auxprotec      :integer;
 
        PresetCont,
@@ -269,29 +270,7 @@ begin
   end;
 end;
 
-(*
-procedure TFDISBENNETT2.RevisaPrecioEstandar(xpos:integer);
-var xp,xcomb:integer;
-    xprecio:real;
-    ss:string;
-begin
-  with DMCONS,TPosCarga[xpos] do begin
-    for xp:=1 to 4 do if SwPrecEsp[xp] then begin
-      xcomb:=CombustibleEnPosicion(xpos,xp,0);
-      if xcomb in [1..MaxComb] then begin
-        xprecio:=TabComb[xcomb].Precio;
-        if xprecio>0.01 then begin
-          ss:='U'+IntToClaveNum(xpos,2)+NivelPrecioContado+IntToStr(xp)+FiltraStrNum(FormatoNumeroSinComas(xprecio,5,2));
-          ComandoConsola(ss);
-          esperamiliseg(100);
-        end;
-      end;
-      SwPrecEsp[xp]:=false;
-      SwPrecEspPc:=false;
-    end;
-  end;
-end;
-  *)
+
 
 procedure TFDISBENNETT2.IniciaBaseDeDatos;
 var i:integer;
@@ -408,6 +387,7 @@ begin
       PresetImpo:=0;
       PresetImpoN:=0;
       PresetComb:=0;
+      StFlujo:=0;
     end;
     //CargaAdicional;
     // CARGA DEFAULTS BENNETT
@@ -786,20 +766,20 @@ begin
 end;
 
 procedure TFDISBENNETT2.ProcesaFlujo(xpos:integer;swarriba:boolean);
-var xcomb,xp,xcmb:integer;
+var xp,xcmb:integer;
     xadic:real;
     ss,sval:string;
 begin
   with DMCONS do begin
     // Ver 4.4
-
     for xcmb:=1 to TPosCarga[xpos].NoComb do begin
       xp:=TPosCarga[xpos].TPos[xcmb];
-      if swarriba then begin
+      if swarriba then begin  // arriba
         if swflujostd then
           ComandoConsolaBuff(TPosCarga[xpos].TCmndZ[xp],true);
+        TPosCarga[xpos].stflujo:=1;
       end
-      else begin
+      else begin // abajo
         xadic:=TPosCarga[xpos].Tadic[xp]/100;
         if xadic>9.5 then
           xadic:=9.99;
@@ -808,11 +788,13 @@ begin
         else
           sval:='-'+FiltraStrNum(FormatFloat('0.00',Abs(xadic)));
         ss:='Z'+IntToClaveNum(xpos,2)+InttoClaveNum(TPosCarga[xpos].TAjuPos[xp],4)+sval;
-        ComandoConsolaBuff(ss,true);
-        //esperamiliseg(300);
+        ComandoConsolaBuff(ss,false);
+        if swflumin then
+          ComandoConsolaBuff(ss,false);
+        TPosCarga[xpos].stflujo:=0;
       end;
     end;
-    // Fin ver4.4
+    // Fin ver4.4                               
   end;
 end;
 
@@ -923,8 +905,10 @@ begin
                      end
                      else begin
                        if estatusant<>1 then begin
-                         if (swflujostd) then
-                           ProcesaFlujo(xpos,true);
+                         if (swflujostd) then begin
+                           ProcesaFlujo(xpos,false);
+                           esperamiliseg(100);
+                         end;
                          if swflujovehiculo then begin
                            swflujovehiculo:=false;
                            swadic:=true;
@@ -941,7 +925,7 @@ begin
                            if DMCONS.BennettOmitirComandoF='No' then begin
                              ss:='F'+IntToClaveNum(xpos,2)+'9999';
                              ComandoConsolaBuff(ss,false);
-                             EsperaMiliseg(300);
+                             EsperaMiliseg(100);
                            end;
                            SwCmndF:=false;
                          end;
@@ -957,6 +941,14 @@ begin
                      if estatusant=4 then begin
                        SwContStop:=true;ContStop:=0;
                      end;
+                     (*
+                     if stflujo=1 then begin
+                       if (swflujostd) then begin
+                         ProcesaFlujo(xpos,false);
+                         esperamiliseg(100);
+                       end;
+                     end;
+                     *)
                      if SwContStop then begin
                        inc(ContStop);
                        if ContStop>=8 then begin
@@ -992,6 +984,14 @@ begin
                    end;
                  4:begin
                      descestat:='Listo para Despachar';
+                     (*
+                     if stflujo=1 then begin
+                       if (swflujostd) then begin
+                         ProcesaFlujo(xpos,false);
+                         esperamiliseg(100);
+                       end;
+                     end;
+                     *)
                      if (SwArosMag) then begin
                        if (not DMCONS.ConexionArosActiva(xpos)) then with DMCONS do begin
                          PresetImpo:=0; PresetImpoN:=0;
@@ -1032,6 +1032,14 @@ begin
                      if not SwCargando then
                        SwCargaPreset:=true;
                      swcargando:=true;
+                     (*
+                     if stflujo=1 then begin
+                       if (swflujostd) then begin
+                         ProcesaFlujo(xpos,false);
+                         esperamiliseg(100);
+                       end;
+                     end;
+                     *)
                      if SwArosMag then begin
                        if (not DMCONS.ConexionArosActiva(xpos)) then with DMCONS do begin
                          PresetImpo:=0; PresetImpoN:=0;
@@ -1044,11 +1052,12 @@ begin
                      end;
                      if (DMCONS.BennettPararVentaCompleta='Si')and(TPosCarga[xpos].presetimpo>0.5) then begin
                        inc(TPosCarga[xpos].PresetCont);
-                       if (TPosCarga[xpos].importe>=abs(TPosCarga[xpos].presetimpo-0.001)) then begin
+                       if (TPosCarga[xpos].importe>=abs(TPosCarga[xpos].presetimpo+0.01)) then begin
                          if TPosCarga[xpos].PresetCont>=3 then begin
                            PresetImpo:=0; PresetImpoN:=0;
                            ss:='E'+IntToClaveNum(xpos,2); // STOP
                            ComandoConsolaBuff(ss,false);
+                           Button1.Click;
                            if DMCONS.swemular then
                              EmularEstatus[2*xpos]:='6';
                          end;
@@ -1100,6 +1109,7 @@ begin
                // Actualiza Precios
                if ActualizarPrecio then with DMCONS do begin
                  for i:=1 to NoComb do begin
+                   esperamiliseg(100);
                    ss:='U'+IntToClaveNum(xpos,2)+NivelPrecioContado+IntToStr(TPos[i])+FiltraStrNum(FormatoNumeroSinComas(TabComb[TComb[i]].precio,5,2));
                    ComandoConsolaBuff(ss,false);
                    esperamiliseg(100);
@@ -1117,14 +1127,6 @@ begin
                  dec(contpreset);
                case Estatus of
                  1:if SwInicio then begin
-                     (*
-                     ss:='K'+IntToClaveNum(xpos,2)+'1'; // Postpago
-                     ComandoConsolaBuff(ss,false);
-                     ss:='L'+IntToClaveNum(xpos,2)+NivelPrecioContado; // Nivel de Precios
-                     ComandoConsolaBuff(ss,false);
-                     ss:='E'+IntToClaveNum(xpos,2); // Desautorizar
-                     ComandoConsolaBuff(ss,false);
-                     *)
                      SwInicio:=false;
                      SwPrepago:=false;
                      SwPreset:=false;
@@ -1139,7 +1141,7 @@ begin
                          if auxprotec<2 then begin
                            inc(auxprotec);
                            comandoconsola('Y'+IntToClaveNum(xpos,2));
-                           esperamiliseg(300);
+                           esperamiliseg(100);
                            swaux:=false;
                          end;
                        end;
@@ -1148,17 +1150,15 @@ begin
                            if DMCONS.BennettOmitirComandoF='No' then begin
                              ss:='F'+IntToClaveNum(xpos,2)+'9999'; // Alocate Limit
                              ComandoConsolaBuff(ss,true);
-                             EsperaMiliseg(300);
+                             EsperaMiliseg(100);
                            end;
                          end;
                          if DMCONS.ModoAutorizaBennett=0 then begin
-                           (*
-                           xp:=Random(TPosCarga[xpos].NoComb)+1;
-                           if TPosCarga[xpos].TCmndZ[xp]<>'' then begin
-                             ComandoConsola(TPosCarga[xpos].TCmndZ[xp]);
-                             Esperamiliseg(300);
+                           // Autoriza
+                           if (swflujostd)and(not swflujovehiculo) then begin
+                             ProcesaFlujo(xpos,true);
+                             esperamiliseg(100);
                            end;
-                             *)
                            ss:='S'+IntToClaveNum(xpos,2); // Autorizar
                            ComandoConsolaBuff(ss,false);
                          end
@@ -1220,7 +1220,7 @@ begin
                    end;
                  end;
                  if (presetimpo>0.5) then begin
-                   if (estatus=5)and(importe>presetimpo) then begin
+                   if (estatus=5)and(importe>presetimpo+0.01) then begin
                      PresetImpo:=0; PresetImpoN:=0;
                      ss:='E'+IntToClaveNum(xpos,2); // STOP
                      ComandoConsolaBuff(ss,false);
@@ -1232,21 +1232,65 @@ begin
            end;
          end;
          // 4.3x
+     '1':begin // pide estatus de una bomba
+           NumPaso:=2;
+           StaticText5.Caption:=IntToStr(NumPaso);
+           xpos:=StrToIntDef(copy(lin,2,2),0);
+           if (xpos>=1)and(xpos<=DMCONS.MaximoDePosiciones) then begin
+             ContEsperaPaso2:=0;
+             with TPosCarga[xpos] do begin
+               try
+                 swinicio2:=false;
+                 volumen:=StrToFloat(copy(lin,5,8))/100;
+                 simp:=copy(lin,13,8);
+                 spre:=copy(lin,21,5);
+                 importe:=StrToFloat(simp)/100;
+                 precio:=StrToFloat(spre)/100;
+                 (*
+                 // valida ventas mayores a 10000 pesos
+                 ximpo:=volumen*precio;
+                 xdif:=abs(ximpo-importe);
+                 if xdif>=900 then begin
+                   importe:=AjustaFloat(ximpo,2);
+                 end;
+                 // fin
+                   *)
+                 xvol:=ajustafloat(dividefloat(importe,precio),3);
+                 if abs(volumen-xvol)<0.05 then
+                   volumen:=xvol;
+                 if (Estatus in [7,8])and(swcargando) then begin
+                   swcargando:=false;
+                   swdesp:=true;
+                   DMCONS.AgregaLog('GUARDA VENTA Pos:'+inttostr(xpos)+' Estatus:'+inttostr(estatus)+' - ant:'+inttostr(estatusant));
+                 end;
+                 DespliegaPosCarga(xpos);
+                 if (TPosCarga[xpos].finventa=0) then begin
+                   if Estatus in [7,8] then begin
+                     ss:='J'+IntToClaveNum(xpos,2); // Fin de Venta
+                     if DMCONS.swemular then
+                       EmularEstatus[2*xpos]:='1';
+                     ComandoConsola(ss);
+                   end;
+                 end;
+
+               except
+               end;
+             end;
+           end;
+         end;
      'Y':with DMCONS do begin // proteccion lts
            if lin[4]='2' then begin
              xpos:=StrToIntDef(copy(lin,2,2),0);
              if TPosCarga[xpos].auxprotec=2 then begin
-               (*
-               if TPosCarga[xpos].TipoDisp<>400 then
-                 ii:=strtoint(copy(lin,5,4))
-               else
-               *)
+
                ii:=strtoint(copy(lin,5,3));
                DMCONS.AgregaLog('AuxProtec:'+inttostr(TPosCarga[xpos].auxprotec)+'  '+inttostr(ii));
                for i:=1 to CantProtec do begin
                  DMCONS.AgregaLog('Protec:'+inttostr(TabProtec[i]));
-                 if ii=TabProtec[i] then
-                   ProcesaFlujo(xpos,false);
+                 if ii=TabProtec[i] then begin
+                   TPosCarga[xpos].swflujovehiculo:=true;
+                 end;
+                   //ProcesaFlujo(xpos,false);
                end;
              end;
            end;
@@ -1276,9 +1320,20 @@ begin
     end;
     if (ListaCmnd.Count>0)and(not SwEsperaRsp) then begin
       ss:=ListaCmnd[0];
+      if swflumin then begin
+        if ss[1]='Z' then begin
+          if not DMCONS.swemular then begin
+            Ap1.Open:=false;
+            EsperaMiliSeg(100);
+            Ap1.Open:=true;
+            EsperaMiliSeg(100);
+          end;
+        end;
+      end;
       ListaCmnd.Delete(0);
       ComandoConsola(ss);
-      esperamiliseg(500);
+      if not swflumin then
+        esperamiliseg(300);
       exit;
     end
     else begin
@@ -1296,8 +1351,10 @@ begin
           with TPosCarga[PosicionActual] do if NoComb>0 then begin
             if (estatus<>estatusant)or(estatus>=5)or(SwA)or(swinicio2)or(swcargando) then begin
               SwA:=false;
-              //SwActualizar:=true;
-              ComandoConsolaBuff('A'+IntToClaveNum(PosicionActual,2),false);
+              if DMCONS.Bennett8Digitos<>'Si' then
+                ComandoConsolaBuff('A'+IntToClaveNum(PosicionActual,2),false)
+              else
+                ComandoConsolaBuff('1'+IntToClaveNum(PosicionActual,2),false);
             end
             else
               DespliegaPosCarga(PosicionActual);
@@ -1418,9 +1475,11 @@ begin
       // Checa Comandos
       with DMCONS do begin
         if swcierrabd then begin
-          DBGASCON.Connected:=false;
-          Esperamiliseg(300);
-          DBGASCON.Connected:=true;
+          if DMCONS.CierraBD='Si' then begin
+            DBGASCON.Connected:=false;
+            Esperamiliseg(300);
+            DBGASCON.Connected:=true;
+          end;
           swcierrabd:=false;
           Q_CombIb.Active:=true;
         end;
@@ -1433,7 +1492,7 @@ begin
             for xpos:=1 to MaxPosCargaActiva do if TPosCarga[xpos].TipoDisp=400 then  begin
               ss:='F'+IntToClaveNum(xpos,2)+'9999'; // Alocate Limit
               ComandoConsola(ss);
-              EsperaMiliseg(300);
+              EsperaMiliseg(100);
             end;
             rsp:='OK';
             SwCerrar:=true;
@@ -1558,14 +1617,12 @@ begin
                           rsp:='Aro magnético se encuentra desconectado';
                       end;
                       if rsp='OK' then begin
-                        EnviaPreset(rsp,xcomb,sprec,(TPosCarga[SnPosCarga].ContOCC<DMCONS.BennettReintentosPreset));
-                        if rsp='OK' then begin
                           if TPosCarga[SnPosCarga].swflujovehiculo then begin
                             if (Licencia3Ok) then begin
                               xpos:=SnPosCarga;
                               // Ver 4.4
-                              for xp:=1 to TPosCarga[xpos].NoComb do begin
-                                if ((xcomb=0)or(CombustibleEnPosicion(xpos,xp,0)=xcomb)) then begin
+                              for xcmb:=1 to TPosCarga[xpos].NoComb do begin
+                                  xp:=TPosCarga[xpos].TPos[xcmb];
                                   ss:='Z'+IntToClaveNum(xpos,2);
                                   ss:=ss+InttoClaveNum(TPosCarga[xpos].TAjuPos[xp],4);
                                   xadic:=TPosCarga[xpos].flujovehiculo+TPosCarga[xpos].Tadic[xp]/100;
@@ -1576,14 +1633,14 @@ begin
                                   else
                                     sval:='-'+FiltraStrNum(FormatFloat('0.00',Abs(xadic)));
                                   ss:=ss+sval;
-                                  ComandoConsola(ss);
-                                  esperamiliseg(300);
-                                end;
+                                  ComandoConsolaBuff(ss,true);
                               end;
                               // Fin ver4.4
                             end;
                           end;
-                        end;
+                          
+                        EnviaPreset(rsp,xcomb,sprec,(TPosCarga[SnPosCarga].ContOCC<DMCONS.BennettReintentosPreset));
+
                       end;
                     end;
                   end;
@@ -1656,22 +1713,15 @@ begin
                           rsp:='Aro magnético se encuentra desconectado';
                       end;
                       if rsp='OK' then begin
-                        ss:='F'+IntToClaveNum(xpos,2)+FiltraStrNum(FormatFloat('0000',SnLitros));
-                        ComandoConsolaBuff(ss,false);
-                        EsperaMiliSeg(300);
-                        TPosCarga[SnPosCarga].SwCmndF:=true;
-                        SnImporte:=9999.99;
-                        EnviaPreset(rsp,xcomb,sprec,(TPosCarga[SnPosCarga].ContOCC<DMCONS.BennettReintentosPreset));
-                        if rsp='OK' then begin
+                      
                           if TPosCarga[SnPosCarga].swflujovehiculo then begin
                             if (Licencia3Ok) then begin
                               xpos:=SnPosCarga;
                               // Ver 4.4
-                              for xp:=1 to TPosCarga[xpos].NoComb do begin
-                                if ((xcomb=0)or(CombustibleEnPosicion(xpos,xp,0)=xcomb)) then begin
+                              for xcmb:=1 to TPosCarga[xpos].NoComb do begin
+                                  xp:=TPosCarga[xpos].TPos[xcmb];
                                   ss:='Z'+IntToClaveNum(xpos,2);
                                   ss:=ss+InttoClaveNum(TPosCarga[xpos].TAjuPos[xp],4);
-                                  //tabaju[xp]:=TPosCarga[xpos].Tadic[xp];
                                   xadic:=TPosCarga[xpos].flujovehiculo+TPosCarga[xpos].Tadic[xp]/100;
                                   if xadic>9.5 then
                                     xadic:=9.99;
@@ -1680,9 +1730,8 @@ begin
                                   else
                                     sval:='-'+FiltraStrNum(FormatFloat('0.00',Abs(xadic)));
                                   ss:=ss+sval;
-                                  ComandoConsola(ss);
+                                  ComandoConsolaBuff(ss,true);
                                   esperamiliseg(300);
-                                end;
                               end;
                               // Fin ver4.4
                             end;
@@ -1692,28 +1741,15 @@ begin
                             for i:=1 to CantProtec do
                               if SnLitros=TabProtec[i] then begin
                                 TPosCarga[SnPosCarga].swflujovehiculo:=true;
-                                xpos:=SnPosCarga;
-                                // Ver 4.4
-                                for xp:=1 to TPosCarga[xpos].NoComb do begin
-                                  if ((xcomb=0)or(CombustibleEnPosicion(xpos,xp,0)=xcomb)) then begin
-                                    ss:='Z'+IntToClaveNum(xpos,2);
-                                    ss:=ss+InttoClaveNum(TPosCarga[xpos].TAjuPos[xp],4);
-                                    xadic:=TPosCarga[xpos].Tadic[xp]/100;
-                                    if xadic>9.5 then
-                                      xadic:=9.99;
-                                    if xadic>0 then
-                                      sval:='+'+FiltraStrNum(FormatFloat('0.00',Abs(xadic)))
-                                    else
-                                      sval:='-'+FiltraStrNum(FormatFloat('0.00',Abs(xadic)));
-                                    ss:=ss+sval;
-                                    ComandoConsola(ss);
-                                    esperamiliseg(300);
-                                  end;
-                                end;
-                                // Fin ver4.4
                               end;
                           end;
-                        end;
+
+                        ss:='F'+IntToClaveNum(xpos,2)+FiltraStrNum(FormatFloat('0000',SnLitros));
+                        ComandoConsolaBuff(ss,false);
+                        EsperaMiliSeg(100);
+                        TPosCarga[SnPosCarga].SwCmndF:=true;
+                        SnImporte:=9999.99;
+                        EnviaPreset(rsp,xcomb,sprec,(TPosCarga[SnPosCarga].ContOCC<DMCONS.BennettReintentosPreset));
                       end;
                     end;
                   end;
@@ -1844,7 +1880,7 @@ begin
                     else
                       sval:='-'+FiltraStrNum(FormatFloat('0.00',Abs(xadic)));
                     ss:=ss+sval;
-                    ComandoConsolaBuff(ss,true);
+                    //ComandoConsolaBuff(ss,true);
                     TPosCarga[xpos].TCmndZ[xp]:=ss;
                   end;
                   // Fin ver4.4
@@ -1866,9 +1902,8 @@ begin
                 StAdic:=1;
                 rsp:='OK';
                 for xpos:=1 to MaxPosCargaActiva do begin
-                  if (xpos<=DMCONS.MaximoDePosiciones) then if TPosCarga[xpos].estatus<>0 then begin
+                  if (xpos<=DMCONS.MaximoDePosiciones) then if TPosCarga[xpos].estatus<>0 then
                     ProcesaFlujo(xpos,false);
-                  end;
                 end;
                 ActualizaAdic(0);
               end
@@ -2003,7 +2038,7 @@ procedure TFDISBENNETT2.ComandoConsolaBuff(ss:string;swinicio:boolean);
 begin
   if (ListaCmnd.Count=0)and(not SwEsperaRsp) then begin
     ComandoConsola(ss);
-    esperamiliseg(500);
+    esperamiliseg(100);
   end
   else begin
     if swinicio then begin
@@ -2123,7 +2158,7 @@ begin
     end
     else begin // HAY COMANDOS EN PROCESO
       inc(ContEsperaRsp);
-      if ContEsperaRsp>MaxEsperaRsp then begin
+      if (ContEsperaRsp>MaxEsperaRsp)or(swflumin) then begin
         ContEsperaRsp:=0;
         case CharCmnd of
          'B':LineaTimer:=idStx+idStx+'B00'+idEtx+'.*';
@@ -2143,13 +2178,7 @@ var xpos,xp,xc:integer;
 begin
   rsp:='OK';
   xpos:=SnPosCarga;
-  (*
-  xp:=Random(TPosCarga[xpos].NoComb)+1;
-  if TPosCarga[xpos].TCmndZ[xp]<>'' then begin
-    ComandoConsola(TPosCarga[xpos].TCmndZ[xp]);
-    Esperamiliseg(300);
-  end;
-    *)
+
   if not (TPosCarga[xpos].estatus in [1..3]) then begin
     rsp:='Posición no Disponible';
     exit;
@@ -2158,11 +2187,17 @@ begin
     rsp:='Posición Deshabilitada';
     exit;
   end;
+
+  if (swflujostd)and(not TPosCarga[xpos].swflujovehiculo) then begin
+    ProcesaFlujo(xpos,true);
+    esperamiliseg(100);
+  end;
+
   if TPosCarga[xpos].TipoDisp=400 then begin
     if DMCONS.BennettOmitirComandoF='No' then begin
       ss:='F'+IntToClaveNum(xpos,2)+'9999'; // Alocate Limit
       ComandoConsolaBuff(ss,true);
-      EsperaMiliseg(300);
+      EsperaMiliseg(100);
     end;
   end;
   if (DMCONS.BennettPresetExtendido='No')or(SnImporte<=9999.99) then begin
@@ -2174,7 +2209,8 @@ begin
     ComandoConsolaBuff(ss,false);
     ss:='L'+IntToClaveNum(xpos,2)+NivelPrecioContado; // Nivel de Precios
     ComandoConsolaBuff(ss,false);
-    ss:='S'+IntToClaveNum(xpos,2); // Autorizar
+    // Autoriza
+    ss:='S'+IntToClaveNum(xpos,2);
     TPosCarga[xpos].PosAutorizada:=0;
     if DMCONS.SoportaSeleccionProducto='Si' then
       if xcomb>0 then with TPosCarga[xpos] do begin

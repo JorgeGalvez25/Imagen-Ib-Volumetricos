@@ -22,16 +22,16 @@ var
 implementation
 
 uses DDMCONS, ULIBDATABASE, ULIBGRAL, ULIBLICENCIAS, ULIBPRINT, UDisWayne,
-  UDISBENNETT2, UDISPAM10002, UDISTEAM, UDISHONGJANG, UDISPAMPC, UDISFUSION,
-  UDISOPENGAS;
+  UDISBENNETT2, UDISPAM10002, UDISTEAM, UDISHONGJANG, UDISGILBARCO, UDISGILBARCOKiros,
+  UDISGATEWAY;
 
 {$R *.dfm}
 
 procedure TFDISMENU.IniciaBaseDeDatos;
-var xfecha:tdatetime;
+//var xfecha:tdatetime;
 begin
   with DMCONS do begin
-    if true (*not swemular *) then begin
+    if not swemular then begin
       if (lcLicTemporal)and(date>lcLicVence) then begin
         raise Exception.Create('Licencia vencida');
       end;
@@ -57,7 +57,7 @@ end;
 
 procedure TFDISMENU.FormShow(Sender: TObject);
 var numerr:integer;
-    xfec:string;
+    //xfec:string;
 begin
   with DMCONS do begin
     try
@@ -69,16 +69,6 @@ begin
       ConectaBaseDatos;
       IniciaBaseDeDatos;
       numerr:=2;
-      (*
-      if (not SwEmular) then begin
-        xfec:=fechatostr(date);
-        if xfec>'20200531' then
-          raise exception.Create('Licencia Vencida');
-      end
-      else
-        Licencia3Ok:=true;
-        *)
-
       Case T_EstsIbTipoDispensario.AsInteger of
         1:begin
             Application.CreateForm(TFDISWAYNE,FDISWAYNE);
@@ -101,17 +91,17 @@ begin
             FDISHONGJANG.Show;
           end;
         6:begin
-            Application.CreateForm(TFDISPAMPC,FDISPAMPC);
-            FDISPAMPC.Show;
+            Application.CreateForm(TFDISGILBARCO,FDISGILBARCO);
+            FDISGILBARCO.Show;
           end;
         7:begin
-            Application.CreateForm(TFDISFUSION,FDISFUSION);
-            FDISFUSION.Show;
+            Application.CreateForm(TFDISGILBARCOKiros,FDISGILBARCOKiros);
+            FDISGILBARCOKiros.Show;
           end;
         8:begin
-            Application.CreateForm(TFDISOPENGAS,FDISOPENGAS);
-            FDISOPENGAS.Show;
-          end;
+            Application.CreateForm(TFDISGATEWAY,FDISGATEWAY);
+            FDISGATEWAY.Show;
+          end;          
       end;
     except
       case numerr of

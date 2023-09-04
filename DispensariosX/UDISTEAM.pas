@@ -147,7 +147,7 @@ type
     function ComandoC(xdisp:integer):string;
     function ComandoD(xdisp:integer):string;
     function ComandoN(xdisp,xlado,xprod:integer):string;
-    function ComandoW(xdisp,xvalor:integer):string;
+    function ComandoW(xdisp,xlado,xvalor:integer):string;
     function StrToHexSep(ss:string):string;
     function HexSepToStr(ss:string):string;
     function HexToBinario(ss:string):string;
@@ -166,6 +166,12 @@ type
        importe,
        volumen,
        precio     :real;
+       importepre,
+       volumenpre,
+       preciopre,
+       importenvo,
+       volumennvo,
+       precionvo :real;
        importeant :real;
        //importex   :real;
        //swerr_vta   :boolean;
@@ -386,12 +392,14 @@ begin
       ActualizarPrecio:=false;
       Mensaje:='';
       importe:=0;
-      //importex:=0;
-      //swerr_vta:=false;
       impopreset:=0;
       volumen:=0;
       precio:=0;
+      importepre:=0;
+      volumenpre:=0;
+      preciopre:=0;
       importeant:=0;
+      importenvo:=0;
       for j:=1 to MCxP do
         TotalLitros[j]:=0;
       SwCargando:=false;
@@ -881,7 +889,9 @@ begin
                      swcargando:=true;
                      if estatusant<>5 then begin
                        ContDesp:=0;
-                       //importex:=0;
+                       importenvo:=0;
+                       volumennvo:=0;
+                       precionvo:=0;
                      end;
                    end;
                  6:begin
@@ -931,6 +941,10 @@ begin
              ContEsperaPaso2:=0;
              with TPosCarga[xpos] do begin
                try
+                 importepre:=importenvo;
+                 volumenpre:=volumennvo;
+                 preciopre:=precionvo;
+
                  swinicio2:=false;
                  volumen:=StrToFloat(copy(lin,5,6))/100;
                  simp:=copy(lin,11,8);
@@ -938,6 +952,10 @@ begin
                  importe:=StrToFloat(simp)/100;
                  precio:=StrToFloat(spre)/100;
 
+                 importenvo:=importe;
+                 volumennvo:=volumen;
+                 precionvo:=precio;
+                 
                  if estatus=5 then begin // valida estatus fantasma
                    inc(contdesp);
                    if (contdesp=1)and(abs(importe-importeant)<=0.005) then
@@ -945,22 +963,18 @@ begin
                  end;
 
                  if (Estatus in [1,7,8])and(swcargando) then begin
+                   if (importenvo<importepre) then begin
+                     DMCONS.AgregaLog('FIN DE VENTA CORREGIDO');
+                     importe:=importepre;
+                     volumen:=volumenpre;
+                     precio:=preciopre;
+                   end
+                   else
+                     DMCONS.AgregaLog('FIN DE VENTA');
                    swcargando:=false;
                    swdesp:=true;
-                   (*
-                   if (contdesp>1) then
-                     swdesp:=true
-                   else
-                     Button1.Click;
-                     *)
                  end;
-                 (*
-                 if (Estatus in [1,7,8]) then begin
-                   importeant:=importe;
-                   swcargando:=false;
-                 end;
-                   *)
-
+               
                  DespliegaPosCarga(xpos);
                  if (estatus=8) then
                    finventa:=2;
@@ -998,7 +1012,10 @@ begin
                ss:=copy(lin,5,12);
                if NoComb=1 then
                  ii:=1;
-               TotalLitros[ii]:=StrToFloat(ss)/100;
+               if DMCONS.TresDecimTotTeam='Si' then
+                 TotalLitros[ii]:=StrToFloat(ss)/1000
+               else
+                 TotalLitros[ii]:=StrToFloat(ss)/100;
                DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
                DespliegaPosCarga(xpos);
              end;
@@ -1150,9 +1167,11 @@ begin
       // Checa Comandos
       with DMCONS do begin
         if swcierrabd then begin
-          DBGASCON.Connected:=false;
-          Esperamiliseg(300);
-          DBGASCON.Connected:=true;
+          if DMCONS.CierraBD='Si' then begin
+            DBGASCON.Connected:=false;
+            Esperamiliseg(300);
+            DBGASCON.Connected:=true;
+          end;
           swcierrabd:=false;
           Q_CombIb.Active:=true;
         end;
@@ -1362,22 +1381,20 @@ begin
           end
           // CMND: ACTIVA FLUJO ESTANDAR
           else if ss='FLUSTD' then begin  // FLUJO ESTANDAR
-            if true (*Licencia3Ok*) then begin
+            if Licencia3Ok then begin
               Q_Pcar.Active:=false;
               Q_Pcar.Active:=true;
               while not Q_Pcar.Eof do begin
                 xpos:=Q_PcarPosCarga.AsInteger;
-                if ((xpos)mod(2)=1)and(xpos<=DMCONS.MaximoDePosiciones) then begin
-                  Esperamiliseg(200);
-                  ii:=Trunc(10*Q_PcarSlowFlow.AsFloat+0.5);
-                  ss:='W'+IntToClaveNum(xpos,2)+IntToClaveNum(ii,2);
-                  TPosCarga[xpos].flujostd:=ii;
-                  DMCONS.AgregaLog(ss);
-                  ComandoConsola(ss);
-                  Esperamiliseg(200);
-                  TPosCarga[xpos].cmndflujo:=ss;
-                  TPosCarga[xpos].SwChecaAdic:=true;
-                end;
+                Esperamiliseg(200);
+                ii:=Trunc(10*Q_PcarSlowFlow.AsFloat+0.5);
+                ss:='W'+IntToClaveNum(xpos,2)+IntToClaveNum(ii,2);
+                TPosCarga[xpos].flujostd:=ii;
+                DMCONS.AgregaLog('*'+ss);
+                ComandoConsola(ss);
+                Esperamiliseg(200);
+                TPosCarga[xpos].cmndflujo:=ss;
+                TPosCarga[xpos].SwChecaAdic:=true;
                 Q_Pcar.Next;
               end;
               rsp:='OK';
@@ -1389,10 +1406,11 @@ begin
           end
           // CMND: ACTIVA FLUJO MINIMO
           else if ss='FLUMIN' then begin // FLUJO MINIMO
-            if true (*Licencia3Ok*) then begin
-              for xpos:=1 to MaxPosCarga do if ((xpos)mod(2)=1) then begin
+            if Licencia3Ok then begin
+              for xpos:=1 to MaxPosCarga do begin
                 Esperamiliseg(200);
                 ss:='W'+IntToClaveNum(xpos,2)+IntToClaveNum(0,2);
+                DMCONS.AgregaLog(ss);
                 ComandoConsola(ss);
                 Esperamiliseg(200);
                 TPosCarga[xpos].cmndflujo:=ss;
@@ -1400,6 +1418,7 @@ begin
               end;
               rsp:='OK';
               ActualizaAdic(0);
+              Esperamiliseg(500);
               SwCerrar:=true;
             end
             else begin // if licencia2ok
@@ -1588,7 +1607,7 @@ var ss,ss2:string;
     ii:integer;
 begin
   ss:='A5 '+inttoclavenum(xdisp,2)+' 00 07 '+inttoclavenum(xlado,2)+' 09';
-  ii:=trunc(xlitros*100+0.5); ss2:=inttoclavenum(ii,8);
+  ii:=trunc(xlitros*1000+0.5); ss2:=inttoclavenum(ii,8);
   result:=ss+' '+copy(ss2,1,2)+' '+copy(ss2,3,2)+' '+copy(ss2,5,2)+' '+copy(ss2,7,2);
 end;
 
@@ -1628,20 +1647,30 @@ begin
   result:=ss;
 end;
 
-function TFDISTEAM.ComandoW(xdisp,xvalor:integer):string;
+function TFDISTEAM.ComandoW(xdisp,xlado,xvalor:integer):string;
 //  E0 04 00 06 05 03 26 11 14 59
 //  E0 04 00 06 05 14 11 26 03 59
 var ss:string;
-    i:integer;
     xcodigoteam:string;
+    i:integer;
 begin
-  ss:='E0 '+inttoclavenum(xdisp,2)+' 00 06 '+inttoclavenum(xvalor,2);
-  xcodigoteam:=DMCONS.CodigoTeam;
-  for i:=1 to MaxPosCarga do
-    if TPosCarga[i].dispensario=xdisp then
-      if length(TPosCarga[i].TCodigoTeam)=8 then
-        xcodigoteam:=TPosCarga[i].TCodigoTeam;
-  for i:=1 to 4 do
+  ss:='E0 '+inttoclavenum(xdisp,2)+' 00 06 '+inttoclavenum(xvalor,2)+' '+inttoclavenum(xlado,2);
+  //   E0      DD                    00 06          %%                           LL
+  if length(DMCONS.CodigoTeam)=8 then
+    xcodigoteam:=copy(DMCONS.CodigoTeam,2,6)
+  else if length(DMCONS.CodigoTeam)=6 then
+    xcodigoteam:=DMCONS.CodigoTeam
+  else
+    xcodigoteam:='000000';
+  (*
+  if length(TPosCarga[xpos].TCodigoTeam)=8 then
+    xcodigoteam:=copy(TPosCarga[xpos].TCodigoTeam,2,6)
+  else if length(TPosCarga[xpos].TCodigoTeam)=8 then
+    xcodigoteam:=copy(TPosCarga[i].TCodigoTeam,2,6)
+  else
+    xcodigoteam:='000000';
+    *)
+  for i:=1 to 3 do
     ss:=ss+' '+copy(xCodigoTeam,i*2-1,2);
   result:=ss;
 end;
@@ -1672,6 +1701,7 @@ begin
           ContB:=0;
         end;
     'A':begin
+          esperamiliseg(100);
           s1:=copy(LinCmnd,2,2);
           xpos:=strtointdef(s1,0);
           s1:=copy(LinCmnd,4,1);
@@ -1684,6 +1714,7 @@ begin
           end;
         end;
     'S':begin
+          esperamiliseg(500);
           s1:=copy(LinCmnd,2,2);
           xpos:=strtointdef(s1,0);
           s1:=copy(LinCmnd,4,6);
@@ -1692,6 +1723,7 @@ begin
             LinCmd2:=ComandoS(dispensario,lado,r1);
         end;
     'L':begin
+          esperamiliseg(500);
           s1:=copy(LinCmnd,2,2);
           xpos:=strtointdef(s1,0);
           s1:=copy(LinCmnd,4,6);
@@ -1737,7 +1769,7 @@ begin
           s1:=copy(LinCmnd,4,2);
           n:=strtointdef(s1,0);
           with TPosCarga[xpos] do
-            LinCmd2:=ComandoW(dispensario,n);
+            LinCmd2:=ComandoW(dispensario,lado,n);
         end;
     else exit;
   end;

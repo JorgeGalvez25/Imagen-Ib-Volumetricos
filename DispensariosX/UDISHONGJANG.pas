@@ -216,6 +216,7 @@ type
        Boucher    :string[12];
        ModoOpera  :string[8];
 
+       sw_w,
        swflujovehiculo:boolean;
        flujovehiculo  :integer;
      end;
@@ -245,6 +246,7 @@ var
   MangueraActual  :integer;
   SwDespEmular,
   SwReintentoCmnd,
+  sw47,
   SwEsperaCmnd    :boolean;
   TimeCmnd,
   TimeResp        :TDateTime;  // Momento de envio de comando, es para medir la espera
@@ -523,6 +525,9 @@ begin
         SwDesp:=false;
         SwDespTot:=false;
         ModoOpera:=Q_BombIbModoOperacion.AsString;
+        sw_w:=true;
+        if Q_BombIbImpreTarjetas.asstring='X' then
+          sw_w:=false;
         SwPrepagoM:= (ModoOpera='Prepago');
         ValorAdic:=TValor[PosCarga,PosComb];
       end;
@@ -676,7 +681,6 @@ begin
         if SwDesp then with DMCONS do begin
           SwDesp:=false;
           if (importe>0.001)or(tipopago>0) then begin
-            //SwCargaTotales:=true;
             try
               try
                 T_MoviIb.Active:=true;
@@ -964,12 +968,6 @@ var s1,s2:string;
 begin
   LinCmnd:=ss;
   MangCmnd:=strtointdef(copy(LinCmnd,2,2),0);
-  (*
-  if (LinCmnd[1]='W')and(TMangueras[MangCmnd].estatus in [5,8]) then begin
-    MeteACola(ss);
-    exit;
-  end;
-  *)
   if (MangCmnd>=1)and(MangCmnd<=MaxMangueras) then begin
     CharCmnd:=LinCmnd[1];
     SwEsperaCmnd:=true;
@@ -1095,12 +1093,18 @@ FIN DE VENTA
 0A  0000 1010   despachando
 1A  0001 1010   despachando
 0E  0000 1110   despachando
+4B  0100 1011   despachando
+43  0100 0011   Pistola levantada
 46  0100 0110   FIN VENTA PISTOLA LEVANTADA
 52  0101 0010
-4E  0100 1110}
+4E  0100 1110
+03  0000 0011
+}
 var xst,ss:string;
     ee:integer;
+
 begin
+  sw47:=false;
   ee:=0;
   ss:=ExtraeElemStrSep(xstr,2,' ');
   xst:=HexToBinario(ss);
@@ -1118,11 +1122,14 @@ begin
     ee:=9;
   swerror:=(xst[3]='1');
 
-  if (ss='06')or(ss='16')or(ss='46') then      // fin venta
+  if (ss='06')or(ss='03')or(ss='16')or(ss='46')or(ss[2]='7') then begin     // fin venta                47
+    ee:=1;
+    if (ss[2]='7') then
+      sw47:=true;
+  end
+  else if (ss='12')or(ss='02') then            // inativo
     ee:=1
-  else if (ss='02')or(ss='12') then            // inativo
-    ee:=1
-  else if (ss='4A')or(ss='0A')or(ss='0E')or(ss='1A') then  // despachando
+  else if (ss='4A')or(ss='4B')or(ss='0A')or(ss='0E')or(ss='1A') then  // despachando            4B
     ee:=5;
 
   SwLocked:=false;
@@ -1137,8 +1144,8 @@ procedure TFDISHONGJANG.ProcesoComandoA(xResp:string);
 //                IMPORTE=0013.07          LITROS=0017.64
 //           0C  12    00 40 00    00 00 00   92 01 00 0F
 var ss:string;
-    ee,xp,ne:integer;
-    swestat:boolean;
+    xmang,ee,xp,ne:integer;
+    ximp,xvol,xpre:real;
 begin
   with TMangueras[MangCmnd] do begin
     ss:=StrToHexSep(xResp);
@@ -1158,11 +1165,24 @@ begin
       if precio>0.01 then
         precioant:=precio;
       estatus:=ee;
+      if (Estatusant=5)and(estatus=5)and(importe<importeant-0.5) then begin       // CAMBIO
+        DMCONS.AgregaLog('>>Cambio importe '+inttostr(MangCmnd)+FormatoNumero(importeant,10,2)+FormatoNumero(importe,10,2));
+        ximp:=importe;  importe:=importeant;
+        xvol:=volumen;  volumen:=volumenant;
+        xpre:=precio;   precio:=precioant;
+        try
+          swdesp:=true;
+          DespliegaManguera(MangCmnd);
+        finally
+          importe:=ximp;
+          volumen:=xvol;
+          precio:=xpre;
+        end;
+      end;
       if (estatusant=0)and(estatus<>0) then begin
         SwCargaTotales:=true;
         ActualizarPrecio:=true;
       end;
-      swestat:=false;
       if (estatus=1)and(finventa=1)and(swfinventa) then begin
         if not SwVentaValidada then begin
           estatus:=8;
@@ -1179,14 +1199,17 @@ begin
       end;
       with DMCONS do if ((estatusant>1)and(estatus=1))or(swadic) then begin
         SwAdic:=false;
-        if stadic=1 then begin
-          if DMCONS.ValorHongYang>=0 then
-            MeteACola('W'+IntToClaveNum(MangCmnd,2)+IntToClaveNum(DMCONS.ValorHongYang,2))
+        (*
+        if Sw_W then begin
+          if stadic=1 then begin
+            if DMCONS.ValorHongYang>=0 then
+              MeteACola('W'+IntToClaveNum(MangCmnd,2)+IntToClaveNum(DMCONS.ValorHongYang,2))
+            else
+              MeteACola('W'+IntToClaveNum(MangCmnd,2)+IntToClaveNum(ValorAdic,2))
+          end
           else
-            MeteACola('W'+IntToClaveNum(MangCmnd,2)+IntToClaveNum(ValorAdic,2))
-        end
-        else
-            MeteACola('W'+IntToClaveNum(MangCmnd,2)+IntToClaveNum(0,2))
+              MeteACola('W'+IntToClaveNum(MangCmnd,2)+IntToClaveNum(0,2))
+        end;*)
       end;
       case estatus of
         1:begin  // Inactivo
@@ -1194,28 +1217,26 @@ begin
             SwPreset:=false;
             Swfinventa:=false;
             ContInicDesp:=0;
-            if EstatusAnt<>1 then begin
+            if EstatusAnt<>1 then
               FinVenta:=0;
-            end
-            else if importe<>importeant then begin
-              importe:=importeant;
-              volumen:=volumenant;
-              precio:=ajustafloat(dividefloat(importe,volumen),2);
-              if (swprepagom)and(not swenllavado) then
-                MeteACola('C'+inttoclavenum(MangCmnd,2));
-            end;
           end;
         2:descestat:='Autorizado';
-        3:descestat:='Pistola Levantada';
+        //3:descestat:='Pistola Levantada';
         5:begin                // Despachando
+            if (estatusant<>5) then begin
+              xMang:=MangCmnd;
+              if not TMangueras[xmang].swflujovehiculo then begin
+                if DMCONS.ValorHongYang>=0 then
+                  MeteACola('W'+IntToClaveNum(xMang,2)+IntToClaveNum(DMCONS.ValorHongYang,2))
+                else
+                  MeteACola('W'+IntToClaveNum(xMang,2)+IntToClaveNum(TMangueras[xmang].ValorAdic,2));
+              end;
+            end;
             descestat:='Despachando';
             swcargando:=true;
             swfinventa:=true;
             ContTotErr:=0;
             SwVentaValidada:=false;
-            (*
-            if not swestat then
-              ContInact:=0;*)
             if (SwPrepagoM)and(Importe<=0.001) then
               descestat:='Autorizado';
             Inc(ContInicDesp);
@@ -1223,7 +1244,7 @@ begin
         7,8:descestat:='Fin de Venta';
         9:descestat:='Enllavado';
       end;
-      if (Estatus in [1,8])and(swcargando) then begin
+      if (Estatus in [1,8])and((swcargando)or(sw47)) then begin
         swcargando:=false;
         swdesptot:=true;
         SwCargaTotales:=true;
@@ -1464,7 +1485,7 @@ end;
 // CONTROLADOR DEL PROCESO
 procedure TFDISHONGJANG.Timer1Timer(Sender: TObject);
 label uno;
-var ii,xmang,ncant:integer;
+var ii,xmang:integer;
     swestatus7:boolean;
     xcmnd:string;
 begin
@@ -1669,7 +1690,6 @@ begin
                     xestado:=xestado+'1'; // Inactivo (Idle)
                     if SwPendw then begin
                       SwPendW:=false;
-                      //MeteACola('W'+IntToClaveNum(xMang,2)+IntToClaveNum(0,2));
                     end;
                   end;
                 5,8:xestado:=xestado+'2'; // Cargando (In Use)
@@ -1829,7 +1849,7 @@ begin
                 end;
 
                 if TMangueras[xmang].SwPrepagoM then begin
-                  MeteACola('D'+inttoclavenum(xmang,2));
+                  //MeteACola('D'+inttoclavenum(xmang,2));
                 end;
 
                 MeteACola('S'+inttoclavenum(xmang,2)+InttoClaveNum(ximp,6));
@@ -1880,7 +1900,7 @@ begin
                 end;
 
                 if TMangueras[xmang].SwPrepagoM then begin
-                  MeteACola('D'+inttoclavenum(xmang,2));
+                  //MeteACola('D'+inttoclavenum(xmang,2));
                 end;
 
                 MeteACola('L'+inttoclavenum(xmang,2)+InttoClaveNum(ximp,6));
@@ -1934,12 +1954,14 @@ begin
           if true then begin //(Licencia2Ok)or(Licencia3Ok) then begin
             rsp:='OK';
             ActualizaAdic(1);
+            (*
             for xmang:=1 to MaxMangueras do begin
               if DMCONS.ValorHongYang>=0 then
                 MeteACola('W'+IntToClaveNum(xMang,2)+IntToClaveNum(DMCONS.ValorHongYang,2))
               else
                 MeteACola('W'+IntToClaveNum(xMang,2)+IntToClaveNum(TMangueras[xmang].ValorAdic,2));
             end;
+            *)
           end
           else begin // if licencia2ok
             rsp:='Opción no Habilitada';
@@ -1956,7 +1978,7 @@ begin
               end
               else begin
                 TMangueras[xmang].SwPendW:=false;
-                MeteACola('W'+IntToClaveNum(xMang,2)+IntToClaveNum(0,2));
+                //MeteACola('W'+IntToClaveNum(xMang,2)+IntToClaveNum(0,2));
               end;
             end;
             SwCierraPuerto:=true;
@@ -1974,9 +1996,11 @@ begin
           if true then begin //(Licencia2Ok)or(Licencia3Ok) then begin
             rsp:='OK';
             ActualizaAdic(0);
+            (*
             for xmang:=1 to MaxMangueras do begin
               MeteACola('W'+IntToClaveNum(xMang,2)+IntToClaveNum(0,2));
             end;
+            *)
             SwCierraPuerto:=true;
             (*
             Ap1.Open:=false;

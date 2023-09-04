@@ -8,1126 +8,1104 @@
   resources were bound to the produced executable.
 */
 
-#define AdExcept_sdispTelnetTerminalLocNum 63904
-#define AdExcept_sdispTelnetTelnet3270Regime 63905
-#define AdExcept_sdispTelnetX3PAD 63906
-#define AdExcept_sdispTelnetNegWindowSize 63907
-#define AdExcept_sdispTelnetTerminalSpeed 63908
-#define AdExcept_sdispTelnetFlowControl 63909
-#define AdExcept_sdispTelnetLineMode 63910
-#define AdExcept_sdispTelnetXDisplayLocation 63911
-#define AdExcept_sdispTelnetEnvironment 63912
-#define AdExcept_sdispTelnetAuthentication 63913
-#define AdExcept_sdispTelnetTelnetcode38 63914
-#define AdExcept_sdispTelnetNewEnvironment 63915
-#define AdExcept_sdispTelnetTelnetcode40 63916
-#define AdExcept_sdispTelnetTelnetcode41 63917
-#define AdExcept_sdispTelnetCharacterSet 63918
-#define dxGDIPlusAPI_scxGdipInvalidOperation 63919
-#define AdExcept_sdispTelnetOutputHorzTabDisp 63920
-#define AdExcept_sdispTelnetOutputFFDisp 63921
-#define AdExcept_sdispTelnetOutputVertTabs 63922
-#define AdExcept_sdispTelnetOutputVertTabDisp 63923
-#define AdExcept_sdispTelnetOutputLinefeedDisp 63924
-#define AdExcept_sdispTelnetExtendedASCII 63925
-#define AdExcept_sdispTelnetLogout 63926
-#define AdExcept_sdispTelnetByteMacro 63927
-#define AdExcept_sdispTelnetDataEntryTerminal 63928
-#define AdExcept_sdispTelnetSUPDUP 63929
-#define AdExcept_sdispTelnetSUPDUPOutput 63930
-#define AdExcept_sdispTelnetSendLocation 63931
-#define AdExcept_sdispTelnetTerminalType 63932
-#define AdExcept_sdispTelnetEndofRecord 63933
-#define AdExcept_sdispTelnetTACACSUserID 63934
-#define AdExcept_sdispTelnetOutputMarking 63935
-#define AdExcept_sdispmdmtagCTS 63936
-#define AdExcept_sdispmdmtagDSR 63937
-#define AdExcept_sdispmdmtagRI 63938
-#define AdExcept_sdispmdmtagDCD 63939
-#define AdExcept_sdispTelnetBinary 63940
-#define AdExcept_sdispTelnetEcho 63941
-#define AdExcept_sdispTelnetReconnection 63942
-#define AdExcept_sdispTelnetSupressGoAhead 63943
-#define AdExcept_sdispTelnetApproxMsgSize 63944
-#define AdExcept_sdispTelnetStatus 63945
-#define AdExcept_sdispTelnetTimingMark 63946
-#define AdExcept_sdispTelnetRemoteTransEcho 63947
-#define AdExcept_sdispTelnetOutputLineWidth 63948
-#define AdExcept_sdispTelnetOutputPageSize 63949
-#define AdExcept_sdispTelnetOutputCRDisp 63950
-#define AdExcept_sdispTelnetOutputHorzTabs 63951
-#define AdExcept_sdstEnable 63952
-#define AdExcept_sdstDisable 63953
-#define AdExcept_sdstStringPacket 63954
-#define AdExcept_sdstSizePacket 63955
-#define AdExcept_sdstPacketTimeout 63956
-#define AdExcept_sdstStartStr 63957
-#define AdExcept_sdstEndStr 63958
-#define AdExcept_sdstIdle 63959
-#define AdExcept_sdstWaiting 63960
-#define AdExcept_sdstCollecting 63961
-#define AdExcept_sdispHeader 63962
-#define AdExcept_sdispHeaderLine 63963
-#define AdExcept_sdispmdmtagDCTS 63964
-#define AdExcept_sdispmdmtagDDSR 63965
-#define AdExcept_sdispmdmtagTERI 63966
-#define AdExcept_sdispmdmtagDDCD 63967
-#define AdExcept_sdstrkWaitCancel 63968
-#define AdExcept_sdstrkError 63969
-#define AdExcept_sdstrkDone 63970
-#define AdExcept_sdsttaInitial 63971
-#define AdExcept_sdsttaGetBlock 63972
-#define AdExcept_sdsttaWaitFreeSpace 63973
-#define AdExcept_sdsttaSendBlock 63974
-#define AdExcept_sdsttaSendDelay 63975
-#define AdExcept_sdsttaFinishDrain 63976
-#define AdExcept_sdsttaFinished 63977
-#define AdExcept_sdsttaDone 63978
-#define AdExcept_sdstraInitial 63979
-#define AdExcept_sdstraCollectBlock 63980
-#define AdExcept_sdstraProcessBlock 63981
-#define AdExcept_sdstraFinished 63982
-#define AdExcept_sdstraDone 63983
-#define AdExcept_sdsttkCollectEof 63984
-#define AdExcept_sdsttkSendBreak 63985
-#define AdExcept_sdsttkBreakReply 63986
-#define AdExcept_sdsttkCollectBreak 63987
-#define AdExcept_sdsttkComplete 63988
-#define AdExcept_sdsttkWaitCancel 63989
-#define AdExcept_sdsttkError 63990
-#define AdExcept_sdsttkDone 63991
-#define AdExcept_sdstrkInit 63992
-#define AdExcept_sdstrkGetInit 63993
-#define AdExcept_sdstrkCollectInit 63994
-#define AdExcept_sdstrkGetFile 63995
-#define AdExcept_sdstrkCollectFile 63996
-#define AdExcept_sdstrkGetData 63997
-#define AdExcept_sdstrkCollectData 63998
-#define AdExcept_sdstrkComplete 63999
-#define AdExcept_sdstrzWaitCancel 64000
-#define AdExcept_sdstrzCleanup 64001
-#define AdExcept_sdstrzDone 64002
-#define AdExcept_sdsttkInit 64003
-#define AdExcept_sdsttkInitReply 64004
-#define AdExcept_sdsttkCollectInit 64005
-#define AdExcept_sdsttkOpenFile 64006
-#define AdExcept_sdsttkSendFile 64007
-#define AdExcept_sdsttkFileReply 64008
-#define AdExcept_sdsttkCollectFile 64009
-#define AdExcept_sdsttkCheckTable 64010
-#define AdExcept_sdsttkSendData 64011
-#define AdExcept_sdsttkBlockReply 64012
-#define AdExcept_sdsttkCollectBlock 64013
-#define AdExcept_sdsttkSendEof 64014
-#define AdExcept_sdsttkEofReply 64015
-#define AdExcept_sdstrzDelay 64016
-#define AdExcept_sdstrzWaitFile 64017
-#define AdExcept_sdstrzCollectFile 64018
-#define AdExcept_sdstrzSendInit 64019
-#define AdExcept_sdstrzSendBlockPrep 64020
-#define AdExcept_sdstrzSendBlock 64021
-#define AdExcept_sdstrzSync 64022
-#define AdExcept_sdstrzStartFile 64023
-#define AdExcept_sdstrzStartData 64024
-#define AdExcept_sdstrzCollectData 64025
-#define AdExcept_sdstrzGotData 64026
-#define AdExcept_sdstrzWaitEof 64027
-#define AdExcept_sdstrzEndOfFile 64028
-#define AdExcept_sdstrzSendFinish 64029
-#define AdExcept_sdstrzCollectFinish 64030
-#define AdExcept_sdstrzError 64031
-#define AdExcept_sdsttzGetFile 64032
-#define AdExcept_sdsttzSendFile 64033
-#define AdExcept_sdsttzCheckFile 64034
-#define AdExcept_sdsttzStartData 64035
-#define AdExcept_sdsttzEscapeData 64036
-#define AdExcept_sdsttzSendData 64037
-#define AdExcept_sdsttzWaitAck 64038
-#define AdExcept_sdsttzSendEof 64039
-#define AdExcept_sdsttzDrainEof 64040
-#define AdExcept_sdsttzCheckEof 64041
-#define AdExcept_sdsttzSendFinish 64042
-#define AdExcept_sdsttzCheckFinish 64043
-#define AdExcept_sdsttzError 64044
-#define AdExcept_sdsttzCleanup 64045
-#define AdExcept_sdsttzDone 64046
-#define AdExcept_sdstrzRqstFile 64047
-#define AdExcept_sdsttyFinished 64048
-#define AdExcept_sdsttyFinishDrain 64049
-#define AdExcept_sdsttyDone 64050
-#define AdExcept_sdstryInitial 64051
-#define AdExcept_sdstryDelay 64052
-#define AdExcept_sdstryWaitForHSReply 64053
-#define AdExcept_sdstryWaitForBlockStart 64054
-#define AdExcept_sdstryCollectBlock 64055
-#define AdExcept_sdstryProcessBlock 64056
-#define AdExcept_sdstryOpenFile 64057
-#define AdExcept_sdstryPrepXmodem 64058
-#define AdExcept_sdstryReceiveXmodem 64059
-#define AdExcept_sdstryFinished 64060
-#define AdExcept_sdstryDone 64061
-#define AdExcept_sdsttzInitial 64062
-#define AdExcept_sdsttzHandshake 64063
-#define AdExcept_sdstrxInitial 64064
-#define AdExcept_sdstrxWaitForHSReply 64065
-#define AdExcept_sdstrxWaitForBlockStart 64066
-#define AdExcept_sdstrxCollectBlock 64067
-#define AdExcept_sdstrxProcessBlock 64068
-#define AdExcept_sdstrxFinishedSkip 64069
-#define AdExcept_sdstrxFinished 64070
-#define AdExcept_sdstrxDone 64071
-#define AdExcept_sdsttyInitial 64072
-#define AdExcept_sdsttyHandshake 64073
-#define AdExcept_sdsttyGetFileName 64074
-#define AdExcept_sdsttySendFileName 64075
-#define AdExcept_sdsttyDraining 64076
-#define AdExcept_sdsttyReplyPending 64077
-#define AdExcept_sdsttyPrepXmodem 64078
-#define AdExcept_sdsttySendXmodem 64079
-#define AdExcept_sdstrfComplete 64080
-#define AdExcept_sdstrfAbort 64081
-#define AdExcept_sdstrfDone 64082
-#define AdExcept_sdsttxInitial 64083
-#define AdExcept_sdsttxHandshake 64084
-#define AdExcept_sdsttxGetBlock 64085
-#define AdExcept_sdsttxWaitFreeSpace 64086
-#define AdExcept_sdsttxSendBlock 64087
-#define AdExcept_sdsttxDraining 64088
-#define AdExcept_sdsttxReplyPending 64089
-#define AdExcept_sdsttxEndDrain 64090
-#define AdExcept_sdsttxFirstEndOfTransmit 64091
-#define AdExcept_sdsttxRestEndOfTransmit 64092
-#define AdExcept_sdsttxEotReply 64093
-#define AdExcept_sdsttxFinished 64094
-#define AdExcept_sdsttxDone 64095
-#define AdExcept_sdstrf1FinishTrain 64096
-#define AdExcept_sdstrf1SendCFR 64097
-#define AdExcept_sdstrf1WaitPageConnect 64098
-#define AdExcept_sdstrf2ValidConnect 64099
-#define AdExcept_sdstrf2GetSenderID 64100
-#define AdExcept_sdstrf2GetConnect 64101
-#define AdExcept_sdstrfStartPage 64102
-#define AdExcept_sdstrfGetPageData 64103
-#define AdExcept_sdstrf1FinishPage 64104
-#define AdExcept_sdstrf1WaitEOP 64105
-#define AdExcept_sdstrf1WritePage 64106
-#define AdExcept_sdstrf1SendMCF 64107
-#define AdExcept_sdstrf1WaitDCN 64108
-#define AdExcept_sdstrf1WaitHangup 64109
-#define AdExcept_sdstrf2GetPageResult 64110
-#define AdExcept_sdstrf2GetFHNG 64111
-#define AdExcept_sdstrf2Init1 64112
-#define AdExcept_sdstrf2Init1A 64113
-#define AdExcept_sdstrf2Init1B 64114
-#define AdExcept_sdstrf2Init2 64115
-#define AdExcept_sdstrf2Init3 64116
-#define AdExcept_sdstrfWaiting 64117
-#define AdExcept_sdstrfAnswer 64118
-#define AdExcept_sdstrf1SendCSI 64119
-#define AdExcept_sdstrf1SendDIS 64120
-#define AdExcept_sdstrf1CollectFrames 64121
-#define AdExcept_sdstrf1CollectRetry1 64122
-#define AdExcept_sdstrf1CollectRetry2 64123
-#define AdExcept_sdstrf1StartTrain 64124
-#define AdExcept_sdstrf1CollectTrain 64125
-#define AdExcept_sdstrf1Timeout 64126
-#define AdExcept_sdstrf1Retrain 64127
-#define AdExcept_sdsttf1Hangup 64128
-#define AdExcept_sdsttf1WaitHangup 64129
-#define AdExcept_sdsttf2SendEOP 64130
-#define AdExcept_sdsttf2WaitFPTS 64131
-#define AdExcept_sdsttf2WaitFET 64132
-#define AdExcept_sdsttf2WaitPageOK 64133
-#define AdExcept_sdsttf2SendNewParams 64134
-#define AdExcept_sdsttf2NextPage 64135
-#define AdExcept_sdsttf20CheckPage 64136
-#define AdExcept_sdsttfClose 64137
-#define AdExcept_sdsttfCompleteOK 64138
-#define AdExcept_sdsttfAbort 64139
-#define AdExcept_sdsttfDone 64140
-#define AdExcept_sdstrfNone 64141
-#define AdExcept_sdstrfInit 64142
-#define AdExcept_sdstrf1Init1 64143
-#define AdExcept_sdsttf2GetParams 64144
-#define AdExcept_sdsttfWaitXon 64145
-#define AdExcept_sdsttfWaitFreeHeader 64146
-#define AdExcept_sdsttfSendPageHeader 64147
-#define AdExcept_sdsttfOpenCover 64148
-#define AdExcept_sdsttfSendCover 64149
-#define AdExcept_sdsttfPrepPage 64150
-#define AdExcept_sdsttfSendPage 64151
-#define AdExcept_sdsttfDrainPage 64152
-#define AdExcept_sdsttf1PageEnd 64153
-#define AdExcept_sdsttf1PrepareEOP 64154
-#define AdExcept_sdsttf1SendEOP 64155
-#define AdExcept_sdsttf1WaitMPS 64156
-#define AdExcept_sdsttf1WaitEOP 64157
-#define AdExcept_sdsttf1WaitMCF 64158
-#define AdExcept_sdsttf1SendDCN 64159
-#define AdExcept_sdsttf2Init1 64160
-#define AdExcept_sdsttf2Init1A 64161
-#define AdExcept_sdsttf2Init1B 64162
-#define AdExcept_sdsttf2Init2 64163
-#define AdExcept_sdsttf2Init3 64164
-#define AdExcept_sdsttfDial 64165
-#define AdExcept_sdsttfRetryWait 64166
-#define AdExcept_sdsttf1Connect 64167
-#define AdExcept_sdsttf1SendTSI 64168
-#define AdExcept_sdsttf1TSIResponse 64169
-#define AdExcept_sdsttf1DCSResponse 64170
-#define AdExcept_sdsttf1TrainStart 64171
-#define AdExcept_sdsttf1TrainFinish 64172
-#define AdExcept_sdsttf1WaitCFR 64173
-#define AdExcept_sdsttf1WaitPageConnect 64174
-#define AdExcept_sdsttf2Connect 64175
-#define AdExcept_sdstProcHandler 64176
-#define AdExcept_sdstEventHandler 64177
-#define AdExcept_sdstSWill 64178
-#define AdExcept_sdstSWont 64179
-#define AdExcept_sdstSDo 64180
-#define AdExcept_sdstSDont 64181
-#define AdExcept_sdstRWill 64182
-#define AdExcept_sdstRWont 64183
-#define AdExcept_sdstRDo 64184
-#define AdExcept_sdstRDont 64185
-#define AdExcept_sdstCommand 64186
-#define AdExcept_sdstSTerm 64187
-#define AdExcept_sdsttfNone 64188
-#define AdExcept_sdsttfGetEntry 64189
-#define AdExcept_sdsttfInit 64190
-#define AdExcept_sdsttf1Init1 64191
-#define AdExcept_sdstWriteCom 64192
-#define AdExcept_sdstLineStatus 64193
-#define AdExcept_sdstModemStatus 64194
-#define AdExcept_sdstAvail 64195
-#define AdExcept_sdstTimer 64196
-#define AdExcept_sdstData 64197
-#define AdExcept_sdstStatus 64198
-#define AdExcept_sdstThreadStart 64199
-#define AdExcept_sdstThreadExit 64200
-#define AdExcept_sdstThreadSleep 64201
-#define AdExcept_sdstThreadWake 64202
-#define AdExcept_sdstDataTrigger 64203
-#define AdExcept_sdstTimerTrigger 64204
-#define AdExcept_sdstStatusTrigger 64205
-#define AdExcept_sdstAvailTrigger 64206
-#define AdExcept_sdstWndHandler 64207
-#define AdExcept_sdtTriggerHandlerAlloc 64208
-#define AdExcept_sdtTriggerHandlerDispose 64209
-#define AdExcept_sdtTriggerDataChange 64210
-#define AdExcept_sdtTelnet 64211
-#define AdExcept_sdtFax 64212
-#define AdExcept_sdtXModem 64213
-#define AdExcept_sdtYModem 64214
-#define AdExcept_sdtZModem 64215
-#define AdExcept_sdtKermit 64216
-#define AdExcept_sdtAscii 64217
-#define AdExcept_sdtBPlus 64218
-#define AdExcept_sdtPacket 64219
-#define AdExcept_sdtUser 64220
-#define AdExcept_sdtScript 64221
-#define AdExcept_sdstNone 64222
-#define AdExcept_sdstReadCom 64223
-#define AdExcept_secVoIPBadAddress 64224
-#define AdExcept_secVoIPNoAnswer 64225
-#define AdExcept_secVoIPCancelled 64226
-#define AdExcept_secVoIPRejected 64227
-#define AdExcept_secVoIPFailed 64228
-#define AdExcept_secVoIPTapi3NotInstalled 64229
-#define AdExcept_secVoIPH323NotFound 64230
-#define AdExcept_secVoIPTapi3EventFailure 64231
-#define AdExcept_secRasLoadFail 64232
-#define AdExcept_sdtNone 64233
-#define AdExcept_sdtDispatch 64234
-#define AdExcept_sdtTrigger 64235
-#define AdExcept_sdtError 64236
-#define AdExcept_sdtThread 64237
-#define AdExcept_sdtTriggerAlloc 64238
-#define AdExcept_sdtTriggerDispose 64239
-#define AdExcept_secTapiGetAddrFail 64240
-#define AdExcept_sTAPIdisabled16bit 64241
-#define AdExcept_secTapiUnexpected 64242
-#define AdExcept_secTapiVoiceNotSupported 64243
-#define AdExcept_secTapiWaveFail 64244
-#define AdExcept_secTapiCIDBlocked 64245
-#define AdExcept_secTapiCIDOutOfArea 64246
-#define AdExcept_secTapiWaveFormatError 64247
-#define AdExcept_secTapiWaveReadError 64248
-#define AdExcept_secTapiWaveBadFormat 64249
-#define AdExcept_secTapiTranslateFail 64250
-#define AdExcept_secTapiWaveDeviceInUse 64251
-#define AdExcept_secTapiWaveFileExists 64252
-#define AdExcept_secTapiWaveNoData 64253
-#define AdExcept_secVoIPNotSupported 64254
-#define AdExcept_secVoIPCallBusy 64255
-#define AdExcept_secResourceUnavail 64256
-#define AdExcept_secRequestOverrun 64257
-#define AdExcept_secStructureTooSmall 64258
-#define AdExcept_secTargetNotFound 64259
-#define AdExcept_secTargetSelf 64260
-#define AdExcept_secUninitialized 64261
-#define AdExcept_secUserUserInfoTooBig 64262
-#define AdExcept_secReinit 64263
-#define AdExcept_secAddressBlocked 64264
-#define AdExcept_secBillingRejected 64265
-#define AdExcept_secInvalFeature 64266
-#define AdExcept_secNoMultipleInstance 64267
-#define AdExcept_secTapiBusy 64268
-#define AdExcept_secTapiNotSet 64269
-#define AdExcept_secTapiNoSelect 64270
-#define AdExcept_secTapiLoadFail 64271
-#define AdExcept_secInvalTimeout 64272
-#define AdExcept_secInvalTone 64273
-#define AdExcept_secInvalToneList 64274
-#define AdExcept_secInvalToneMode 64275
-#define AdExcept_secInvalTransferMode 64276
-#define AdExcept_secLineMapperFailed 64277
-#define AdExcept_secNoConference 64278
-#define AdExcept_secNoDevice 64279
-#define AdExcept_secNoDriver 64280
-#define AdExcept_secNoMem 64281
-#define AdExcept_secNoRequest 64282
-#define AdExcept_secNotOwner 64283
-#define AdExcept_secNotRegistered 64284
-#define AdExcept_secOperationFailed 64285
-#define AdExcept_secOperationUnavail 64286
-#define AdExcept_secRateUnavail 64287
-#define AdExcept_secInvalGroupID 64288
-#define AdExcept_secInvalLineHandle 64289
-#define AdExcept_secInvalLineState 64290
-#define AdExcept_secInvalLocation 64291
-#define AdExcept_secInvalMediaList 64292
-#define AdExcept_secInvalMediaMode 64293
-#define AdExcept_secInvalMessageID 64294
-#define AdExcept_secInvalParam 64295
-#define AdExcept_secInvalParkID 64296
-#define AdExcept_secInvalParkMode 64297
-#define AdExcept_secInvalPointer 64298
-#define AdExcept_secInvalPrivSelect 64299
-#define AdExcept_secInvalRate 64300
-#define AdExcept_secInvalRequestMode 64301
-#define AdExcept_secInvalTerminalID 64302
-#define AdExcept_secInvalTerminalMode 64303
-#define AdExcept_secInvalCallPrivilege 64304
-#define AdExcept_secInvalCallSelect 64305
-#define AdExcept_secInvalCallState 64306
-#define AdExcept_secInvalCallStatelist 64307
-#define AdExcept_secInvalCard 64308
-#define AdExcept_secInvalCompletionID 64309
-#define AdExcept_secInvalConfCallHandle 64310
-#define AdExcept_secInvalConsultCallHandle 64311
-#define AdExcept_secInvalCountryCode 64312
-#define AdExcept_secInvalDeviceClass 64313
-#define AdExcept_secInvalDeviceHandle 64314
-#define AdExcept_secInvalDialParams 64315
-#define AdExcept_secInvalDigitList 64316
-#define AdExcept_secInvalDigitMode 64317
-#define AdExcept_secInvalDigits 64318
-#define AdExcept_secInvalExtVersion 64319
-#define AdExcept_secDialPrompt 64320
-#define AdExcept_secDialQuiet 64321
-#define AdExcept_secIncompatibleApiVersion 64322
-#define AdExcept_secIncompatibleExtVersion 64323
-#define AdExcept_secIniFileCorrupt 64324
-#define AdExcept_secInUse 64325
-#define AdExcept_secInvalAddress 64326
-#define AdExcept_secInvalAddressID 64327
-#define AdExcept_secInvalAddressMode 64328
-#define AdExcept_secInvalAddressState 64329
-#define AdExcept_secInvalAppHandle 64330
-#define AdExcept_secInvalAppName 64331
-#define AdExcept_secInvalBearerMode 64332
-#define AdExcept_secInvalCallComplMode 64333
-#define AdExcept_secInvalCallHandle 64334
-#define AdExcept_secInvalCallParams 64335
-#define AdExcept_sTAPIDisconnect_NoDialtone 64336
-#define AdExcept_sTAPIDisconnect_NumberChanged 64337
-#define AdExcept_sTAPIDisconnect_OutOfOrder 64338
-#define AdExcept_sTAPIDisconnect_TempFailure 64339
-#define AdExcept_sTAPIDisconnect_QOSUnavail 64340
-#define AdExcept_sTAPIDisconnect_Blocked 64341
-#define AdExcept_sTAPIDisconnect_DoNotDisturb 64342
-#define AdExcept_sTAPIDisconnect_Cancelled 64343
-#define AdExcept_secAllocated 64344
-#define AdExcept_secBadDeviceID 64345
-#define AdExcept_secBearerModeUnavail 64346
-#define AdExcept_secCallUnavail 64347
-#define AdExcept_secCompletionOverrun 64348
-#define AdExcept_secConferenceFull 64349
-#define AdExcept_secDialBilling 64350
-#define AdExcept_secDialDialtone 64351
-#define AdExcept_sTAPIDialFail 64352
-#define AdExcept_sTAPIRetryWait 64353
-#define AdExcept_sTAPIDeviceInUse 64354
-#define AdExcept_sTAPIDisconnect_Unspecified 64355
-#define AdExcept_sTAPIDisconnect_Normal 64356
-#define AdExcept_sTAPIDisconnect_Unknown 64357
-#define AdExcept_sTAPIDisconnect_Reject 64358
-#define AdExcept_sTAPIDisconnect_PickUp 64359
-#define AdExcept_sTAPIDisconnect_Forwarded 64360
-#define AdExcept_sTAPIDisconnect_Busy 64361
-#define AdExcept_sTAPIDisconnect_NoAnswer 64362
-#define AdExcept_sTAPIDisconnect_BadAddress 64363
-#define AdExcept_sTAPIDisconnect_Unreachable 64364
-#define AdExcept_sTAPIDisconnect_Congestion 64365
-#define AdExcept_sTAPIDisconnect_Incompatible 64366
-#define AdExcept_sTAPIDisconnect_Unavail 64367
-#define AdExcept_stds_NumCompletions 64368
-#define AdExcept_stds_Terminals 64369
-#define AdExcept_stds_RoamMode 64370
-#define AdExcept_stds_Battery 64371
-#define AdExcept_stds_Signal 64372
-#define AdExcept_stds_DevSpecific 64373
-#define AdExcept_stds_ReInit 64374
-#define AdExcept_stds_Lock 64375
-#define AdExcept_stds_CapsChange 64376
-#define AdExcept_stds_ConfigChange 64377
-#define AdExcept_stds_TranslateChange 64378
-#define AdExcept_stds_ComplCancel 64379
-#define AdExcept_stds_Removed 64380
-#define AdExcept_sTAPILineReply 64381
-#define AdExcept_sTAPIStateChange 64382
-#define AdExcept_sTAPICalledBusy 64383
-#define AdExcept_stcs_OnHoldPendConf 64384
-#define AdExcept_stcs_OnHoldPendTransfer 64385
-#define AdExcept_stcs_Disconnected 64386
-#define AdExcept_stcs_Unknown 64387
-#define AdExcept_stds_Other 64388
-#define AdExcept_stds_Ringing 64389
-#define AdExcept_stds_Connected 64390
-#define AdExcept_stds_Disconnected 64391
-#define AdExcept_stds_MsgWaitOn 64392
-#define AdExcept_stds_MsgWaitOff 64393
-#define AdExcept_stds_InService 64394
-#define AdExcept_stds_OutOfService 64395
-#define AdExcept_stds_Maintenance 64396
-#define AdExcept_stds_Open 64397
-#define AdExcept_stds_Close 64398
-#define AdExcept_stds_NumCalls 64399
-#define AdExcept_swsaHost_Not_Found 64400
-#define AdExcept_swsaTry_Again 64401
-#define AdExcept_swsaNo_Recovery 64402
-#define AdExcept_swsaNo_Data 64403
-#define AdExcept_stcs_Idle 64404
-#define AdExcept_stcs_Offering 64405
-#define AdExcept_stcs_Accepted 64406
-#define AdExcept_stcs_Dialtone 64407
-#define AdExcept_stcs_Dialing 64408
-#define AdExcept_stcs_Ringback 64409
-#define AdExcept_stcs_Busy 64410
-#define AdExcept_stcs_SpecialInfo 64411
-#define AdExcept_stcs_Connected 64412
-#define AdExcept_stcs_Proceeding 64413
-#define AdExcept_stcs_OnHold 64414
-#define AdExcept_stcs_Conferenced 64415
-#define AdExcept_swsaETimedOut 64416
-#define AdExcept_swsaEConnRefused 64417
-#define AdExcept_swsaELoop 64418
-#define AdExcept_swsaENameTooLong 64419
-#define AdExcept_swsaEHostDown 64420
-#define AdExcept_swsaEHostUnreach 64421
-#define AdExcept_swsaENotEmpty 64422
-#define AdExcept_swsaEProcLim 64423
-#define AdExcept_swsaEUsers 64424
-#define AdExcept_swsaEDQuot 64425
-#define AdExcept_swsaEStale 64426
-#define AdExcept_swsaERemote 64427
-#define AdExcept_swsaSysNotReady 64428
-#define AdExcept_swsaVerNotSupported 64429
-#define AdExcept_swsaNotInitialised 64430
-#define AdExcept_swsaEDiscOn 64431
-#define AdExcept_swsaESocktNoSupport 64432
-#define AdExcept_swsaEOpNotSupp 64433
-#define AdExcept_swsaEPfNoSupport 64434
-#define AdExcept_swsaEAfNoSupport 64435
-#define AdExcept_swsaEAddrInUse 64436
-#define AdExcept_swsaEAddrNotAvail 64437
-#define AdExcept_swsaENetDown 64438
-#define AdExcept_swsaENetUnreach 64439
-#define AdExcept_swsaENetReset 64440
-#define AdExcept_swsaEConnAborted 64441
-#define AdExcept_swsaEConnReset 64442
-#define AdExcept_swsaENoBufs 64443
-#define AdExcept_swsaEIsConn 64444
-#define AdExcept_swsaENotConn 64445
-#define AdExcept_swsaEShutDown 64446
-#define AdExcept_swsaETooManyRefs 64447
-#define AdExcept_swsaBaseErr 64448
-#define AdExcept_swsaEIntr 64449
-#define AdExcept_swsaEBadF 64450
-#define AdExcept_swsaEAcces 64451
-#define AdExcept_swsaEFault 64452
-#define AdExcept_swsaEInVal 64453
-#define AdExcept_swsaEMFile 64454
-#define AdExcept_swsaEWouldBlock 64455
-#define AdExcept_swsaEInProgress 64456
-#define AdExcept_swsaEAlReady 64457
-#define AdExcept_swsaENotSock 64458
-#define AdExcept_swsaEDestAddrReq 64459
-#define AdExcept_swsaEMsgSize 64460
-#define AdExcept_swsaEPrototype 64461
-#define AdExcept_swsaENoProtoOpt 64462
-#define AdExcept_swsaEProtoNoSupport 64463
-#define AdExcept_secSIMPUK2 64464
-#define AdExcept_secMemFail 64465
-#define AdExcept_secInvalidMemIndex 64466
-#define AdExcept_secMemFull 64467
-#define AdExcept_secSMSCAddUnknown 64468
-#define AdExcept_secNoNetwork 64469
-#define AdExcept_secNetworkTimeout 64470
-#define AdExcept_secCNMAAck 64471
-#define AdExcept_secUnknown 64472
-#define AdExcept_secADWSERROR 64473
-#define AdExcept_secADWSLOADERROR 64474
-#define AdExcept_secADWSVERSIONERROR 64475
-#define AdExcept_secADWSNOTINIT 64476
-#define AdExcept_secADWSINVPORT 64477
-#define AdExcept_secADWSCANTCHANGE 64478
-#define AdExcept_secADWSCANTRESOLVE 64479
-#define AdExcept_secSMSTooLong 64480
-#define AdExcept_secSMSUnknownStatus 64481
-#define AdExcept_secMEFailure 64482
-#define AdExcept_secServiceRes 64483
-#define AdExcept_secBadOperation 64484
-#define AdExcept_secUnsupported 64485
-#define AdExcept_secInvalidPDU 64486
-#define AdExcept_secInvalidText 64487
-#define AdExcept_secSIMInsert 64488
-#define AdExcept_secSIMPin 64489
-#define AdExcept_secSIMPH 64490
-#define AdExcept_secSIMFailure 64491
-#define AdExcept_secSIMBusy 64492
-#define AdExcept_secSIMWrong 64493
-#define AdExcept_secSIMPUK 64494
-#define AdExcept_secSIMPIN2 64495
-#define AdExcept_secFaxConverterInitFail 64496
-#define AdExcept_secNoAnswer 64497
-#define AdExcept_secAlreadyMonitored 64498
-#define AdExcept_secUniAlreadyInstalled 64499
-#define AdExcept_secUniCannotGetSysDir 64500
-#define AdExcept_secUniCannotGetWinDir 64501
-#define AdExcept_secUniUnknownLayout 64502
-#define AdExcept_secUniCannotInstallFile 64503
-#define AdExcept_secDrvCopyError 64504
-#define AdExcept_secCannotAddPrinter 64505
-#define AdExcept_secDrvBadResources 64506
-#define AdExcept_secDrvDriverNotFound 64507
-#define AdExcept_secUniCannotGetPrinterDriverDir 64508
-#define AdExcept_secInstallDriverFailed 64509
-#define AdExcept_secSMSBusy 64510
-#define AdExcept_secSMSTimedOut 64511
-#define AdExcept_secInvalidPageNumber 64512
-#define AdExcept_secBmpTooBig 64513
-#define AdExcept_secEnhFontTooBig 64514
-#define AdExcept_secFaxBadMachine 64515
-#define AdExcept_secFaxBadModemResult 64516
-#define AdExcept_secFaxTrainError 64517
-#define AdExcept_secFaxInitError 64518
-#define AdExcept_secFaxBusy 64519
-#define AdExcept_secFaxVoiceCall 64520
-#define AdExcept_secFaxDataCall 64521
-#define AdExcept_secFaxNoDialTone 64522
-#define AdExcept_secFaxNoCarrier 64523
-#define AdExcept_secFaxSessionError 64524
-#define AdExcept_secFaxPageError 64525
-#define AdExcept_secFaxGDIPrintError 64526
-#define AdExcept_secFaxMixedResolution 64527
-#define AdExcept_secDatabaseFull 64528
-#define AdExcept_secDatabaseEmpty 64529
-#define AdExcept_secDatabaseNotPrepared 64530
-#define AdExcept_secBadFieldList 64531
-#define AdExcept_secBadFieldForIndex 64532
-#define AdExcept_secNoStateMachine 64533
-#define AdExcept_secNoStartState 64534
-#define AdExcept_secNoSapiEngine 64535
-#define AdExcept_secFaxBadFormat 64536
-#define AdExcept_secBadGraphicsFormat 64537
-#define AdExcept_secConvertAbort 64538
-#define AdExcept_secUnpackAbort 64539
-#define AdExcept_secCantMakeBitmap 64540
-#define AdExcept_secNoImageLoaded 64541
-#define AdExcept_secNoImageBlockMarked 64542
-#define AdExcept_secFontFileNotFound 64543
-#define AdExcept_secNoFilename 64544
-#define AdExcept_secFileRejected 64545
-#define AdExcept_secCantWriteFile 64546
-#define AdExcept_secTableFull 64547
-#define AdExcept_secAbortNoCarrier 64548
-#define AdExcept_secBadProtocolFunction 64549
-#define AdExcept_secProtocolAbort 64550
-#define AdExcept_secKeyTooLong 64551
-#define AdExcept_secDataTooLarge 64552
-#define AdExcept_secNoFieldsDefined 64553
-#define AdExcept_secIniWrite 64554
-#define AdExcept_secIniRead 64555
-#define AdExcept_secNoIndexKey 64556
-#define AdExcept_secRecordExists 64557
-#define AdExcept_secRecordNotFound 64558
-#define AdExcept_secMustHaveIdxVal 64559
-#define AdExcept_secBadTriggerHandle 64560
-#define AdExcept_secStartStringEmpty 64561
-#define AdExcept_secPacketTooSmall 64562
-#define AdExcept_secNoEndCharCount 64563
-#define AdExcept_secEmptyEndString 64564
-#define AdExcept_secZeroSizePacket 64565
-#define AdExcept_secPacketTooLong 64566
-#define AdExcept_secBadFileList 64567
-#define AdExcept_secNoSearchMask 64568
-#define AdExcept_secNoMatchingFiles 64569
-#define AdExcept_secDirNotFound 64570
-#define AdExcept_secCancelRequested 64571
-#define AdExcept_secTimeout 64572
-#define AdExcept_secProtocolError 64573
-#define AdExcept_secTooManyErrors 64574
-#define AdExcept_secSequenceError 64575
-#define AdExcept_sfpAnswer 64576
-#define AdExcept_sfpIncoming 64577
-#define AdExcept_sfpGetPage 64578
-#define AdExcept_sfpGetPageResult 64579
-#define AdExcept_sfpCheckMorePages 64580
-#define AdExcept_sfpGetHangup 64581
-#define AdExcept_sfpGotHangup 64582
-#define AdExcept_sfpSwitchModes 64583
-#define AdExcept_sfpMonitorEnabled 64584
-#define AdExcept_sfpMonitorDisabled 64585
-#define AdExcept_sfpSessionParams 64586
-#define AdExcept_sfpGotRemoteID 64587
-#define AdExcept_sfpCancel 64588
-#define AdExcept_sfpFinished 64589
-#define AdExcept_secNoMoreTriggers 64590
-#define AdExcept_secTriggerTooLong 64591
-#define AdExcept_spsWaitAck 64592
-#define AdExcept_spsNoHeader 64593
-#define AdExcept_spsGotHeader 64594
-#define AdExcept_spsGotData 64595
-#define AdExcept_spsNoData 64596
-#define AdExcept_spsAbort 64597
-#define AdExcept_sfpInitModem 64598
-#define AdExcept_sfpDialing 64599
-#define AdExcept_sfpBusyWait 64600
-#define AdExcept_sfpSendPage 64601
-#define AdExcept_sfpSendPageStatus 64602
-#define AdExcept_sfpPageError 64603
-#define AdExcept_sfpPageOK 64604
-#define AdExcept_sfpConnecting 64605
-#define AdExcept_sfpWaiting 64606
-#define AdExcept_sfpNoConnect 64607
-#define AdExcept_spsTimeout 64608
-#define AdExcept_spsBlockCheckError 64609
-#define AdExcept_spsLongPacket 64610
-#define AdExcept_spsDuplicateBlock 64611
-#define AdExcept_spsProtocolError 64612
-#define AdExcept_spsCancelRequested 64613
-#define AdExcept_spsEndFile 64614
-#define AdExcept_spsResumeBad 64615
-#define AdExcept_spsSequenceError 64616
-#define AdExcept_spsAbortNoCarrier 64617
-#define AdExcept_spsGotCrcE 64618
-#define AdExcept_spsGotCrcG 64619
-#define AdExcept_spsGotCrcW 64620
-#define AdExcept_spsGotCrcQ 64621
-#define AdExcept_spsTryResume 64622
-#define AdExcept_spsHostResume 64623
-#define AdExcept_sTAPS_LOGINFAIL 64624
-#define AdExcept_sTAPS_MSGOKTOSEND 64625
-#define AdExcept_sTAPS_SENDINGMSG 64626
-#define AdExcept_sTAPS_MSGACK 64627
-#define AdExcept_sTAPS_MSGNAK 64628
-#define AdExcept_sTAPS_MSGRS 64629
-#define AdExcept_sTAPS_MSGCOMPLETED 64630
-#define AdExcept_sTAPS_DONE 64631
-#define AdExcept_spsOK 64632
-#define AdExcept_spsProtocolHandshake 64633
-#define AdExcept_spsInvalidDate 64634
-#define AdExcept_spsFileRejected 64635
-#define AdExcept_spsFileRenamed 64636
-#define AdExcept_spsSkipFile 64637
-#define AdExcept_spsFileDoesntExist 64638
-#define AdExcept_spsCantWriteFile 64639
-#define AdExcept_sPDS_WAITFORCONNECT 64640
-#define AdExcept_sPDS_CONNECTED 64641
-#define AdExcept_sPDS_WAITINGTOREDIAL 64642
-#define AdExcept_sPDS_REDIALING 64643
-#define AdExcept_sPDS_MSGNOTSENT 64644
-#define AdExcept_sPDS_CANCELLING 64645
-#define AdExcept_sPDS_DISCONNECT 64646
-#define AdExcept_sPDS_CLEANUP 64647
-#define AdExcept_sPDE_NONE 64648
-#define AdExcept_sPDE_NODIALTONE 64649
-#define AdExcept_sPDE_LINEBUSY 64650
-#define AdExcept_sPDE_NOCONNECTION 64651
-#define AdExcept_sTAPS_NONE 64652
-#define AdExcept_sTAPS_LOGINPROMPT 64653
-#define AdExcept_sTAPS_LOGGEDIN 64654
-#define AdExcept_sTAPS_LOGINERR 64655
-#define AdExcept_scsWaitForCallback 64656
-#define AdExcept_scsProjected 64657
-#define AdExcept_scsStartAuthentication 64658
-#define AdExcept_scsCallbackComplete 64659
-#define AdExcept_scsLogonNetwork 64660
-#define AdExcept_scsSubEntryConnected 64661
-#define AdExcept_scsSubEntryDisconnected 64662
-#define AdExcept_scsRasInteractive 64663
-#define AdExcept_scsRasRetryAuthentication 64664
-#define AdExcept_scsRasCallbackSetByCaller 64665
-#define AdExcept_scsRasPasswordExpired 64666
-#define AdExcept_scsRasDeviceConnected 64667
-#define AdExcept_sPDS_NONE 64668
-#define AdExcept_sPDS_OFFHOOK 64669
-#define AdExcept_sPDS_DIALING 64670
-#define AdExcept_sPDS_RINGING 64671
-#define AdExcept_scsPortOpened 64672
-#define AdExcept_scsConnectDevice 64673
-#define AdExcept_scsDeviceConnected 64674
-#define AdExcept_scsAllDevicesConnected 64675
-#define AdExcept_scsAuthenticate 64676
-#define AdExcept_scsAuthNotify 64677
-#define AdExcept_scsAuthRetry 64678
-#define AdExcept_scsAuthCallback 64679
-#define AdExcept_scsAuthChangePassword 64680
-#define AdExcept_scsAuthProject 64681
-#define AdExcept_scsAuthLinkSpeed 64682
-#define AdExcept_scsAuthAck 64683
-#define AdExcept_scsReAuthenticate 64684
-#define AdExcept_scsAuthenticated 64685
-#define AdExcept_scsPrepareForCallback 64686
-#define AdExcept_scsWaitForModemReset 64687
-#define AdExcept_sdddCycling 64688
-#define AdExcept_sdddRetryWaiting 64689
-#define AdExcept_sdddRetryWaitOver 64690
-#define AdExcept_sdddDialing 64691
-#define AdExcept_sdddModemConnect 64692
-#define AdExcept_sdddModemConnectAt 64693
-#define AdExcept_sdddModemVoice 64694
-#define AdExcept_sdddModemError 64695
-#define AdExcept_sdddModemNoCarrier 64696
-#define AdExcept_sdddModemBusy 64697
-#define AdExcept_sdddModemNoDialTone 64698
-#define AdExcept_sdddDialTimedOut 64699
-#define AdExcept_sdpeMustEnterName 64700
-#define AdExcept_sdpeMustEnterNumber 64701
-#define AdExcept_sdpeNameExists 64702
-#define AdExcept_scsOpenPort 64703
-#define AdExcept_secInvalidFile 64704
-#define AdExcept_spbeDeleteQuery 64705
-#define AdExcept_sdsmMsgBase 64706
-#define AdExcept_sdsmMsgReady 64707
-#define AdExcept_sdsmMsgInitialize 64708
-#define AdExcept_sdsmMsgInitializeTimeout 64709
-#define AdExcept_sdsmMsgAutoAnswerBackground 64710
-#define AdExcept_sdsmMsgAutoAnswerWait 64711
-#define AdExcept_sdsmMsgAnswerWait 64712
-#define AdExcept_sdsmMsgDialWait 64713
-#define AdExcept_sdsmMsgDialCycle 64714
-#define AdExcept_sdsmMsgNoDialtone 64715
-#define AdExcept_sdsmMsgConnectWait 64716
-#define AdExcept_sdsmMsgConnected 64717
-#define AdExcept_sdsmMsgHangup 64718
-#define AdExcept_sdsmMsgCancel 64719
-#define AdExcept_secModemNotDialing 64720
-#define AdExcept_secNotDialing 64721
-#define AdExcept_secAlreadyDialing 64722
-#define AdExcept_secModemNotResponding 64723
-#define AdExcept_secModemRejectedCommand 64724
-#define AdExcept_secModemStatusMismatch 64725
-#define AdExcept_secDeviceNotSelected 64726
-#define AdExcept_secModemDetectedBusy 64727
-#define AdExcept_secModemNoDialtone 64728
-#define AdExcept_secModemNoCarrier 64729
-#define AdExcept_secModemNoAnswer 64730
-#define AdExcept_secInitFail 64731
-#define AdExcept_secLoginFail 64732
-#define AdExcept_secMinorSrvErr 64733
-#define AdExcept_secFatalSrvErr 64734
-#define AdExcept_secModemNotFound 64735
-#define AdExcept_secNoHandles 64736
-#define AdExcept_secNoTimers 64737
-#define AdExcept_secNoPortSelected 64738
-#define AdExcept_secNotOpenedByTapi 64739
-#define AdExcept_secNullApi 64740
-#define AdExcept_secNotSupported 64741
-#define AdExcept_secRegisterHandlerFailed 64742
-#define AdExcept_secPutBlockFail 64743
-#define AdExcept_secGetBlockFail 64744
-#define AdExcept_secOutputBufferTooSmall 64745
-#define AdExcept_secBufferIsEmpty 64746
-#define AdExcept_secTracingNotEnabled 64747
-#define AdExcept_secLoggingNotEnabled 64748
-#define AdExcept_secBaseAddressNotSet 64749
-#define AdExcept_secModemNotStarted 64750
-#define AdExcept_secModemBusy 64751
-#define AdExcept_secBadArgument 64752
-#define AdExcept_secGotQuitMsg 64753
-#define AdExcept_secBufferTooBig 64754
-#define AdExcept_secPortNotAssigned 64755
-#define AdExcept_secInternal 64756
-#define AdExcept_secModemNotAssigned 64757
-#define AdExcept_secPhonebookNotAssigned 64758
-#define AdExcept_secCannotUseWithWinSock 64759
-#define AdExcept_secBadId 64760
-#define AdExcept_secBaudRate 64761
-#define AdExcept_secByteSize 64762
-#define AdExcept_secDefault 64763
-#define AdExcept_secHardware 64764
-#define AdExcept_secMemory 64765
-#define AdExcept_secCommNotOpen 64766
-#define AdExcept_secAlreadyOpen 64767
-#define AdExcept_secNotOpenInput 64768
-#define AdExcept_secNotOpenOutput 64769
-#define AdExcept_secWriteProtected 64770
-#define AdExcept_secUnknownUnit 64771
-#define AdExcept_secDriveNotReady 64772
-#define AdExcept_secUnknownCommand 64773
-#define AdExcept_secCrcError 64774
-#define AdExcept_secBadStructLen 64775
-#define AdExcept_secSeekError 64776
-#define AdExcept_secUnknownMedia 64777
-#define AdExcept_secSectorNotFound 64778
-#define AdExcept_secOutOfPaper 64779
-#define AdExcept_secDeviceWrite 64780
-#define AdExcept_secDeviceRead 64781
-#define AdExcept_secHardwareFailure 64782
-#define AdExcept_secBadHandle 64783
-#define OleConst_SNoWindowHandle 64784
-#define OleConst_SInvalidLicense 64785
-#define OleConst_SNotLicensed 64786
-#define AdExcept_secOK 64787
-#define AdExcept_secFileNotFound 64788
-#define AdExcept_secPathNotFound 64789
-#define AdExcept_secTooManyFiles 64790
-#define AdExcept_secAccessDenied 64791
-#define AdExcept_secInvalidHandle 64792
-#define AdExcept_secOutOfMemory 64793
-#define AdExcept_secInvalidDrive 64794
-#define AdExcept_secNoMoreFiles 64795
-#define AdExcept_secDiskRead 64796
-#define AdExcept_secDiskFull 64797
-#define AdExcept_secNotAssigned 64798
-#define AdExcept_secNotOpen 64799
-#define fib_FalseStr 64800
-#define SIBFIBEA_SIB_RS_FIB_SET_NATIVEHANDLE 64801
-#define SIBFIBEA_SIB_RS_FIB_NO_DATABASE 64802
-#define DECConst_sProtectionCircular 64803
-#define DECConst_sStringFormatExists 64804
-#define DECConst_sInvalidStringFormat 64805
-#define DECConst_sInvalidFormatString 64806
-#define DECConst_sFMT_COPY 64807
-#define DECConst_sFMT_HEX 64808
-#define DECConst_sFMT_HEXL 64809
-#define DECConst_sFMT_MIME64 64810
-#define DECConst_sFMT_UU 64811
-#define DECConst_sFMT_XX 64812
-#define DECConst_sInvalidKeySize 64813
-#define DECConst_sNotInitialized 64814
-#define OleConst_SCannotActivate 64815
-#define FIBConsts_SFIBErrorCircularLinks 64816
-#define FIBConsts_SFIBErrorParamNotExist 64817
-#define FIBConsts_SFIBErrorWideStringValueTooLong 64818
-#define FIBConsts_SFIBErrorEOFInComments 64819
-#define FIBConsts_SFIBErrorEOFInString 64820
-#define FIBConsts_SFIBErrorParamNameExpected 64821
-#define FIBConsts_SFIBErrorNotDataSet 64822
-#define FIBConsts_SFIBErrorAbortUpdates 64823
-#define FIBConsts_SFIBErrorUnableGetRecordCount 64824
-#define FIBConsts_SFIBErrorUnableLock 64825
-#define FIBConsts_SFIBErrorGenerationError 64826
-#define FIBConsts_reVarNotArray 64827
-#define FIBConsts_reVarArrayBounds 64828
-#define FIBConsts_reVarArrayCreate 64829
-#define FIBConsts_SNoTimers 64830
-#define fib_TrueStr 64831
-#define FIBConsts_SDBEditUserName 64832
-#define FIBConsts_SDBEditPassword 64833
-#define FIBConsts_SDBEditSQLRole 64834
-#define FIBConsts_SLoginDlgLoginCaption 64835
-#define FIBConsts_SLoginDlgDatabase 64836
-#define FIBConsts_SCompEditDataSet_ID 64837
-#define FIBConsts_SCompEditDataSetInfoNotExists 64838
-#define FIBConsts_SCompEditDataSetInfoForbid 64839
-#define FIBConsts_SCompEditUnableInsertInfoRecord 64840
-#define FIBConsts_SFIBErrorBeforeDisconnectDetail 64841
-#define FIBConsts_SFIBErrorBeforeDisconnect 64842
-#define FIBConsts_SFIBErrorAfterDisconnectDetail 64843
-#define FIBConsts_SFIBErrorAfterDisconnect 64844
-#define FIBConsts_SFIBErrorNoDBLoginDialog 64845
-#define FIBConsts_SFIBErrorInstallPropertyEditorPackage 64846
-#define FIBConsts_SFIBErrorIncludeDBLoginDialog 64847
-#define SIBGlobals_SIB_RS_ALREADY_REGISTERED 64848
-#define SIBGlobals_SIB_RS_EMPTY_STRINGS 64849
-#define SIBGlobals_SIB_RS_TOO_LONG 64850
-#define FIBConsts_SCantFindApiProc 64851
-#define FIBConsts_SCantLoadLibrary 64852
-#define FIBConsts_SUnknownClientLibrary 64853
-#define FIBConsts_STransactionForOtherLibrary 64854
-#define FIBConsts_SEdErrorPrefix 64855
-#define FIBConsts_SEdDeadLockMess 64856
-#define FIBConsts_SEdNotExistRecord 64857
-#define FIBConsts_SEdMultiplyRecord 64858
-#define FIBConsts_SCantSort 64859
-#define FIBConsts_SCantGetInfo 64860
-#define FIBConsts_SDataBaseNotAssigned 64861
-#define FIBConsts_SOKButton 64862
-#define FIBConsts_SCancelButton 64863
-#define ADOConst_SInvalidEnumValue 64864
-#define ADOConst_SMissingConnection 64865
-#define ADOConst_SNoDetailFilter 64866
-#define ADOConst_SBookmarksRequired 64867
-#define ADOConst_SMissingCommandText 64868
-#define ADOConst_SNoResultSet 64869
-#define ADOConst_SADOCreateError 64870
-#define ADOConst_SEventsNotSupported 64871
-#define ADOConst_SUsupportedFieldType 64872
-#define ADOConst_SConnectionRequired 64873
-#define ADOConst_SCantRequery 64874
-#define ADOConst_SNoFilterOptions 64875
-#define ADOConst_SRecordsetNotOpen 64876
-#define ADOConst_sNameAttr 64877
-#define ADOConst_sValueAttr 64878
-#define SIBGlobals_SIB_RS_NOT_REGISTERED 64879
-#define IdResourceStrings_RSSSLLoadingKeyError 64880
-#define IdResourceStrings_RSSSLGetMethodError 64881
-#define IdResourceStrings_RSSSLDataBindingError 64882
-#define IdResourceStrings_RSOSSLModeNotSet 64883
-#define IdResourceStrings_RSOSSLCouldNotLoadSSLLibrary 64884
-#define IdResourceStrings_RSOSSLStatusString 64885
-#define IdResourceStrings_RSUnevenSizeInDecodeStream 64886
-#define IdResourceStrings_RSUnevenSizeInEncodeStream 64887
-#define IdResourceStrings_RSHL7StatusStopped 64888
-#define IdResourceStrings_RSHL7StatusFailedToStop 64889
-#define IdResourceStrings_RSHL7NotWhileWorking 64890
-#define IdResourceStrings_RSHL7AlreadyStopped 64891
-#define IdResourceStrings_RSHL7ClientThreadNotStopped 64892
-#define IdResourceStrings_RSURINoProto 64893
-#define IdResourceStrings_RSURINoHost 64894
-#define IdResourceStrings_RSThreadTerminateAndWaitFor 64895
-#define IdResourceStrings_RSSocksAuthMethodError 64896
-#define IdResourceStrings_RSSocksAuthError 64897
-#define IdResourceStrings_RSSocksServerGeneralError 64898
-#define IdResourceStrings_RSSocksServerPermissionError 64899
-#define IdResourceStrings_RSSocksServerNetUnreachableError 64900
-#define IdResourceStrings_RSSocksServerHostUnreachableError 64901
-#define IdResourceStrings_RSSocksServerConnectionRefusedError 64902
-#define IdResourceStrings_RSSocksServerTTLExpiredError 64903
-#define IdResourceStrings_RSSocksServerCommandError 64904
-#define IdResourceStrings_RSSocksServerAddressError 64905
-#define IdResourceStrings_RSSSLAcceptError 64906
-#define IdResourceStrings_RSSSLConnectError 64907
-#define IdResourceStrings_RSSSLSettingCipherError 64908
-#define IdResourceStrings_RSSSLCreatingContextError 64909
-#define IdResourceStrings_RSSSLLoadingRootCertError 64910
-#define IdResourceStrings_RSSSLLoadingCertError 64911
-#define IdResourceStrings_RSStackENOTCONN 64912
-#define IdResourceStrings_RSStackESHUTDOWN 64913
-#define IdResourceStrings_RSStackETOOMANYREFS 64914
-#define IdResourceStrings_RSStackETIMEDOUT 64915
-#define IdResourceStrings_RSStackECONNREFUSED 64916
-#define IdResourceStrings_RSStackELOOP 64917
-#define IdResourceStrings_RSStackENAMETOOLONG 64918
-#define IdResourceStrings_RSStackEHOSTDOWN 64919
-#define IdResourceStrings_RSStackEHOSTUNREACH 64920
-#define IdResourceStrings_RSStackENOTEMPTY 64921
-#define IdResourceStrings_RSStackHOST_NOT_FOUND 64922
-#define IdResourceStrings_RSSocksRequestFailed 64923
-#define IdResourceStrings_RSSocksRequestServerFailed 64924
-#define IdResourceStrings_RSSocksRequestIdentFailed 64925
-#define IdResourceStrings_RSSocksUnknownError 64926
-#define IdResourceStrings_RSSocksServerRespondError 64927
-#define IdResourceStrings_RSStackEPROTOTYPE 64928
-#define IdResourceStrings_RSStackENOPROTOOPT 64929
-#define IdResourceStrings_RSStackEPROTONOSUPPORT 64930
-#define IdResourceStrings_RSStackESOCKTNOSUPPORT 64931
-#define IdResourceStrings_RSStackEOPNOTSUPP 64932
-#define IdResourceStrings_RSStackEPFNOSUPPORT 64933
-#define IdResourceStrings_RSStackEAFNOSUPPORT 64934
-#define IdResourceStrings_RSStackEADDRINUSE 64935
-#define IdResourceStrings_RSStackEADDRNOTAVAIL 64936
-#define IdResourceStrings_RSStackENETDOWN 64937
-#define IdResourceStrings_RSStackENETUNREACH 64938
-#define IdResourceStrings_RSStackENETRESET 64939
-#define IdResourceStrings_RSStackECONNABORTED 64940
-#define IdResourceStrings_RSStackECONNRESET 64941
-#define IdResourceStrings_RSStackENOBUFS 64942
-#define IdResourceStrings_RSStackEISCONN 64943
-#define IdResourceStrings_RSHTTPCannotSwitchSessionStateWhenActive 64944
-#define IdResourceStrings_RSHTTPAuthAlreadyRegistered 64945
-#define IdResourceStrings_RSInvalidServiceName 64946
-#define IdResourceStrings_RSStackError 64947
-#define IdResourceStrings_RSStackEINTR 64948
-#define IdResourceStrings_RSStackEBADF 64949
-#define IdResourceStrings_RSStackEACCES 64950
-#define IdResourceStrings_RSStackEFAULT 64951
-#define IdResourceStrings_RSStackEINVAL 64952
-#define IdResourceStrings_RSStackEMFILE 64953
-#define IdResourceStrings_RSStackEWOULDBLOCK 64954
-#define IdResourceStrings_RSStackEINPROGRESS 64955
-#define IdResourceStrings_RSStackEALREADY 64956
-#define IdResourceStrings_RSStackENOTSOCK 64957
-#define IdResourceStrings_RSStackEDESTADDRREQ 64958
-#define IdResourceStrings_RSStackEMSGSIZE 64959
-#define IdResourceStrings_RSHTTPGone 64960
-#define IdResourceStrings_RSHTTPLengthRequired 64961
-#define IdResourceStrings_RSHTTPPreconditionFailed 64962
-#define IdResourceStrings_RSHTTPRequestEntityToLong 64963
-#define IdResourceStrings_RSHTTPRequestURITooLong 64964
-#define IdResourceStrings_RSHTTPUnsupportedMediaType 64965
-#define IdResourceStrings_RSHTTPInternalServerError 64966
-#define IdResourceStrings_RSHTTPNotImplemented 64967
-#define IdResourceStrings_RSHTTPBadGateway 64968
-#define IdResourceStrings_RSHTTPServiceUnavailable 64969
-#define IdResourceStrings_RSHTTPGatewayTimeout 64970
-#define IdResourceStrings_RSHTTPHTTPVersionNotSupported 64971
-#define IdResourceStrings_RSHTTPUnknownResponseCode 64972
-#define IdResourceStrings_RSHTTPHeaderAlreadyWritten 64973
-#define IdResourceStrings_RSHTTPErrorParsingCommand 64974
-#define IdResourceStrings_RSHTTPUnsupportedAuthorisationScheme 64975
-#define IdResourceStrings_RSHTTPResetContent 64976
-#define IdResourceStrings_RSHTTPPartialContent 64977
-#define IdResourceStrings_RSHTTPMovedPermanently 64978
-#define IdResourceStrings_RSHTTPMovedTemporarily 64979
-#define IdResourceStrings_RSHTTPSeeOther 64980
-#define IdResourceStrings_RSHTTPNotModified 64981
-#define IdResourceStrings_RSHTTPUseProxy 64982
-#define IdResourceStrings_RSHTTPBadRequest 64983
-#define IdResourceStrings_RSHTTPUnauthorized 64984
-#define IdResourceStrings_RSHTTPForbidden 64985
-#define IdResourceStrings_RSHTTPNotFound 64986
-#define IdResourceStrings_RSHTTPMethodeNotallowed 64987
-#define IdResourceStrings_RSHTTPNotAcceptable 64988
-#define IdResourceStrings_RSHTTPProxyAuthenticationRequired 64989
-#define IdResourceStrings_RSHTTPRequestTimeout 64990
-#define IdResourceStrings_RSHTTPConflict 64991
-#define IdResourceStrings_RSMIMEMIMETypeEmpty 64992
-#define IdResourceStrings_RSMIMEMIMEExtAlreadyExists 64993
-#define IdResourceStrings_RSStatusResolving 64994
-#define IdResourceStrings_RSStatusConnecting 64995
-#define IdResourceStrings_RSStatusConnected 64996
-#define IdResourceStrings_RSStatusDisconnecting 64997
-#define IdResourceStrings_RSStatusDisconnected 64998
-#define IdResourceStrings_RSStatusText 64999
-#define IdResourceStrings_RSConnectTimeout 65000
-#define IdResourceStrings_RSHTTPChunkStarted 65001
-#define IdResourceStrings_RSHTTPContinue 65002
-#define IdResourceStrings_RSHTTPOK 65003
-#define IdResourceStrings_RSHTTPCreated 65004
-#define IdResourceStrings_RSHTTPAccepted 65005
-#define IdResourceStrings_RSHTTPNonAuthoritativeInformation 65006
-#define IdResourceStrings_RSHTTPNoContent 65007
-#define IdResourceStrings_RSFileNotFound 65008
-#define IdResourceStrings_RSOnlyOneAntiFreeze 65009
-#define IdResourceStrings_RSIOHandlerPropInvalid 65010
-#define IdResourceStrings_RSNotConnected 65011
-#define IdResourceStrings_RSObjectTypeNotSupported 65012
-#define IdResourceStrings_RSTerminateThreadTimeout 65013
-#define IdResourceStrings_RSNoExecuteSpecified 65014
-#define IdResourceStrings_RSIdNoDataToRead 65015
-#define IdResourceStrings_RSCanNotBindRange 65016
-#define IdResourceStrings_RSInvalidPortRange 65017
-#define IdResourceStrings_RSReadTimeout 65018
-#define IdResourceStrings_RSReadLnMaxLineLengthExceeded 65019
-#define IdResourceStrings_RSNoCommandHandlerFound 65020
-#define IdResourceStrings_RSWS2CallError 65021
-#define IdResourceStrings_RSWS2LoadError 65022
-#define IdResourceStrings_RSMIMEExtensionEmpty 65023
+#define AdExcept_sdispTelnetLineMode 63920
+#define AdExcept_sdispTelnetXDisplayLocation 63921
+#define AdExcept_sdispTelnetEnvironment 63922
+#define AdExcept_sdispTelnetAuthentication 63923
+#define AdExcept_sdispTelnetTelnetcode38 63924
+#define AdExcept_sdispTelnetNewEnvironment 63925
+#define AdExcept_sdispTelnetTelnetcode40 63926
+#define AdExcept_sdispTelnetTelnetcode41 63927
+#define AdExcept_sdispTelnetCharacterSet 63928
+#define dxGDIPlusAPI_scxGdipInvalidOperation 63929
+#define AdExcept_sdispTelnetLogout 63936
+#define AdExcept_sdispTelnetByteMacro 63937
+#define AdExcept_sdispTelnetDataEntryTerminal 63938
+#define AdExcept_sdispTelnetSUPDUP 63939
+#define AdExcept_sdispTelnetSUPDUPOutput 63940
+#define AdExcept_sdispTelnetSendLocation 63941
+#define AdExcept_sdispTelnetTerminalType 63942
+#define AdExcept_sdispTelnetEndofRecord 63943
+#define AdExcept_sdispTelnetTACACSUserID 63944
+#define AdExcept_sdispTelnetOutputMarking 63945
+#define AdExcept_sdispTelnetTerminalLocNum 63946
+#define AdExcept_sdispTelnetTelnet3270Regime 63947
+#define AdExcept_sdispTelnetX3PAD 63948
+#define AdExcept_sdispTelnetNegWindowSize 63949
+#define AdExcept_sdispTelnetTerminalSpeed 63950
+#define AdExcept_sdispTelnetFlowControl 63951
+#define AdExcept_sdispTelnetReconnection 63952
+#define AdExcept_sdispTelnetSupressGoAhead 63953
+#define AdExcept_sdispTelnetApproxMsgSize 63954
+#define AdExcept_sdispTelnetStatus 63955
+#define AdExcept_sdispTelnetTimingMark 63956
+#define AdExcept_sdispTelnetRemoteTransEcho 63957
+#define AdExcept_sdispTelnetOutputLineWidth 63958
+#define AdExcept_sdispTelnetOutputPageSize 63959
+#define AdExcept_sdispTelnetOutputCRDisp 63960
+#define AdExcept_sdispTelnetOutputHorzTabs 63961
+#define AdExcept_sdispTelnetOutputHorzTabDisp 63962
+#define AdExcept_sdispTelnetOutputFFDisp 63963
+#define AdExcept_sdispTelnetOutputVertTabs 63964
+#define AdExcept_sdispTelnetOutputVertTabDisp 63965
+#define AdExcept_sdispTelnetOutputLinefeedDisp 63966
+#define AdExcept_sdispTelnetExtendedASCII 63967
+#define AdExcept_sdstEndStr 63968
+#define AdExcept_sdstIdle 63969
+#define AdExcept_sdstWaiting 63970
+#define AdExcept_sdstCollecting 63971
+#define AdExcept_sdispHeader 63972
+#define AdExcept_sdispHeaderLine 63973
+#define AdExcept_sdispmdmtagDCTS 63974
+#define AdExcept_sdispmdmtagDDSR 63975
+#define AdExcept_sdispmdmtagTERI 63976
+#define AdExcept_sdispmdmtagDDCD 63977
+#define AdExcept_sdispmdmtagCTS 63978
+#define AdExcept_sdispmdmtagDSR 63979
+#define AdExcept_sdispmdmtagRI 63980
+#define AdExcept_sdispmdmtagDCD 63981
+#define AdExcept_sdispTelnetBinary 63982
+#define AdExcept_sdispTelnetEcho 63983
+#define AdExcept_sdsttaSendBlock 63984
+#define AdExcept_sdsttaSendDelay 63985
+#define AdExcept_sdsttaFinishDrain 63986
+#define AdExcept_sdsttaFinished 63987
+#define AdExcept_sdsttaDone 63988
+#define AdExcept_sdstraInitial 63989
+#define AdExcept_sdstraCollectBlock 63990
+#define AdExcept_sdstraProcessBlock 63991
+#define AdExcept_sdstraFinished 63992
+#define AdExcept_sdstraDone 63993
+#define AdExcept_sdstEnable 63994
+#define AdExcept_sdstDisable 63995
+#define AdExcept_sdstStringPacket 63996
+#define AdExcept_sdstSizePacket 63997
+#define AdExcept_sdstPacketTimeout 63998
+#define AdExcept_sdstStartStr 63999
+#define AdExcept_sdsttkError 64000
+#define AdExcept_sdsttkDone 64001
+#define AdExcept_sdstrkInit 64002
+#define AdExcept_sdstrkGetInit 64003
+#define AdExcept_sdstrkCollectInit 64004
+#define AdExcept_sdstrkGetFile 64005
+#define AdExcept_sdstrkCollectFile 64006
+#define AdExcept_sdstrkGetData 64007
+#define AdExcept_sdstrkCollectData 64008
+#define AdExcept_sdstrkComplete 64009
+#define AdExcept_sdstrkWaitCancel 64010
+#define AdExcept_sdstrkError 64011
+#define AdExcept_sdstrkDone 64012
+#define AdExcept_sdsttaInitial 64013
+#define AdExcept_sdsttaGetBlock 64014
+#define AdExcept_sdsttaWaitFreeSpace 64015
+#define AdExcept_sdsttkOpenFile 64016
+#define AdExcept_sdsttkSendFile 64017
+#define AdExcept_sdsttkFileReply 64018
+#define AdExcept_sdsttkCollectFile 64019
+#define AdExcept_sdsttkCheckTable 64020
+#define AdExcept_sdsttkSendData 64021
+#define AdExcept_sdsttkBlockReply 64022
+#define AdExcept_sdsttkCollectBlock 64023
+#define AdExcept_sdsttkSendEof 64024
+#define AdExcept_sdsttkEofReply 64025
+#define AdExcept_sdsttkCollectEof 64026
+#define AdExcept_sdsttkSendBreak 64027
+#define AdExcept_sdsttkBreakReply 64028
+#define AdExcept_sdsttkCollectBreak 64029
+#define AdExcept_sdsttkComplete 64030
+#define AdExcept_sdsttkWaitCancel 64031
+#define AdExcept_sdstrzSync 64032
+#define AdExcept_sdstrzStartFile 64033
+#define AdExcept_sdstrzStartData 64034
+#define AdExcept_sdstrzCollectData 64035
+#define AdExcept_sdstrzGotData 64036
+#define AdExcept_sdstrzWaitEof 64037
+#define AdExcept_sdstrzEndOfFile 64038
+#define AdExcept_sdstrzSendFinish 64039
+#define AdExcept_sdstrzCollectFinish 64040
+#define AdExcept_sdstrzError 64041
+#define AdExcept_sdstrzWaitCancel 64042
+#define AdExcept_sdstrzCleanup 64043
+#define AdExcept_sdstrzDone 64044
+#define AdExcept_sdsttkInit 64045
+#define AdExcept_sdsttkInitReply 64046
+#define AdExcept_sdsttkCollectInit 64047
+#define AdExcept_sdsttzWaitAck 64048
+#define AdExcept_sdsttzSendEof 64049
+#define AdExcept_sdsttzDrainEof 64050
+#define AdExcept_sdsttzCheckEof 64051
+#define AdExcept_sdsttzSendFinish 64052
+#define AdExcept_sdsttzCheckFinish 64053
+#define AdExcept_sdsttzError 64054
+#define AdExcept_sdsttzCleanup 64055
+#define AdExcept_sdsttzDone 64056
+#define AdExcept_sdstrzRqstFile 64057
+#define AdExcept_sdstrzDelay 64058
+#define AdExcept_sdstrzWaitFile 64059
+#define AdExcept_sdstrzCollectFile 64060
+#define AdExcept_sdstrzSendInit 64061
+#define AdExcept_sdstrzSendBlockPrep 64062
+#define AdExcept_sdstrzSendBlock 64063
+#define AdExcept_sdstryWaitForBlockStart 64064
+#define AdExcept_sdstryCollectBlock 64065
+#define AdExcept_sdstryProcessBlock 64066
+#define AdExcept_sdstryOpenFile 64067
+#define AdExcept_sdstryPrepXmodem 64068
+#define AdExcept_sdstryReceiveXmodem 64069
+#define AdExcept_sdstryFinished 64070
+#define AdExcept_sdstryDone 64071
+#define AdExcept_sdsttzInitial 64072
+#define AdExcept_sdsttzHandshake 64073
+#define AdExcept_sdsttzGetFile 64074
+#define AdExcept_sdsttzSendFile 64075
+#define AdExcept_sdsttzCheckFile 64076
+#define AdExcept_sdsttzStartData 64077
+#define AdExcept_sdsttzEscapeData 64078
+#define AdExcept_sdsttzSendData 64079
+#define AdExcept_sdstrxFinished 64080
+#define AdExcept_sdstrxDone 64081
+#define AdExcept_sdsttyInitial 64082
+#define AdExcept_sdsttyHandshake 64083
+#define AdExcept_sdsttyGetFileName 64084
+#define AdExcept_sdsttySendFileName 64085
+#define AdExcept_sdsttyDraining 64086
+#define AdExcept_sdsttyReplyPending 64087
+#define AdExcept_sdsttyPrepXmodem 64088
+#define AdExcept_sdsttySendXmodem 64089
+#define AdExcept_sdsttyFinished 64090
+#define AdExcept_sdsttyFinishDrain 64091
+#define AdExcept_sdsttyDone 64092
+#define AdExcept_sdstryInitial 64093
+#define AdExcept_sdstryDelay 64094
+#define AdExcept_sdstryWaitForHSReply 64095
+#define AdExcept_sdsttxWaitFreeSpace 64096
+#define AdExcept_sdsttxSendBlock 64097
+#define AdExcept_sdsttxDraining 64098
+#define AdExcept_sdsttxReplyPending 64099
+#define AdExcept_sdsttxEndDrain 64100
+#define AdExcept_sdsttxFirstEndOfTransmit 64101
+#define AdExcept_sdsttxRestEndOfTransmit 64102
+#define AdExcept_sdsttxEotReply 64103
+#define AdExcept_sdsttxFinished 64104
+#define AdExcept_sdsttxDone 64105
+#define AdExcept_sdstrxInitial 64106
+#define AdExcept_sdstrxWaitForHSReply 64107
+#define AdExcept_sdstrxWaitForBlockStart 64108
+#define AdExcept_sdstrxCollectBlock 64109
+#define AdExcept_sdstrxProcessBlock 64110
+#define AdExcept_sdstrxFinishedSkip 64111
+#define AdExcept_sdstrfStartPage 64112
+#define AdExcept_sdstrfGetPageData 64113
+#define AdExcept_sdstrf1FinishPage 64114
+#define AdExcept_sdstrf1WaitEOP 64115
+#define AdExcept_sdstrf1WritePage 64116
+#define AdExcept_sdstrf1SendMCF 64117
+#define AdExcept_sdstrf1WaitDCN 64118
+#define AdExcept_sdstrf1WaitHangup 64119
+#define AdExcept_sdstrf2GetPageResult 64120
+#define AdExcept_sdstrf2GetFHNG 64121
+#define AdExcept_sdstrfComplete 64122
+#define AdExcept_sdstrfAbort 64123
+#define AdExcept_sdstrfDone 64124
+#define AdExcept_sdsttxInitial 64125
+#define AdExcept_sdsttxHandshake 64126
+#define AdExcept_sdsttxGetBlock 64127
+#define AdExcept_sdstrfAnswer 64128
+#define AdExcept_sdstrf1SendCSI 64129
+#define AdExcept_sdstrf1SendDIS 64130
+#define AdExcept_sdstrf1CollectFrames 64131
+#define AdExcept_sdstrf1CollectRetry1 64132
+#define AdExcept_sdstrf1CollectRetry2 64133
+#define AdExcept_sdstrf1StartTrain 64134
+#define AdExcept_sdstrf1CollectTrain 64135
+#define AdExcept_sdstrf1Timeout 64136
+#define AdExcept_sdstrf1Retrain 64137
+#define AdExcept_sdstrf1FinishTrain 64138
+#define AdExcept_sdstrf1SendCFR 64139
+#define AdExcept_sdstrf1WaitPageConnect 64140
+#define AdExcept_sdstrf2ValidConnect 64141
+#define AdExcept_sdstrf2GetSenderID 64142
+#define AdExcept_sdstrf2GetConnect 64143
+#define AdExcept_sdsttf2SendNewParams 64144
+#define AdExcept_sdsttf2NextPage 64145
+#define AdExcept_sdsttf20CheckPage 64146
+#define AdExcept_sdsttfClose 64147
+#define AdExcept_sdsttfCompleteOK 64148
+#define AdExcept_sdsttfAbort 64149
+#define AdExcept_sdsttfDone 64150
+#define AdExcept_sdstrfNone 64151
+#define AdExcept_sdstrfInit 64152
+#define AdExcept_sdstrf1Init1 64153
+#define AdExcept_sdstrf2Init1 64154
+#define AdExcept_sdstrf2Init1A 64155
+#define AdExcept_sdstrf2Init1B 64156
+#define AdExcept_sdstrf2Init2 64157
+#define AdExcept_sdstrf2Init3 64158
+#define AdExcept_sdstrfWaiting 64159
+#define AdExcept_sdsttfPrepPage 64160
+#define AdExcept_sdsttfSendPage 64161
+#define AdExcept_sdsttfDrainPage 64162
+#define AdExcept_sdsttf1PageEnd 64163
+#define AdExcept_sdsttf1PrepareEOP 64164
+#define AdExcept_sdsttf1SendEOP 64165
+#define AdExcept_sdsttf1WaitMPS 64166
+#define AdExcept_sdsttf1WaitEOP 64167
+#define AdExcept_sdsttf1WaitMCF 64168
+#define AdExcept_sdsttf1SendDCN 64169
+#define AdExcept_sdsttf1Hangup 64170
+#define AdExcept_sdsttf1WaitHangup 64171
+#define AdExcept_sdsttf2SendEOP 64172
+#define AdExcept_sdsttf2WaitFPTS 64173
+#define AdExcept_sdsttf2WaitFET 64174
+#define AdExcept_sdsttf2WaitPageOK 64175
+#define AdExcept_sdsttfRetryWait 64176
+#define AdExcept_sdsttf1Connect 64177
+#define AdExcept_sdsttf1SendTSI 64178
+#define AdExcept_sdsttf1TSIResponse 64179
+#define AdExcept_sdsttf1DCSResponse 64180
+#define AdExcept_sdsttf1TrainStart 64181
+#define AdExcept_sdsttf1TrainFinish 64182
+#define AdExcept_sdsttf1WaitCFR 64183
+#define AdExcept_sdsttf1WaitPageConnect 64184
+#define AdExcept_sdsttf2Connect 64185
+#define AdExcept_sdsttf2GetParams 64186
+#define AdExcept_sdsttfWaitXon 64187
+#define AdExcept_sdsttfWaitFreeHeader 64188
+#define AdExcept_sdsttfSendPageHeader 64189
+#define AdExcept_sdsttfOpenCover 64190
+#define AdExcept_sdsttfSendCover 64191
+#define AdExcept_sdstRWill 64192
+#define AdExcept_sdstRWont 64193
+#define AdExcept_sdstRDo 64194
+#define AdExcept_sdstRDont 64195
+#define AdExcept_sdstCommand 64196
+#define AdExcept_sdstSTerm 64197
+#define AdExcept_sdsttfNone 64198
+#define AdExcept_sdsttfGetEntry 64199
+#define AdExcept_sdsttfInit 64200
+#define AdExcept_sdsttf1Init1 64201
+#define AdExcept_sdsttf2Init1 64202
+#define AdExcept_sdsttf2Init1A 64203
+#define AdExcept_sdsttf2Init1B 64204
+#define AdExcept_sdsttf2Init2 64205
+#define AdExcept_sdsttf2Init3 64206
+#define AdExcept_sdsttfDial 64207
+#define AdExcept_sdstStatus 64208
+#define AdExcept_sdstThreadStart 64209
+#define AdExcept_sdstThreadExit 64210
+#define AdExcept_sdstThreadSleep 64211
+#define AdExcept_sdstThreadWake 64212
+#define AdExcept_sdstDataTrigger 64213
+#define AdExcept_sdstTimerTrigger 64214
+#define AdExcept_sdstStatusTrigger 64215
+#define AdExcept_sdstAvailTrigger 64216
+#define AdExcept_sdstWndHandler 64217
+#define AdExcept_sdstProcHandler 64218
+#define AdExcept_sdstEventHandler 64219
+#define AdExcept_sdstSWill 64220
+#define AdExcept_sdstSWont 64221
+#define AdExcept_sdstSDo 64222
+#define AdExcept_sdstSDont 64223
+#define AdExcept_sdtYModem 64224
+#define AdExcept_sdtZModem 64225
+#define AdExcept_sdtKermit 64226
+#define AdExcept_sdtAscii 64227
+#define AdExcept_sdtBPlus 64228
+#define AdExcept_sdtPacket 64229
+#define AdExcept_sdtUser 64230
+#define AdExcept_sdtScript 64231
+#define AdExcept_sdstNone 64232
+#define AdExcept_sdstReadCom 64233
+#define AdExcept_sdstWriteCom 64234
+#define AdExcept_sdstLineStatus 64235
+#define AdExcept_sdstModemStatus 64236
+#define AdExcept_sdstAvail 64237
+#define AdExcept_sdstTimer 64238
+#define AdExcept_sdstData 64239
+#define AdExcept_secVoIPH323NotFound 64240
+#define AdExcept_secVoIPTapi3EventFailure 64241
+#define AdExcept_secRasLoadFail 64242
+#define AdExcept_sdtNone 64243
+#define AdExcept_sdtDispatch 64244
+#define AdExcept_sdtTrigger 64245
+#define AdExcept_sdtError 64246
+#define AdExcept_sdtThread 64247
+#define AdExcept_sdtTriggerAlloc 64248
+#define AdExcept_sdtTriggerDispose 64249
+#define AdExcept_sdtTriggerHandlerAlloc 64250
+#define AdExcept_sdtTriggerHandlerDispose 64251
+#define AdExcept_sdtTriggerDataChange 64252
+#define AdExcept_sdtTelnet 64253
+#define AdExcept_sdtFax 64254
+#define AdExcept_sdtXModem 64255
+#define AdExcept_secTapiCIDOutOfArea 64256
+#define AdExcept_secTapiWaveFormatError 64257
+#define AdExcept_secTapiWaveReadError 64258
+#define AdExcept_secTapiWaveBadFormat 64259
+#define AdExcept_secTapiTranslateFail 64260
+#define AdExcept_secTapiWaveDeviceInUse 64261
+#define AdExcept_secTapiWaveFileExists 64262
+#define AdExcept_secTapiWaveNoData 64263
+#define AdExcept_secVoIPNotSupported 64264
+#define AdExcept_secVoIPCallBusy 64265
+#define AdExcept_secVoIPBadAddress 64266
+#define AdExcept_secVoIPNoAnswer 64267
+#define AdExcept_secVoIPCancelled 64268
+#define AdExcept_secVoIPRejected 64269
+#define AdExcept_secVoIPFailed 64270
+#define AdExcept_secVoIPTapi3NotInstalled 64271
+#define AdExcept_secUserUserInfoTooBig 64272
+#define AdExcept_secReinit 64273
+#define AdExcept_secAddressBlocked 64274
+#define AdExcept_secBillingRejected 64275
+#define AdExcept_secInvalFeature 64276
+#define AdExcept_secNoMultipleInstance 64277
+#define AdExcept_secTapiBusy 64278
+#define AdExcept_secTapiNotSet 64279
+#define AdExcept_secTapiNoSelect 64280
+#define AdExcept_secTapiLoadFail 64281
+#define AdExcept_secTapiGetAddrFail 64282
+#define AdExcept_sTAPIdisabled16bit 64283
+#define AdExcept_secTapiUnexpected 64284
+#define AdExcept_secTapiVoiceNotSupported 64285
+#define AdExcept_secTapiWaveFail 64286
+#define AdExcept_secTapiCIDBlocked 64287
+#define AdExcept_secNoConference 64288
+#define AdExcept_secNoDevice 64289
+#define AdExcept_secNoDriver 64290
+#define AdExcept_secNoMem 64291
+#define AdExcept_secNoRequest 64292
+#define AdExcept_secNotOwner 64293
+#define AdExcept_secNotRegistered 64294
+#define AdExcept_secOperationFailed 64295
+#define AdExcept_secOperationUnavail 64296
+#define AdExcept_secRateUnavail 64297
+#define AdExcept_secResourceUnavail 64298
+#define AdExcept_secRequestOverrun 64299
+#define AdExcept_secStructureTooSmall 64300
+#define AdExcept_secTargetNotFound 64301
+#define AdExcept_secTargetSelf 64302
+#define AdExcept_secUninitialized 64303
+#define AdExcept_secInvalMessageID 64304
+#define AdExcept_secInvalParam 64305
+#define AdExcept_secInvalParkID 64306
+#define AdExcept_secInvalParkMode 64307
+#define AdExcept_secInvalPointer 64308
+#define AdExcept_secInvalPrivSelect 64309
+#define AdExcept_secInvalRate 64310
+#define AdExcept_secInvalRequestMode 64311
+#define AdExcept_secInvalTerminalID 64312
+#define AdExcept_secInvalTerminalMode 64313
+#define AdExcept_secInvalTimeout 64314
+#define AdExcept_secInvalTone 64315
+#define AdExcept_secInvalToneList 64316
+#define AdExcept_secInvalToneMode 64317
+#define AdExcept_secInvalTransferMode 64318
+#define AdExcept_secLineMapperFailed 64319
+#define AdExcept_secInvalConfCallHandle 64320
+#define AdExcept_secInvalConsultCallHandle 64321
+#define AdExcept_secInvalCountryCode 64322
+#define AdExcept_secInvalDeviceClass 64323
+#define AdExcept_secInvalDeviceHandle 64324
+#define AdExcept_secInvalDialParams 64325
+#define AdExcept_secInvalDigitList 64326
+#define AdExcept_secInvalDigitMode 64327
+#define AdExcept_secInvalDigits 64328
+#define AdExcept_secInvalExtVersion 64329
+#define AdExcept_secInvalGroupID 64330
+#define AdExcept_secInvalLineHandle 64331
+#define AdExcept_secInvalLineState 64332
+#define AdExcept_secInvalLocation 64333
+#define AdExcept_secInvalMediaList 64334
+#define AdExcept_secInvalMediaMode 64335
+#define AdExcept_secInvalAddress 64336
+#define AdExcept_secInvalAddressID 64337
+#define AdExcept_secInvalAddressMode 64338
+#define AdExcept_secInvalAddressState 64339
+#define AdExcept_secInvalAppHandle 64340
+#define AdExcept_secInvalAppName 64341
+#define AdExcept_secInvalBearerMode 64342
+#define AdExcept_secInvalCallComplMode 64343
+#define AdExcept_secInvalCallHandle 64344
+#define AdExcept_secInvalCallParams 64345
+#define AdExcept_secInvalCallPrivilege 64346
+#define AdExcept_secInvalCallSelect 64347
+#define AdExcept_secInvalCallState 64348
+#define AdExcept_secInvalCallStatelist 64349
+#define AdExcept_secInvalCard 64350
+#define AdExcept_secInvalCompletionID 64351
+#define AdExcept_sTAPIDisconnect_DoNotDisturb 64352
+#define AdExcept_sTAPIDisconnect_Cancelled 64353
+#define AdExcept_secAllocated 64354
+#define AdExcept_secBadDeviceID 64355
+#define AdExcept_secBearerModeUnavail 64356
+#define AdExcept_secCallUnavail 64357
+#define AdExcept_secCompletionOverrun 64358
+#define AdExcept_secConferenceFull 64359
+#define AdExcept_secDialBilling 64360
+#define AdExcept_secDialDialtone 64361
+#define AdExcept_secDialPrompt 64362
+#define AdExcept_secDialQuiet 64363
+#define AdExcept_secIncompatibleApiVersion 64364
+#define AdExcept_secIncompatibleExtVersion 64365
+#define AdExcept_secIniFileCorrupt 64366
+#define AdExcept_secInUse 64367
+#define AdExcept_sTAPIDisconnect_Reject 64368
+#define AdExcept_sTAPIDisconnect_PickUp 64369
+#define AdExcept_sTAPIDisconnect_Forwarded 64370
+#define AdExcept_sTAPIDisconnect_Busy 64371
+#define AdExcept_sTAPIDisconnect_NoAnswer 64372
+#define AdExcept_sTAPIDisconnect_BadAddress 64373
+#define AdExcept_sTAPIDisconnect_Unreachable 64374
+#define AdExcept_sTAPIDisconnect_Congestion 64375
+#define AdExcept_sTAPIDisconnect_Incompatible 64376
+#define AdExcept_sTAPIDisconnect_Unavail 64377
+#define AdExcept_sTAPIDisconnect_NoDialtone 64378
+#define AdExcept_sTAPIDisconnect_NumberChanged 64379
+#define AdExcept_sTAPIDisconnect_OutOfOrder 64380
+#define AdExcept_sTAPIDisconnect_TempFailure 64381
+#define AdExcept_sTAPIDisconnect_QOSUnavail 64382
+#define AdExcept_sTAPIDisconnect_Blocked 64383
+#define AdExcept_stds_ReInit 64384
+#define AdExcept_stds_Lock 64385
+#define AdExcept_stds_CapsChange 64386
+#define AdExcept_stds_ConfigChange 64387
+#define AdExcept_stds_TranslateChange 64388
+#define AdExcept_stds_ComplCancel 64389
+#define AdExcept_stds_Removed 64390
+#define AdExcept_sTAPILineReply 64391
+#define AdExcept_sTAPIStateChange 64392
+#define AdExcept_sTAPICalledBusy 64393
+#define AdExcept_sTAPIDialFail 64394
+#define AdExcept_sTAPIRetryWait 64395
+#define AdExcept_sTAPIDeviceInUse 64396
+#define AdExcept_sTAPIDisconnect_Unspecified 64397
+#define AdExcept_sTAPIDisconnect_Normal 64398
+#define AdExcept_sTAPIDisconnect_Unknown 64399
+#define AdExcept_stds_Connected 64400
+#define AdExcept_stds_Disconnected 64401
+#define AdExcept_stds_MsgWaitOn 64402
+#define AdExcept_stds_MsgWaitOff 64403
+#define AdExcept_stds_InService 64404
+#define AdExcept_stds_OutOfService 64405
+#define AdExcept_stds_Maintenance 64406
+#define AdExcept_stds_Open 64407
+#define AdExcept_stds_Close 64408
+#define AdExcept_stds_NumCalls 64409
+#define AdExcept_stds_NumCompletions 64410
+#define AdExcept_stds_Terminals 64411
+#define AdExcept_stds_RoamMode 64412
+#define AdExcept_stds_Battery 64413
+#define AdExcept_stds_Signal 64414
+#define AdExcept_stds_DevSpecific 64415
+#define AdExcept_stcs_Accepted 64416
+#define AdExcept_stcs_Dialtone 64417
+#define AdExcept_stcs_Dialing 64418
+#define AdExcept_stcs_Ringback 64419
+#define AdExcept_stcs_Busy 64420
+#define AdExcept_stcs_SpecialInfo 64421
+#define AdExcept_stcs_Connected 64422
+#define AdExcept_stcs_Proceeding 64423
+#define AdExcept_stcs_OnHold 64424
+#define AdExcept_stcs_Conferenced 64425
+#define AdExcept_stcs_OnHoldPendConf 64426
+#define AdExcept_stcs_OnHoldPendTransfer 64427
+#define AdExcept_stcs_Disconnected 64428
+#define AdExcept_stcs_Unknown 64429
+#define AdExcept_stds_Other 64430
+#define AdExcept_stds_Ringing 64431
+#define AdExcept_swsaENotEmpty 64432
+#define AdExcept_swsaEProcLim 64433
+#define AdExcept_swsaEUsers 64434
+#define AdExcept_swsaEDQuot 64435
+#define AdExcept_swsaEStale 64436
+#define AdExcept_swsaERemote 64437
+#define AdExcept_swsaSysNotReady 64438
+#define AdExcept_swsaVerNotSupported 64439
+#define AdExcept_swsaNotInitialised 64440
+#define AdExcept_swsaEDiscOn 64441
+#define AdExcept_swsaHost_Not_Found 64442
+#define AdExcept_swsaTry_Again 64443
+#define AdExcept_swsaNo_Recovery 64444
+#define AdExcept_swsaNo_Data 64445
+#define AdExcept_stcs_Idle 64446
+#define AdExcept_stcs_Offering 64447
+#define AdExcept_swsaENetDown 64448
+#define AdExcept_swsaENetUnreach 64449
+#define AdExcept_swsaENetReset 64450
+#define AdExcept_swsaEConnAborted 64451
+#define AdExcept_swsaEConnReset 64452
+#define AdExcept_swsaENoBufs 64453
+#define AdExcept_swsaEIsConn 64454
+#define AdExcept_swsaENotConn 64455
+#define AdExcept_swsaEShutDown 64456
+#define AdExcept_swsaETooManyRefs 64457
+#define AdExcept_swsaETimedOut 64458
+#define AdExcept_swsaEConnRefused 64459
+#define AdExcept_swsaELoop 64460
+#define AdExcept_swsaENameTooLong 64461
+#define AdExcept_swsaEHostDown 64462
+#define AdExcept_swsaEHostUnreach 64463
+#define AdExcept_swsaEMFile 64464
+#define AdExcept_swsaEWouldBlock 64465
+#define AdExcept_swsaEInProgress 64466
+#define AdExcept_swsaEAlReady 64467
+#define AdExcept_swsaENotSock 64468
+#define AdExcept_swsaEDestAddrReq 64469
+#define AdExcept_swsaEMsgSize 64470
+#define AdExcept_swsaEPrototype 64471
+#define AdExcept_swsaENoProtoOpt 64472
+#define AdExcept_swsaEProtoNoSupport 64473
+#define AdExcept_swsaESocktNoSupport 64474
+#define AdExcept_swsaEOpNotSupp 64475
+#define AdExcept_swsaEPfNoSupport 64476
+#define AdExcept_swsaEAfNoSupport 64477
+#define AdExcept_swsaEAddrInUse 64478
+#define AdExcept_swsaEAddrNotAvail 64479
+#define AdExcept_secNetworkTimeout 64480
+#define AdExcept_secCNMAAck 64481
+#define AdExcept_secUnknown 64482
+#define AdExcept_secADWSERROR 64483
+#define AdExcept_secADWSLOADERROR 64484
+#define AdExcept_secADWSVERSIONERROR 64485
+#define AdExcept_secADWSNOTINIT 64486
+#define AdExcept_secADWSINVPORT 64487
+#define AdExcept_secADWSCANTCHANGE 64488
+#define AdExcept_secADWSCANTRESOLVE 64489
+#define AdExcept_swsaBaseErr 64490
+#define AdExcept_swsaEIntr 64491
+#define AdExcept_swsaEBadF 64492
+#define AdExcept_swsaEAcces 64493
+#define AdExcept_swsaEFault 64494
+#define AdExcept_swsaEInVal 64495
+#define AdExcept_secInvalidPDU 64496
+#define AdExcept_secInvalidText 64497
+#define AdExcept_secSIMInsert 64498
+#define AdExcept_secSIMPin 64499
+#define AdExcept_secSIMPH 64500
+#define AdExcept_secSIMFailure 64501
+#define AdExcept_secSIMBusy 64502
+#define AdExcept_secSIMWrong 64503
+#define AdExcept_secSIMPUK 64504
+#define AdExcept_secSIMPIN2 64505
+#define AdExcept_secSIMPUK2 64506
+#define AdExcept_secMemFail 64507
+#define AdExcept_secInvalidMemIndex 64508
+#define AdExcept_secMemFull 64509
+#define AdExcept_secSMSCAddUnknown 64510
+#define AdExcept_secNoNetwork 64511
+#define AdExcept_secUniUnknownLayout 64512
+#define AdExcept_secUniCannotInstallFile 64513
+#define AdExcept_secDrvCopyError 64514
+#define AdExcept_secCannotAddPrinter 64515
+#define AdExcept_secDrvBadResources 64516
+#define AdExcept_secDrvDriverNotFound 64517
+#define AdExcept_secUniCannotGetPrinterDriverDir 64518
+#define AdExcept_secInstallDriverFailed 64519
+#define AdExcept_secSMSBusy 64520
+#define AdExcept_secSMSTimedOut 64521
+#define AdExcept_secSMSTooLong 64522
+#define AdExcept_secSMSUnknownStatus 64523
+#define AdExcept_secMEFailure 64524
+#define AdExcept_secServiceRes 64525
+#define AdExcept_secBadOperation 64526
+#define AdExcept_secUnsupported 64527
+#define AdExcept_secFaxInitError 64528
+#define AdExcept_secFaxBusy 64529
+#define AdExcept_secFaxVoiceCall 64530
+#define AdExcept_secFaxDataCall 64531
+#define AdExcept_secFaxNoDialTone 64532
+#define AdExcept_secFaxNoCarrier 64533
+#define AdExcept_secFaxSessionError 64534
+#define AdExcept_secFaxPageError 64535
+#define AdExcept_secFaxGDIPrintError 64536
+#define AdExcept_secFaxMixedResolution 64537
+#define AdExcept_secFaxConverterInitFail 64538
+#define AdExcept_secNoAnswer 64539
+#define AdExcept_secAlreadyMonitored 64540
+#define AdExcept_secUniAlreadyInstalled 64541
+#define AdExcept_secUniCannotGetSysDir 64542
+#define AdExcept_secUniCannotGetWinDir 64543
+#define AdExcept_secNoStartState 64544
+#define AdExcept_secNoSapiEngine 64545
+#define AdExcept_secFaxBadFormat 64546
+#define AdExcept_secBadGraphicsFormat 64547
+#define AdExcept_secConvertAbort 64548
+#define AdExcept_secUnpackAbort 64549
+#define AdExcept_secCantMakeBitmap 64550
+#define AdExcept_secNoImageLoaded 64551
+#define AdExcept_secNoImageBlockMarked 64552
+#define AdExcept_secFontFileNotFound 64553
+#define AdExcept_secInvalidPageNumber 64554
+#define AdExcept_secBmpTooBig 64555
+#define AdExcept_secEnhFontTooBig 64556
+#define AdExcept_secFaxBadMachine 64557
+#define AdExcept_secFaxBadModemResult 64558
+#define AdExcept_secFaxTrainError 64559
+#define AdExcept_secProtocolAbort 64560
+#define AdExcept_secKeyTooLong 64561
+#define AdExcept_secDataTooLarge 64562
+#define AdExcept_secNoFieldsDefined 64563
+#define AdExcept_secIniWrite 64564
+#define AdExcept_secIniRead 64565
+#define AdExcept_secNoIndexKey 64566
+#define AdExcept_secRecordExists 64567
+#define AdExcept_secRecordNotFound 64568
+#define AdExcept_secMustHaveIdxVal 64569
+#define AdExcept_secDatabaseFull 64570
+#define AdExcept_secDatabaseEmpty 64571
+#define AdExcept_secDatabaseNotPrepared 64572
+#define AdExcept_secBadFieldList 64573
+#define AdExcept_secBadFieldForIndex 64574
+#define AdExcept_secNoStateMachine 64575
+#define AdExcept_secPacketTooLong 64576
+#define AdExcept_secBadFileList 64577
+#define AdExcept_secNoSearchMask 64578
+#define AdExcept_secNoMatchingFiles 64579
+#define AdExcept_secDirNotFound 64580
+#define AdExcept_secCancelRequested 64581
+#define AdExcept_secTimeout 64582
+#define AdExcept_secProtocolError 64583
+#define AdExcept_secTooManyErrors 64584
+#define AdExcept_secSequenceError 64585
+#define AdExcept_secNoFilename 64586
+#define AdExcept_secFileRejected 64587
+#define AdExcept_secCantWriteFile 64588
+#define AdExcept_secTableFull 64589
+#define AdExcept_secAbortNoCarrier 64590
+#define AdExcept_secBadProtocolFunction 64591
+#define AdExcept_sfpGotHangup 64592
+#define AdExcept_sfpSwitchModes 64593
+#define AdExcept_sfpMonitorEnabled 64594
+#define AdExcept_sfpMonitorDisabled 64595
+#define AdExcept_sfpSessionParams 64596
+#define AdExcept_sfpGotRemoteID 64597
+#define AdExcept_sfpCancel 64598
+#define AdExcept_sfpFinished 64599
+#define AdExcept_secNoMoreTriggers 64600
+#define AdExcept_secTriggerTooLong 64601
+#define AdExcept_secBadTriggerHandle 64602
+#define AdExcept_secStartStringEmpty 64603
+#define AdExcept_secPacketTooSmall 64604
+#define AdExcept_secNoEndCharCount 64605
+#define AdExcept_secEmptyEndString 64606
+#define AdExcept_secZeroSizePacket 64607
+#define AdExcept_sfpInitModem 64608
+#define AdExcept_sfpDialing 64609
+#define AdExcept_sfpBusyWait 64610
+#define AdExcept_sfpSendPage 64611
+#define AdExcept_sfpSendPageStatus 64612
+#define AdExcept_sfpPageError 64613
+#define AdExcept_sfpPageOK 64614
+#define AdExcept_sfpConnecting 64615
+#define AdExcept_sfpWaiting 64616
+#define AdExcept_sfpNoConnect 64617
+#define AdExcept_sfpAnswer 64618
+#define AdExcept_sfpIncoming 64619
+#define AdExcept_sfpGetPage 64620
+#define AdExcept_sfpGetPageResult 64621
+#define AdExcept_sfpCheckMorePages 64622
+#define AdExcept_sfpGetHangup 64623
+#define AdExcept_spsEndFile 64624
+#define AdExcept_spsResumeBad 64625
+#define AdExcept_spsSequenceError 64626
+#define AdExcept_spsAbortNoCarrier 64627
+#define AdExcept_spsGotCrcE 64628
+#define AdExcept_spsGotCrcG 64629
+#define AdExcept_spsGotCrcW 64630
+#define AdExcept_spsGotCrcQ 64631
+#define AdExcept_spsTryResume 64632
+#define AdExcept_spsHostResume 64633
+#define AdExcept_spsWaitAck 64634
+#define AdExcept_spsNoHeader 64635
+#define AdExcept_spsGotHeader 64636
+#define AdExcept_spsGotData 64637
+#define AdExcept_spsNoData 64638
+#define AdExcept_spsAbort 64639
+#define AdExcept_sTAPS_MSGCOMPLETED 64640
+#define AdExcept_sTAPS_DONE 64641
+#define AdExcept_spsOK 64642
+#define AdExcept_spsProtocolHandshake 64643
+#define AdExcept_spsInvalidDate 64644
+#define AdExcept_spsFileRejected 64645
+#define AdExcept_spsFileRenamed 64646
+#define AdExcept_spsSkipFile 64647
+#define AdExcept_spsFileDoesntExist 64648
+#define AdExcept_spsCantWriteFile 64649
+#define AdExcept_spsTimeout 64650
+#define AdExcept_spsBlockCheckError 64651
+#define AdExcept_spsLongPacket 64652
+#define AdExcept_spsDuplicateBlock 64653
+#define AdExcept_spsProtocolError 64654
+#define AdExcept_spsCancelRequested 64655
+#define AdExcept_sPDS_DISCONNECT 64656
+#define AdExcept_sPDS_CLEANUP 64657
+#define AdExcept_sPDE_NONE 64658
+#define AdExcept_sPDE_NODIALTONE 64659
+#define AdExcept_sPDE_LINEBUSY 64660
+#define AdExcept_sPDE_NOCONNECTION 64661
+#define AdExcept_sTAPS_NONE 64662
+#define AdExcept_sTAPS_LOGINPROMPT 64663
+#define AdExcept_sTAPS_LOGGEDIN 64664
+#define AdExcept_sTAPS_LOGINERR 64665
+#define AdExcept_sTAPS_LOGINFAIL 64666
+#define AdExcept_sTAPS_MSGOKTOSEND 64667
+#define AdExcept_sTAPS_SENDINGMSG 64668
+#define AdExcept_sTAPS_MSGACK 64669
+#define AdExcept_sTAPS_MSGNAK 64670
+#define AdExcept_sTAPS_MSGRS 64671
+#define AdExcept_scsSubEntryDisconnected 64672
+#define AdExcept_scsRasInteractive 64673
+#define AdExcept_scsRasRetryAuthentication 64674
+#define AdExcept_scsRasCallbackSetByCaller 64675
+#define AdExcept_scsRasPasswordExpired 64676
+#define AdExcept_scsRasDeviceConnected 64677
+#define AdExcept_sPDS_NONE 64678
+#define AdExcept_sPDS_OFFHOOK 64679
+#define AdExcept_sPDS_DIALING 64680
+#define AdExcept_sPDS_RINGING 64681
+#define AdExcept_sPDS_WAITFORCONNECT 64682
+#define AdExcept_sPDS_CONNECTED 64683
+#define AdExcept_sPDS_WAITINGTOREDIAL 64684
+#define AdExcept_sPDS_REDIALING 64685
+#define AdExcept_sPDS_MSGNOTSENT 64686
+#define AdExcept_sPDS_CANCELLING 64687
+#define AdExcept_scsAuthRetry 64688
+#define AdExcept_scsAuthCallback 64689
+#define AdExcept_scsAuthChangePassword 64690
+#define AdExcept_scsAuthProject 64691
+#define AdExcept_scsAuthLinkSpeed 64692
+#define AdExcept_scsAuthAck 64693
+#define AdExcept_scsReAuthenticate 64694
+#define AdExcept_scsAuthenticated 64695
+#define AdExcept_scsPrepareForCallback 64696
+#define AdExcept_scsWaitForModemReset 64697
+#define AdExcept_scsWaitForCallback 64698
+#define AdExcept_scsProjected 64699
+#define AdExcept_scsStartAuthentication 64700
+#define AdExcept_scsCallbackComplete 64701
+#define AdExcept_scsLogonNetwork 64702
+#define AdExcept_scsSubEntryConnected 64703
+#define AdExcept_sdddModemVoice 64704
+#define AdExcept_sdddModemError 64705
+#define AdExcept_sdddModemNoCarrier 64706
+#define AdExcept_sdddModemBusy 64707
+#define AdExcept_sdddModemNoDialTone 64708
+#define AdExcept_sdddDialTimedOut 64709
+#define AdExcept_sdpeMustEnterName 64710
+#define AdExcept_sdpeMustEnterNumber 64711
+#define AdExcept_sdpeNameExists 64712
+#define AdExcept_scsOpenPort 64713
+#define AdExcept_scsPortOpened 64714
+#define AdExcept_scsConnectDevice 64715
+#define AdExcept_scsDeviceConnected 64716
+#define AdExcept_scsAllDevicesConnected 64717
+#define AdExcept_scsAuthenticate 64718
+#define AdExcept_scsAuthNotify 64719
+#define AdExcept_sdsmMsgAutoAnswerBackground 64720
+#define AdExcept_sdsmMsgAutoAnswerWait 64721
+#define AdExcept_sdsmMsgAnswerWait 64722
+#define AdExcept_sdsmMsgDialWait 64723
+#define AdExcept_sdsmMsgDialCycle 64724
+#define AdExcept_sdsmMsgNoDialtone 64725
+#define AdExcept_sdsmMsgConnectWait 64726
+#define AdExcept_sdsmMsgConnected 64727
+#define AdExcept_sdsmMsgHangup 64728
+#define AdExcept_sdsmMsgCancel 64729
+#define AdExcept_sdddCycling 64730
+#define AdExcept_sdddRetryWaiting 64731
+#define AdExcept_sdddRetryWaitOver 64732
+#define AdExcept_sdddDialing 64733
+#define AdExcept_sdddModemConnect 64734
+#define AdExcept_sdddModemConnectAt 64735
+#define AdExcept_secDeviceNotSelected 64736
+#define AdExcept_secModemDetectedBusy 64737
+#define AdExcept_secModemNoDialtone 64738
+#define AdExcept_secModemNoCarrier 64739
+#define AdExcept_secModemNoAnswer 64740
+#define AdExcept_secInitFail 64741
+#define AdExcept_secLoginFail 64742
+#define AdExcept_secMinorSrvErr 64743
+#define AdExcept_secFatalSrvErr 64744
+#define AdExcept_secModemNotFound 64745
+#define AdExcept_secInvalidFile 64746
+#define AdExcept_spbeDeleteQuery 64747
+#define AdExcept_sdsmMsgBase 64748
+#define AdExcept_sdsmMsgReady 64749
+#define AdExcept_sdsmMsgInitialize 64750
+#define AdExcept_sdsmMsgInitializeTimeout 64751
+#define AdExcept_secRegisterHandlerFailed 64752
+#define AdExcept_secPutBlockFail 64753
+#define AdExcept_secGetBlockFail 64754
+#define AdExcept_secOutputBufferTooSmall 64755
+#define AdExcept_secBufferIsEmpty 64756
+#define AdExcept_secTracingNotEnabled 64757
+#define AdExcept_secLoggingNotEnabled 64758
+#define AdExcept_secBaseAddressNotSet 64759
+#define AdExcept_secModemNotStarted 64760
+#define AdExcept_secModemBusy 64761
+#define AdExcept_secModemNotDialing 64762
+#define AdExcept_secNotDialing 64763
+#define AdExcept_secAlreadyDialing 64764
+#define AdExcept_secModemNotResponding 64765
+#define AdExcept_secModemRejectedCommand 64766
+#define AdExcept_secModemStatusMismatch 64767
+#define AdExcept_secPhonebookNotAssigned 64768
+#define AdExcept_secCannotUseWithWinSock 64769
+#define AdExcept_secBadId 64770
+#define AdExcept_secBaudRate 64771
+#define AdExcept_secByteSize 64772
+#define AdExcept_secDefault 64773
+#define AdExcept_secHardware 64774
+#define AdExcept_secMemory 64775
+#define AdExcept_secCommNotOpen 64776
+#define AdExcept_secAlreadyOpen 64777
+#define AdExcept_secNoHandles 64778
+#define AdExcept_secNoTimers 64779
+#define AdExcept_secNoPortSelected 64780
+#define AdExcept_secNotOpenedByTapi 64781
+#define AdExcept_secNullApi 64782
+#define AdExcept_secNotSupported 64783
+#define AdExcept_secCrcError 64784
+#define AdExcept_secBadStructLen 64785
+#define AdExcept_secSeekError 64786
+#define AdExcept_secUnknownMedia 64787
+#define AdExcept_secSectorNotFound 64788
+#define AdExcept_secOutOfPaper 64789
+#define AdExcept_secDeviceWrite 64790
+#define AdExcept_secDeviceRead 64791
+#define AdExcept_secHardwareFailure 64792
+#define AdExcept_secBadHandle 64793
+#define AdExcept_secBadArgument 64794
+#define AdExcept_secGotQuitMsg 64795
+#define AdExcept_secBufferTooBig 64796
+#define AdExcept_secPortNotAssigned 64797
+#define AdExcept_secInternal 64798
+#define AdExcept_secModemNotAssigned 64799
+#define AdExcept_secTooManyFiles 64800
+#define AdExcept_secAccessDenied 64801
+#define AdExcept_secInvalidHandle 64802
+#define AdExcept_secOutOfMemory 64803
+#define AdExcept_secInvalidDrive 64804
+#define AdExcept_secNoMoreFiles 64805
+#define AdExcept_secDiskRead 64806
+#define AdExcept_secDiskFull 64807
+#define AdExcept_secNotAssigned 64808
+#define AdExcept_secNotOpen 64809
+#define AdExcept_secNotOpenInput 64810
+#define AdExcept_secNotOpenOutput 64811
+#define AdExcept_secWriteProtected 64812
+#define AdExcept_secUnknownUnit 64813
+#define AdExcept_secDriveNotReady 64814
+#define AdExcept_secUnknownCommand 64815
+#define DECConst_sInvalidFormatString 64816
+#define DECConst_sFMT_COPY 64817
+#define DECConst_sFMT_HEX 64818
+#define DECConst_sFMT_HEXL 64819
+#define DECConst_sFMT_MIME64 64820
+#define DECConst_sFMT_UU 64821
+#define DECConst_sFMT_XX 64822
+#define DECConst_sInvalidKeySize 64823
+#define DECConst_sNotInitialized 64824
+#define OleConst_SCannotActivate 64825
+#define OleConst_SNoWindowHandle 64826
+#define OleConst_SInvalidLicense 64827
+#define OleConst_SNotLicensed 64828
+#define AdExcept_secOK 64829
+#define AdExcept_secFileNotFound 64830
+#define AdExcept_secPathNotFound 64831
+#define FIBConsts_SFIBErrorNotDataSet 64832
+#define FIBConsts_SFIBErrorAbortUpdates 64833
+#define FIBConsts_SFIBErrorUnableGetRecordCount 64834
+#define FIBConsts_SFIBErrorUnableLock 64835
+#define FIBConsts_SFIBErrorGenerationError 64836
+#define FIBConsts_reVarNotArray 64837
+#define FIBConsts_reVarArrayBounds 64838
+#define FIBConsts_reVarArrayCreate 64839
+#define FIBConsts_SNoTimers 64840
+#define fib_TrueStr 64841
+#define fib_FalseStr 64842
+#define SIBFIBEA_SIB_RS_FIB_SET_NATIVEHANDLE 64843
+#define SIBFIBEA_SIB_RS_FIB_NO_DATABASE 64844
+#define DECConst_sProtectionCircular 64845
+#define DECConst_sStringFormatExists 64846
+#define DECConst_sInvalidStringFormat 64847
+#define FIBConsts_SCompEditDataSetInfoNotExists 64848
+#define FIBConsts_SCompEditDataSetInfoForbid 64849
+#define FIBConsts_SCompEditUnableInsertInfoRecord 64850
+#define FIBConsts_SFIBErrorBeforeDisconnectDetail 64851
+#define FIBConsts_SFIBErrorBeforeDisconnect 64852
+#define FIBConsts_SFIBErrorAfterDisconnectDetail 64853
+#define FIBConsts_SFIBErrorAfterDisconnect 64854
+#define FIBConsts_SFIBErrorNoDBLoginDialog 64855
+#define FIBConsts_SFIBErrorInstallPropertyEditorPackage 64856
+#define FIBConsts_SFIBErrorIncludeDBLoginDialog 64857
+#define FIBConsts_SFIBErrorCircularLinks 64858
+#define FIBConsts_SFIBErrorParamNotExist 64859
+#define FIBConsts_SFIBErrorWideStringValueTooLong 64860
+#define FIBConsts_SFIBErrorEOFInComments 64861
+#define FIBConsts_SFIBErrorEOFInString 64862
+#define FIBConsts_SFIBErrorParamNameExpected 64863
+#define FIBConsts_STransactionForOtherLibrary 64864
+#define FIBConsts_SEdErrorPrefix 64865
+#define FIBConsts_SEdDeadLockMess 64866
+#define FIBConsts_SEdNotExistRecord 64867
+#define FIBConsts_SEdMultiplyRecord 64868
+#define FIBConsts_SCantSort 64869
+#define FIBConsts_SCantGetInfo 64870
+#define FIBConsts_SDataBaseNotAssigned 64871
+#define FIBConsts_SOKButton 64872
+#define FIBConsts_SCancelButton 64873
+#define FIBConsts_SDBEditUserName 64874
+#define FIBConsts_SDBEditPassword 64875
+#define FIBConsts_SDBEditSQLRole 64876
+#define FIBConsts_SLoginDlgLoginCaption 64877
+#define FIBConsts_SLoginDlgDatabase 64878
+#define FIBConsts_SCompEditDataSet_ID 64879
+#define ADOConst_SADOCreateError 64880
+#define ADOConst_SEventsNotSupported 64881
+#define ADOConst_SUsupportedFieldType 64882
+#define ADOConst_SConnectionRequired 64883
+#define ADOConst_SCantRequery 64884
+#define ADOConst_SNoFilterOptions 64885
+#define ADOConst_SRecordsetNotOpen 64886
+#define ADOConst_sNameAttr 64887
+#define ADOConst_sValueAttr 64888
+#define SIBGlobals_SIB_RS_NOT_REGISTERED 64889
+#define SIBGlobals_SIB_RS_ALREADY_REGISTERED 64890
+#define SIBGlobals_SIB_RS_EMPTY_STRINGS 64891
+#define SIBGlobals_SIB_RS_TOO_LONG 64892
+#define FIBConsts_SCantFindApiProc 64893
+#define FIBConsts_SCantLoadLibrary 64894
+#define FIBConsts_SUnknownClientLibrary 64895
+#define IdResourceStrings_RSSocksServerPermissionError 64896
+#define IdResourceStrings_RSSocksServerNetUnreachableError 64897
+#define IdResourceStrings_RSSocksServerHostUnreachableError 64898
+#define IdResourceStrings_RSSocksServerConnectionRefusedError 64899
+#define IdResourceStrings_RSSocksServerTTLExpiredError 64900
+#define IdResourceStrings_RSSocksServerCommandError 64901
+#define IdResourceStrings_RSSocksServerAddressError 64902
+#define IdResourceStrings_RSUnevenSizeInDecodeStream 64903
+#define IdResourceStrings_RSUnevenSizeInEncodeStream 64904
+#define IdResourceStrings_RSThreadTerminateAndWaitFor 64905
+#define ADOConst_SInvalidEnumValue 64906
+#define ADOConst_SMissingConnection 64907
+#define ADOConst_SNoDetailFilter 64908
+#define ADOConst_SBookmarksRequired 64909
+#define ADOConst_SMissingCommandText 64910
+#define ADOConst_SNoResultSet 64911
+#define IdResourceStrings_RSStackETIMEDOUT 64912
+#define IdResourceStrings_RSStackECONNREFUSED 64913
+#define IdResourceStrings_RSStackELOOP 64914
+#define IdResourceStrings_RSStackENAMETOOLONG 64915
+#define IdResourceStrings_RSStackEHOSTDOWN 64916
+#define IdResourceStrings_RSStackEHOSTUNREACH 64917
+#define IdResourceStrings_RSStackENOTEMPTY 64918
+#define IdResourceStrings_RSStackHOST_NOT_FOUND 64919
+#define IdResourceStrings_RSSocksRequestFailed 64920
+#define IdResourceStrings_RSSocksRequestServerFailed 64921
+#define IdResourceStrings_RSSocksRequestIdentFailed 64922
+#define IdResourceStrings_RSSocksUnknownError 64923
+#define IdResourceStrings_RSSocksServerRespondError 64924
+#define IdResourceStrings_RSSocksAuthMethodError 64925
+#define IdResourceStrings_RSSocksAuthError 64926
+#define IdResourceStrings_RSSocksServerGeneralError 64927
+#define IdResourceStrings_RSStackESOCKTNOSUPPORT 64928
+#define IdResourceStrings_RSStackEOPNOTSUPP 64929
+#define IdResourceStrings_RSStackEPFNOSUPPORT 64930
+#define IdResourceStrings_RSStackEAFNOSUPPORT 64931
+#define IdResourceStrings_RSStackEADDRINUSE 64932
+#define IdResourceStrings_RSStackEADDRNOTAVAIL 64933
+#define IdResourceStrings_RSStackENETDOWN 64934
+#define IdResourceStrings_RSStackENETUNREACH 64935
+#define IdResourceStrings_RSStackENETRESET 64936
+#define IdResourceStrings_RSStackECONNABORTED 64937
+#define IdResourceStrings_RSStackECONNRESET 64938
+#define IdResourceStrings_RSStackENOBUFS 64939
+#define IdResourceStrings_RSStackEISCONN 64940
+#define IdResourceStrings_RSStackENOTCONN 64941
+#define IdResourceStrings_RSStackESHUTDOWN 64942
+#define IdResourceStrings_RSStackETOOMANYREFS 64943
+#define IdResourceStrings_RSStackError 64944
+#define IdResourceStrings_RSStackEINTR 64945
+#define IdResourceStrings_RSStackEBADF 64946
+#define IdResourceStrings_RSStackEACCES 64947
+#define IdResourceStrings_RSStackEFAULT 64948
+#define IdResourceStrings_RSStackEINVAL 64949
+#define IdResourceStrings_RSStackEMFILE 64950
+#define IdResourceStrings_RSStackEWOULDBLOCK 64951
+#define IdResourceStrings_RSStackEINPROGRESS 64952
+#define IdResourceStrings_RSStackEALREADY 64953
+#define IdResourceStrings_RSStackENOTSOCK 64954
+#define IdResourceStrings_RSStackEDESTADDRREQ 64955
+#define IdResourceStrings_RSStackEMSGSIZE 64956
+#define IdResourceStrings_RSStackEPROTOTYPE 64957
+#define IdResourceStrings_RSStackENOPROTOOPT 64958
+#define IdResourceStrings_RSStackEPROTONOSUPPORT 64959
+#define IdResourceStrings_RSHTTPRequestEntityToLong 64960
+#define IdResourceStrings_RSHTTPRequestURITooLong 64961
+#define IdResourceStrings_RSHTTPUnsupportedMediaType 64962
+#define IdResourceStrings_RSHTTPInternalServerError 64963
+#define IdResourceStrings_RSHTTPNotImplemented 64964
+#define IdResourceStrings_RSHTTPBadGateway 64965
+#define IdResourceStrings_RSHTTPServiceUnavailable 64966
+#define IdResourceStrings_RSHTTPGatewayTimeout 64967
+#define IdResourceStrings_RSHTTPHTTPVersionNotSupported 64968
+#define IdResourceStrings_RSHTTPUnknownResponseCode 64969
+#define IdResourceStrings_RSHTTPHeaderAlreadyWritten 64970
+#define IdResourceStrings_RSHTTPErrorParsingCommand 64971
+#define IdResourceStrings_RSHTTPUnsupportedAuthorisationScheme 64972
+#define IdResourceStrings_RSHTTPCannotSwitchSessionStateWhenActive 64973
+#define IdResourceStrings_RSHTTPAuthAlreadyRegistered 64974
+#define IdResourceStrings_RSInvalidServiceName 64975
+#define IdResourceStrings_RSHTTPMovedTemporarily 64976
+#define IdResourceStrings_RSHTTPSeeOther 64977
+#define IdResourceStrings_RSHTTPNotModified 64978
+#define IdResourceStrings_RSHTTPUseProxy 64979
+#define IdResourceStrings_RSHTTPBadRequest 64980
+#define IdResourceStrings_RSHTTPUnauthorized 64981
+#define IdResourceStrings_RSHTTPForbidden 64982
+#define IdResourceStrings_RSHTTPNotFound 64983
+#define IdResourceStrings_RSHTTPMethodeNotallowed 64984
+#define IdResourceStrings_RSHTTPNotAcceptable 64985
+#define IdResourceStrings_RSHTTPProxyAuthenticationRequired 64986
+#define IdResourceStrings_RSHTTPRequestTimeout 64987
+#define IdResourceStrings_RSHTTPConflict 64988
+#define IdResourceStrings_RSHTTPGone 64989
+#define IdResourceStrings_RSHTTPLengthRequired 64990
+#define IdResourceStrings_RSHTTPPreconditionFailed 64991
+#define IdResourceStrings_RSStatusResolving 64992
+#define IdResourceStrings_RSStatusConnecting 64993
+#define IdResourceStrings_RSStatusConnected 64994
+#define IdResourceStrings_RSStatusDisconnecting 64995
+#define IdResourceStrings_RSStatusDisconnected 64996
+#define IdResourceStrings_RSStatusText 64997
+#define IdResourceStrings_RSConnectTimeout 64998
+#define IdResourceStrings_RSHTTPContinue 64999
+#define IdResourceStrings_RSHTTPOK 65000
+#define IdResourceStrings_RSHTTPCreated 65001
+#define IdResourceStrings_RSHTTPAccepted 65002
+#define IdResourceStrings_RSHTTPNonAuthoritativeInformation 65003
+#define IdResourceStrings_RSHTTPNoContent 65004
+#define IdResourceStrings_RSHTTPResetContent 65005
+#define IdResourceStrings_RSHTTPPartialContent 65006
+#define IdResourceStrings_RSHTTPMovedPermanently 65007
+#define IdResourceStrings_RSOnlyOneAntiFreeze 65008
+#define IdResourceStrings_RSNotConnected 65009
+#define IdResourceStrings_RSObjectTypeNotSupported 65010
+#define IdResourceStrings_RSTerminateThreadTimeout 65011
+#define IdResourceStrings_RSNoExecuteSpecified 65012
+#define IdResourceStrings_RSIdNoDataToRead 65013
+#define IdResourceStrings_RSCanNotBindRange 65014
+#define IdResourceStrings_RSInvalidPortRange 65015
+#define IdResourceStrings_RSReadTimeout 65016
+#define IdResourceStrings_RSReadLnMaxLineLengthExceeded 65017
+#define IdResourceStrings_RSNoCommandHandlerFound 65018
+#define IdResourceStrings_RSWS2CallError 65019
+#define IdResourceStrings_RSWS2LoadError 65020
+#define IdResourceStrings_RSMIMEExtensionEmpty 65021
+#define IdResourceStrings_RSMIMEMIMETypeEmpty 65022
+#define IdResourceStrings_RSMIMEMIMEExtAlreadyExists 65023
 #define uRORes_err_ErrorCreatingMsXmlDoc 65024
 #define uRORes_err_NoXMLParsersAvailable 65025
 #define uRORes_err_IDispatchMarshalingNotSupported 65026
@@ -1135,15 +1113,15 @@
 #define uRORes_err_VariantIsNotArray 65028
 #define uRORes_err_InvalidVarArrayDimCount 65029
 #define uRORes_err_MessageNotAssigned 65030
-#define IdResourceStrings_RSAlreadyConnected 65031
-#define IdResourceStrings_RSCannotAllocateSocket 65032
-#define IdResourceStrings_RSConnectionClosedGracefully 65033
-#define IdResourceStrings_RSCouldNotBindSocket 65034
-#define IdResourceStrings_RSFailedTimeZoneInfo 65035
-#define IdResourceStrings_RSNotEnoughDataInBuffer 65036
-#define IdResourceStrings_RSWinsockInitializationError 65037
-#define IdResourceStrings_RSSetSizeExceeded 65038
-#define IdResourceStrings_RSThreadClassNotSpecified 65039
+#define IdResourceStrings_RSCannotAllocateSocket 65031
+#define IdResourceStrings_RSConnectionClosedGracefully 65032
+#define IdResourceStrings_RSCouldNotBindSocket 65033
+#define IdResourceStrings_RSFailedTimeZoneInfo 65034
+#define IdResourceStrings_RSNotEnoughDataInBuffer 65035
+#define IdResourceStrings_RSWinsockInitializationError 65036
+#define IdResourceStrings_RSSetSizeExceeded 65037
+#define IdResourceStrings_RSThreadClassNotSpecified 65038
+#define IdResourceStrings_RSFileNotFound 65039
 #define uRORes_err_ClassFactoryDidNotReturnInstance 65040
 #define uRORes_err_TypeNotSupported 65041
 #define uRORes_err_ClassFactoryNotFound 65042
@@ -1642,12 +1620,6 @@
 #define SysConst_SEndOfFile 65535
 STRINGTABLE
 BEGIN
-	AdExcept_sdispTelnetTerminalLocNum,	"Terminal Loc Num"
-	AdExcept_sdispTelnetTelnet3270Regime,	"Telnet3270 Regime"
-	AdExcept_sdispTelnetX3PAD,	"X.3 PAD"
-	AdExcept_sdispTelnetNegWindowSize,	"Neg Window Size"
-	AdExcept_sdispTelnetTerminalSpeed,	"Terminal Speed"
-	AdExcept_sdispTelnetFlowControl,	"Flow Control"
 	AdExcept_sdispTelnetLineMode,	"LineMode"
 	AdExcept_sdispTelnetXDisplayLocation,	"X Display Location"
 	AdExcept_sdispTelnetEnvironment,	"Environment"
@@ -1658,12 +1630,6 @@ BEGIN
 	AdExcept_sdispTelnetTelnetcode41,	"Telnet code 41"
 	AdExcept_sdispTelnetCharacterSet,	"Character Set"
 	dxGDIPlusAPI_scxGdipInvalidOperation,	"Invalid operation in GDI+"
-	AdExcept_sdispTelnetOutputHorzTabDisp,	"Output Horz Tab Disp"
-	AdExcept_sdispTelnetOutputFFDisp,	"Output FF Disp"
-	AdExcept_sdispTelnetOutputVertTabs,	"Output Vert Tabs"
-	AdExcept_sdispTelnetOutputVertTabDisp,	"Output Vert Tab Disp"
-	AdExcept_sdispTelnetOutputLinefeedDisp,	"Output Linefeed Disp"
-	AdExcept_sdispTelnetExtendedASCII,	"Extended ASCII"
 	AdExcept_sdispTelnetLogout,	"Logout"
 	AdExcept_sdispTelnetByteMacro,	"Byte Macro"
 	AdExcept_sdispTelnetDataEntryTerminal,	"Data Entry Terminal"
@@ -1674,12 +1640,12 @@ BEGIN
 	AdExcept_sdispTelnetEndofRecord,	"End of Record"
 	AdExcept_sdispTelnetTACACSUserID,	"TACACS User ID"
 	AdExcept_sdispTelnetOutputMarking,	"Output Marking"
-	AdExcept_sdispmdmtagCTS,	"CTS "
-	AdExcept_sdispmdmtagDSR,	"DSR "
-	AdExcept_sdispmdmtagRI,	"RI "
-	AdExcept_sdispmdmtagDCD,	"DCD "
-	AdExcept_sdispTelnetBinary,	"Binary"
-	AdExcept_sdispTelnetEcho,	"Echo"
+	AdExcept_sdispTelnetTerminalLocNum,	"Terminal Loc Num"
+	AdExcept_sdispTelnetTelnet3270Regime,	"Telnet3270 Regime"
+	AdExcept_sdispTelnetX3PAD,	"X.3 PAD"
+	AdExcept_sdispTelnetNegWindowSize,	"Neg Window Size"
+	AdExcept_sdispTelnetTerminalSpeed,	"Terminal Speed"
+	AdExcept_sdispTelnetFlowControl,	"Flow Control"
 	AdExcept_sdispTelnetReconnection,	"Reconnection"
 	AdExcept_sdispTelnetSupressGoAhead,	"Supress Go Ahead"
 	AdExcept_sdispTelnetApproxMsgSize,	"Approx Msg Size"
@@ -1690,12 +1656,12 @@ BEGIN
 	AdExcept_sdispTelnetOutputPageSize,	"Output Page Size"
 	AdExcept_sdispTelnetOutputCRDisp,	"Output C/R Disp"
 	AdExcept_sdispTelnetOutputHorzTabs,	"Output Horz Tabs"
-	AdExcept_sdstEnable,	"Enable"
-	AdExcept_sdstDisable,	"Disable"
-	AdExcept_sdstStringPacket,	"StringPacket"
-	AdExcept_sdstSizePacket,	"SizePacket"
-	AdExcept_sdstPacketTimeout,	"PcktTimeout"
-	AdExcept_sdstStartStr,	"StartStr"
+	AdExcept_sdispTelnetOutputHorzTabDisp,	"Output Horz Tab Disp"
+	AdExcept_sdispTelnetOutputFFDisp,	"Output FF Disp"
+	AdExcept_sdispTelnetOutputVertTabs,	"Output Vert Tabs"
+	AdExcept_sdispTelnetOutputVertTabDisp,	"Output Vert Tab Disp"
+	AdExcept_sdispTelnetOutputLinefeedDisp,	"Output Linefeed Disp"
+	AdExcept_sdispTelnetExtendedASCII,	"Extended ASCII"
 	AdExcept_sdstEndStr,	"EndStr"
 	AdExcept_sdstIdle,	"Idle"
 	AdExcept_sdstWaiting,	"Waiting"
@@ -1706,12 +1672,12 @@ BEGIN
 	AdExcept_sdispmdmtagDDSR,	"DDSR "
 	AdExcept_sdispmdmtagTERI,	"TERI "
 	AdExcept_sdispmdmtagDDCD,	"DDCD "
-	AdExcept_sdstrkWaitCancel,	"rkWaitCancel"
-	AdExcept_sdstrkError,	"rkError"
-	AdExcept_sdstrkDone,	"rkDone"
-	AdExcept_sdsttaInitial,	"taInitial"
-	AdExcept_sdsttaGetBlock,	"taGetBlock"
-	AdExcept_sdsttaWaitFreeSpace,	"taWaitFrSpc"
+	AdExcept_sdispmdmtagCTS,	"CTS "
+	AdExcept_sdispmdmtagDSR,	"DSR "
+	AdExcept_sdispmdmtagRI,	"RI "
+	AdExcept_sdispmdmtagDCD,	"DCD "
+	AdExcept_sdispTelnetBinary,	"Binary"
+	AdExcept_sdispTelnetEcho,	"Echo"
 	AdExcept_sdsttaSendBlock,	"taSendBlock"
 	AdExcept_sdsttaSendDelay,	"taSendDelay"
 	AdExcept_sdsttaFinishDrain,	"taFinDrain"
@@ -1722,12 +1688,12 @@ BEGIN
 	AdExcept_sdstraProcessBlock,	"raProcBlock"
 	AdExcept_sdstraFinished,	"raFinished"
 	AdExcept_sdstraDone,	"raDone"
-	AdExcept_sdsttkCollectEof,	"tkCollectEof"
-	AdExcept_sdsttkSendBreak,	"tkSendBreak"
-	AdExcept_sdsttkBreakReply,	"tkBreakReply"
-	AdExcept_sdsttkCollectBreak,	"tkCollBreak"
-	AdExcept_sdsttkComplete,	"tkComplete"
-	AdExcept_sdsttkWaitCancel,	"tkWaitCancel"
+	AdExcept_sdstEnable,	"Enable"
+	AdExcept_sdstDisable,	"Disable"
+	AdExcept_sdstStringPacket,	"StringPacket"
+	AdExcept_sdstSizePacket,	"SizePacket"
+	AdExcept_sdstPacketTimeout,	"PcktTimeout"
+	AdExcept_sdstStartStr,	"StartStr"
 	AdExcept_sdsttkError,	"tkError"
 	AdExcept_sdsttkDone,	"tkDone"
 	AdExcept_sdstrkInit,	"rkInit"
@@ -1738,12 +1704,12 @@ BEGIN
 	AdExcept_sdstrkGetData,	"rkGetData"
 	AdExcept_sdstrkCollectData,	"rkCollData"
 	AdExcept_sdstrkComplete,	"rkComplete"
-	AdExcept_sdstrzWaitCancel,	"rzWaitCancel"
-	AdExcept_sdstrzCleanup,	"rzCleanup"
-	AdExcept_sdstrzDone,	"rzDone"
-	AdExcept_sdsttkInit,	"tkInit"
-	AdExcept_sdsttkInitReply,	"tkInitReply"
-	AdExcept_sdsttkCollectInit,	"tkCollInit"
+	AdExcept_sdstrkWaitCancel,	"rkWaitCancel"
+	AdExcept_sdstrkError,	"rkError"
+	AdExcept_sdstrkDone,	"rkDone"
+	AdExcept_sdsttaInitial,	"taInitial"
+	AdExcept_sdsttaGetBlock,	"taGetBlock"
+	AdExcept_sdsttaWaitFreeSpace,	"taWaitFrSpc"
 	AdExcept_sdsttkOpenFile,	"tkOpenFile"
 	AdExcept_sdsttkSendFile,	"tkSendFile"
 	AdExcept_sdsttkFileReply,	"tkFileReply"
@@ -1754,12 +1720,12 @@ BEGIN
 	AdExcept_sdsttkCollectBlock,	"tkCollBlock"
 	AdExcept_sdsttkSendEof,	"tkSendEof"
 	AdExcept_sdsttkEofReply,	"tkEofReply"
-	AdExcept_sdstrzDelay,	"rzDelay"
-	AdExcept_sdstrzWaitFile,	"rzWaitFile"
-	AdExcept_sdstrzCollectFile,	"rzCollFile"
-	AdExcept_sdstrzSendInit,	"rzSendInit"
-	AdExcept_sdstrzSendBlockPrep,	"rzSndBlkPrp"
-	AdExcept_sdstrzSendBlock,	"rzSendBlock"
+	AdExcept_sdsttkCollectEof,	"tkCollectEof"
+	AdExcept_sdsttkSendBreak,	"tkSendBreak"
+	AdExcept_sdsttkBreakReply,	"tkBreakReply"
+	AdExcept_sdsttkCollectBreak,	"tkCollBreak"
+	AdExcept_sdsttkComplete,	"tkComplete"
+	AdExcept_sdsttkWaitCancel,	"tkWaitCancel"
 	AdExcept_sdstrzSync,	"rzSync"
 	AdExcept_sdstrzStartFile,	"rzStartFile"
 	AdExcept_sdstrzStartData,	"rzStartData"
@@ -1770,12 +1736,12 @@ BEGIN
 	AdExcept_sdstrzSendFinish,	"rzSendFinish"
 	AdExcept_sdstrzCollectFinish,	"rzCollFin"
 	AdExcept_sdstrzError,	"rzError"
-	AdExcept_sdsttzGetFile,	"tzGetFile"
-	AdExcept_sdsttzSendFile,	"tzSendFile"
-	AdExcept_sdsttzCheckFile,	"tzCheckFile"
-	AdExcept_sdsttzStartData,	"tzStartData"
-	AdExcept_sdsttzEscapeData,	"tzEscapeData"
-	AdExcept_sdsttzSendData,	"tzSendData"
+	AdExcept_sdstrzWaitCancel,	"rzWaitCancel"
+	AdExcept_sdstrzCleanup,	"rzCleanup"
+	AdExcept_sdstrzDone,	"rzDone"
+	AdExcept_sdsttkInit,	"tkInit"
+	AdExcept_sdsttkInitReply,	"tkInitReply"
+	AdExcept_sdsttkCollectInit,	"tkCollInit"
 	AdExcept_sdsttzWaitAck,	"tzWaitAck"
 	AdExcept_sdsttzSendEof,	"tzSendEof"
 	AdExcept_sdsttzDrainEof,	"tzDrainEof"
@@ -1786,12 +1752,12 @@ BEGIN
 	AdExcept_sdsttzCleanup,	"tzCleanup"
 	AdExcept_sdsttzDone,	"tzDone"
 	AdExcept_sdstrzRqstFile,	"rzRqstFile"
-	AdExcept_sdsttyFinished,	"tyFinishd"
-	AdExcept_sdsttyFinishDrain,	"tyFinDrain"
-	AdExcept_sdsttyDone,	"tyDone"
-	AdExcept_sdstryInitial,	"ryInitial"
-	AdExcept_sdstryDelay,	"ryDelay"
-	AdExcept_sdstryWaitForHSReply,	"ryWtFrHSRply"
+	AdExcept_sdstrzDelay,	"rzDelay"
+	AdExcept_sdstrzWaitFile,	"rzWaitFile"
+	AdExcept_sdstrzCollectFile,	"rzCollFile"
+	AdExcept_sdstrzSendInit,	"rzSendInit"
+	AdExcept_sdstrzSendBlockPrep,	"rzSndBlkPrp"
+	AdExcept_sdstrzSendBlock,	"rzSendBlock"
 	AdExcept_sdstryWaitForBlockStart,	"ryWtFBlkStrt"
 	AdExcept_sdstryCollectBlock,	"ryCollBlck"
 	AdExcept_sdstryProcessBlock,	"ryProcBlck"
@@ -1802,12 +1768,12 @@ BEGIN
 	AdExcept_sdstryDone,	"ryDone"
 	AdExcept_sdsttzInitial,	"tzInitial"
 	AdExcept_sdsttzHandshake,	"tzHandshake"
-	AdExcept_sdstrxInitial,	"rxInitial"
-	AdExcept_sdstrxWaitForHSReply,	"rxWtFrHSRply"
-	AdExcept_sdstrxWaitForBlockStart,	"rxWtFrBlStrt"
-	AdExcept_sdstrxCollectBlock,	"rxCollBlock"
-	AdExcept_sdstrxProcessBlock,	"rxProcBlck"
-	AdExcept_sdstrxFinishedSkip,	"rxFinSkip"
+	AdExcept_sdsttzGetFile,	"tzGetFile"
+	AdExcept_sdsttzSendFile,	"tzSendFile"
+	AdExcept_sdsttzCheckFile,	"tzCheckFile"
+	AdExcept_sdsttzStartData,	"tzStartData"
+	AdExcept_sdsttzEscapeData,	"tzEscapeData"
+	AdExcept_sdsttzSendData,	"tzSendData"
 	AdExcept_sdstrxFinished,	"rxFinished"
 	AdExcept_sdstrxDone,	"rxDone"
 	AdExcept_sdsttyInitial,	"tyInitial"
@@ -1818,12 +1784,12 @@ BEGIN
 	AdExcept_sdsttyReplyPending,	"tyRplyPndng"
 	AdExcept_sdsttyPrepXmodem,	"tyPrpXmdm"
 	AdExcept_sdsttySendXmodem,	"tySndXmdm"
-	AdExcept_sdstrfComplete,	"rfComplete"
-	AdExcept_sdstrfAbort,	"rfAbort"
-	AdExcept_sdstrfDone,	"rfDone"
-	AdExcept_sdsttxInitial,	"txInitial"
-	AdExcept_sdsttxHandshake,	"txHandshake"
-	AdExcept_sdsttxGetBlock,	"txGetBlock"
+	AdExcept_sdsttyFinished,	"tyFinishd"
+	AdExcept_sdsttyFinishDrain,	"tyFinDrain"
+	AdExcept_sdsttyDone,	"tyDone"
+	AdExcept_sdstryInitial,	"ryInitial"
+	AdExcept_sdstryDelay,	"ryDelay"
+	AdExcept_sdstryWaitForHSReply,	"ryWtFrHSRply"
 	AdExcept_sdsttxWaitFreeSpace,	"txWtFreeSpc"
 	AdExcept_sdsttxSendBlock,	"txSendBlock"
 	AdExcept_sdsttxDraining,	"txDraining"
@@ -1834,12 +1800,12 @@ BEGIN
 	AdExcept_sdsttxEotReply,	"txEotReply"
 	AdExcept_sdsttxFinished,	"txFinished"
 	AdExcept_sdsttxDone,	"txDone"
-	AdExcept_sdstrf1FinishTrain,	"rf1FinTrn"
-	AdExcept_sdstrf1SendCFR,	"rf1SendCFR"
-	AdExcept_sdstrf1WaitPageConnect,	"rf1WtPgCnnct"
-	AdExcept_sdstrf2ValidConnect,	"rf2ValCnnct"
-	AdExcept_sdstrf2GetSenderID,	"rf2GtSndID"
-	AdExcept_sdstrf2GetConnect,	"rf2GtCnnct"
+	AdExcept_sdstrxInitial,	"rxInitial"
+	AdExcept_sdstrxWaitForHSReply,	"rxWtFrHSRply"
+	AdExcept_sdstrxWaitForBlockStart,	"rxWtFrBlStrt"
+	AdExcept_sdstrxCollectBlock,	"rxCollBlock"
+	AdExcept_sdstrxProcessBlock,	"rxProcBlck"
+	AdExcept_sdstrxFinishedSkip,	"rxFinSkip"
 	AdExcept_sdstrfStartPage,	"rfStartPage"
 	AdExcept_sdstrfGetPageData,	"rfGtPgDta"
 	AdExcept_sdstrf1FinishPage,	"rf1FinPage"
@@ -1850,12 +1816,12 @@ BEGIN
 	AdExcept_sdstrf1WaitHangup,	"rf1WtHngp"
 	AdExcept_sdstrf2GetPageResult,	"rf2GtPgRslt"
 	AdExcept_sdstrf2GetFHNG,	"rf2GetFHNG"
-	AdExcept_sdstrf2Init1,	"rf2Init1"
-	AdExcept_sdstrf2Init1A,	"rf2Init1A"
-	AdExcept_sdstrf2Init1B,	"rf2Init1B"
-	AdExcept_sdstrf2Init2,	"rf2Init2"
-	AdExcept_sdstrf2Init3,	"rf2Init3"
-	AdExcept_sdstrfWaiting,	"rfWaiting"
+	AdExcept_sdstrfComplete,	"rfComplete"
+	AdExcept_sdstrfAbort,	"rfAbort"
+	AdExcept_sdstrfDone,	"rfDone"
+	AdExcept_sdsttxInitial,	"txInitial"
+	AdExcept_sdsttxHandshake,	"txHandshake"
+	AdExcept_sdsttxGetBlock,	"txGetBlock"
 	AdExcept_sdstrfAnswer,	"rfAnswer"
 	AdExcept_sdstrf1SendCSI,	"rf1SendCSI"
 	AdExcept_sdstrf1SendDIS,	"rf1SendDIS"
@@ -1866,12 +1832,12 @@ BEGIN
 	AdExcept_sdstrf1CollectTrain,	"rf1CollTrn"
 	AdExcept_sdstrf1Timeout,	"rf1Timeout"
 	AdExcept_sdstrf1Retrain,	"rf1Retrain"
-	AdExcept_sdsttf1Hangup,	"tf1Hangup"
-	AdExcept_sdsttf1WaitHangup,	"tf1WaitHngp"
-	AdExcept_sdsttf2SendEOP,	"tf2SendEOP"
-	AdExcept_sdsttf2WaitFPTS,	"tf2WaitFPTS"
-	AdExcept_sdsttf2WaitFET,	"tf2WaitFET"
-	AdExcept_sdsttf2WaitPageOK,	"tf2WaitPgOK"
+	AdExcept_sdstrf1FinishTrain,	"rf1FinTrn"
+	AdExcept_sdstrf1SendCFR,	"rf1SendCFR"
+	AdExcept_sdstrf1WaitPageConnect,	"rf1WtPgCnnct"
+	AdExcept_sdstrf2ValidConnect,	"rf2ValCnnct"
+	AdExcept_sdstrf2GetSenderID,	"rf2GtSndID"
+	AdExcept_sdstrf2GetConnect,	"rf2GtCnnct"
 	AdExcept_sdsttf2SendNewParams,	"tf2SndNwPrm"
 	AdExcept_sdsttf2NextPage,	"tf2NextPage"
 	AdExcept_sdsttf20CheckPage,	"tf20ChckPg"
@@ -1882,12 +1848,12 @@ BEGIN
 	AdExcept_sdstrfNone,	"rfNone"
 	AdExcept_sdstrfInit,	"rfInit"
 	AdExcept_sdstrf1Init1,	"rf1Init1"
-	AdExcept_sdsttf2GetParams,	"tf2GetParams"
-	AdExcept_sdsttfWaitXon,	"tfWaitXon"
-	AdExcept_sdsttfWaitFreeHeader,	"tfWaitFrHead"
-	AdExcept_sdsttfSendPageHeader,	"tfSndPgeHdr"
-	AdExcept_sdsttfOpenCover,	"tfOpenCover"
-	AdExcept_sdsttfSendCover,	"tfSendCover"
+	AdExcept_sdstrf2Init1,	"rf2Init1"
+	AdExcept_sdstrf2Init1A,	"rf2Init1A"
+	AdExcept_sdstrf2Init1B,	"rf2Init1B"
+	AdExcept_sdstrf2Init2,	"rf2Init2"
+	AdExcept_sdstrf2Init3,	"rf2Init3"
+	AdExcept_sdstrfWaiting,	"rfWaiting"
 	AdExcept_sdsttfPrepPage,	"tfPrepPage"
 	AdExcept_sdsttfSendPage,	"tfSendPage"
 	AdExcept_sdsttfDrainPage,	"tfDrainPage"
@@ -1898,12 +1864,12 @@ BEGIN
 	AdExcept_sdsttf1WaitEOP,	"tf1WaitEOP"
 	AdExcept_sdsttf1WaitMCF,	"tf1WaitMCF"
 	AdExcept_sdsttf1SendDCN,	"tf1SendDCN"
-	AdExcept_sdsttf2Init1,	"tf2Init1"
-	AdExcept_sdsttf2Init1A,	"tf2Init1A"
-	AdExcept_sdsttf2Init1B,	"tf2Init1B"
-	AdExcept_sdsttf2Init2,	"tf2Init2"
-	AdExcept_sdsttf2Init3,	"tf2Init3"
-	AdExcept_sdsttfDial,	"tfDial"
+	AdExcept_sdsttf1Hangup,	"tf1Hangup"
+	AdExcept_sdsttf1WaitHangup,	"tf1WaitHngp"
+	AdExcept_sdsttf2SendEOP,	"tf2SendEOP"
+	AdExcept_sdsttf2WaitFPTS,	"tf2WaitFPTS"
+	AdExcept_sdsttf2WaitFET,	"tf2WaitFET"
+	AdExcept_sdsttf2WaitPageOK,	"tf2WaitPgOK"
 	AdExcept_sdsttfRetryWait,	"tfRetryWait"
 	AdExcept_sdsttf1Connect,	"tf1Connect"
 	AdExcept_sdsttf1SendTSI,	"tf1SendTSI"
@@ -1914,12 +1880,12 @@ BEGIN
 	AdExcept_sdsttf1WaitCFR,	"tf1WaitCFR"
 	AdExcept_sdsttf1WaitPageConnect,	"tf1WaitPgCn"
 	AdExcept_sdsttf2Connect,	"tf2Connect"
-	AdExcept_sdstProcHandler,	"Procedure"
-	AdExcept_sdstEventHandler,	"Method"
-	AdExcept_sdstSWill,	"Sent WILL"
-	AdExcept_sdstSWont,	"Sent WON'T"
-	AdExcept_sdstSDo,	"Sent DO"
-	AdExcept_sdstSDont,	"Sent DON'T"
+	AdExcept_sdsttf2GetParams,	"tf2GetParams"
+	AdExcept_sdsttfWaitXon,	"tfWaitXon"
+	AdExcept_sdsttfWaitFreeHeader,	"tfWaitFrHead"
+	AdExcept_sdsttfSendPageHeader,	"tfSndPgeHdr"
+	AdExcept_sdsttfOpenCover,	"tfOpenCover"
+	AdExcept_sdsttfSendCover,	"tfSendCover"
 	AdExcept_sdstRWill,	"Recv WILL"
 	AdExcept_sdstRWont,	"Recv WON'T"
 	AdExcept_sdstRDo,	"Recv DO"
@@ -1930,12 +1896,12 @@ BEGIN
 	AdExcept_sdsttfGetEntry,	"tfGetEntry"
 	AdExcept_sdsttfInit,	"tfInit"
 	AdExcept_sdsttf1Init1,	"tf1Init1"
-	AdExcept_sdstWriteCom,	"WriteCom"
-	AdExcept_sdstLineStatus,	"Line status"
-	AdExcept_sdstModemStatus,	"Modem status"
-	AdExcept_sdstAvail,	"Avail"
-	AdExcept_sdstTimer,	"Timer"
-	AdExcept_sdstData,	"Data"
+	AdExcept_sdsttf2Init1,	"tf2Init1"
+	AdExcept_sdsttf2Init1A,	"tf2Init1A"
+	AdExcept_sdsttf2Init1B,	"tf2Init1B"
+	AdExcept_sdsttf2Init2,	"tf2Init2"
+	AdExcept_sdsttf2Init3,	"tf2Init3"
+	AdExcept_sdsttfDial,	"tfDial"
 	AdExcept_sdstStatus,	"Status"
 	AdExcept_sdstThreadStart,	"Start"
 	AdExcept_sdstThreadExit,	"Exit"
@@ -1946,12 +1912,12 @@ BEGIN
 	AdExcept_sdstStatusTrigger,	"Status"
 	AdExcept_sdstAvailTrigger,	"Avail"
 	AdExcept_sdstWndHandler,	"Window"
-	AdExcept_sdtTriggerHandlerAlloc,	"TrgHdAlc"
-	AdExcept_sdtTriggerHandlerDispose,	"TrgHdDsp"
-	AdExcept_sdtTriggerDataChange,	"TrDatChg"
-	AdExcept_sdtTelnet,	"Telnet"
-	AdExcept_sdtFax,	"Fax"
-	AdExcept_sdtXModem,	"XModem"
+	AdExcept_sdstProcHandler,	"Procedure"
+	AdExcept_sdstEventHandler,	"Method"
+	AdExcept_sdstSWill,	"Sent WILL"
+	AdExcept_sdstSWont,	"Sent WON'T"
+	AdExcept_sdstSDo,	"Sent DO"
+	AdExcept_sdstSDont,	"Sent DON'T"
 	AdExcept_sdtYModem,	"YModem"
 	AdExcept_sdtZModem,	"ZModem"
 	AdExcept_sdtKermit,	"Kermit"
@@ -1962,12 +1928,12 @@ BEGIN
 	AdExcept_sdtScript,	"Script"
 	AdExcept_sdstNone,	""
 	AdExcept_sdstReadCom,	"ReadCom"
-	AdExcept_secVoIPBadAddress,	"Destination address bad"
-	AdExcept_secVoIPNoAnswer,	"Remote did not answer"
-	AdExcept_secVoIPCancelled,	"Cancelled"
-	AdExcept_secVoIPRejected,	"Remote rejected the call"
-	AdExcept_secVoIPFailed,	"General failure"
-	AdExcept_secVoIPTapi3NotInstalled,	"ITTapi interface failure"
+	AdExcept_sdstWriteCom,	"WriteCom"
+	AdExcept_sdstLineStatus,	"Line status"
+	AdExcept_sdstModemStatus,	"Modem status"
+	AdExcept_sdstAvail,	"Avail"
+	AdExcept_sdstTimer,	"Timer"
+	AdExcept_sdstData,	"Data"
 	AdExcept_secVoIPH323NotFound,	"H.323 line not found"
 	AdExcept_secVoIPTapi3EventFailure,	"Event notify failure"
 	AdExcept_secRasLoadFail,	"Failed to find/load RASAPI32.DLL"
@@ -1978,12 +1944,12 @@ BEGIN
 	AdExcept_sdtThread,	"Thread"
 	AdExcept_sdtTriggerAlloc,	"TrigAllc"
 	AdExcept_sdtTriggerDispose,	"TrigDisp"
-	AdExcept_secTapiGetAddrFail,	"Failed to get TAPI address"
-	AdExcept_sTAPIdisabled16bit,	"TAPI disabled for 16-bit environments"
-	AdExcept_secTapiUnexpected,	"Unexpected TAPI error"
-	AdExcept_secTapiVoiceNotSupported,	"TAPI device does not support voice extensions"
-	AdExcept_secTapiWaveFail,	"TAPI wave file error"
-	AdExcept_secTapiCIDBlocked,	"Caller ID Blocked"
+	AdExcept_sdtTriggerHandlerAlloc,	"TrgHdAlc"
+	AdExcept_sdtTriggerHandlerDispose,	"TrgHdDsp"
+	AdExcept_sdtTriggerDataChange,	"TrDatChg"
+	AdExcept_sdtTelnet,	"Telnet"
+	AdExcept_sdtFax,	"Fax"
+	AdExcept_sdtXModem,	"XModem"
 	AdExcept_secTapiCIDOutOfArea,	"Out of Area Call"
 	AdExcept_secTapiWaveFormatError,	"The selected file is not a wave file"
 	AdExcept_secTapiWaveReadError,	"Unable to read wave file data"
@@ -1994,12 +1960,12 @@ BEGIN
 	AdExcept_secTapiWaveNoData,	"No wave data available"
 	AdExcept_secVoIPNotSupported,	"Voice over IP not available (requires Windows 2000 and above)"
 	AdExcept_secVoIPCallBusy,	"Remote was busy"
-	AdExcept_secResourceUnavail,	"Resource unavailable"
-	AdExcept_secRequestOverrun,	"Request overrun"
-	AdExcept_secStructureTooSmall,	"Structure too small"
-	AdExcept_secTargetNotFound,	"Target not found"
-	AdExcept_secTargetSelf,	"Target is self"
-	AdExcept_secUninitialized,	"Uninitialized"
+	AdExcept_secVoIPBadAddress,	"Destination address bad"
+	AdExcept_secVoIPNoAnswer,	"Remote did not answer"
+	AdExcept_secVoIPCancelled,	"Cancelled"
+	AdExcept_secVoIPRejected,	"Remote rejected the call"
+	AdExcept_secVoIPFailed,	"General failure"
+	AdExcept_secVoIPTapi3NotInstalled,	"ITTapi interface failure"
 	AdExcept_secUserUserInfoTooBig,	"User info too big"
 	AdExcept_secReinit,	"Reinit failed"
 	AdExcept_secAddressBlocked,	"Address blocked"
@@ -2010,12 +1976,12 @@ BEGIN
 	AdExcept_secTapiNotSet,	"TapiMode not set in TApdComPort"
 	AdExcept_secTapiNoSelect,	"No TAPI device selected"
 	AdExcept_secTapiLoadFail,	"Failed to find/load TAPI.DLL"
-	AdExcept_secInvalTimeout,	"Invalid timeout"
-	AdExcept_secInvalTone,	"Invalid tone"
-	AdExcept_secInvalToneList,	"Invalid tone list"
-	AdExcept_secInvalToneMode,	"Invalid tone mode"
-	AdExcept_secInvalTransferMode,	"Invalid transfer mode"
-	AdExcept_secLineMapperFailed,	"Line mapper failed"
+	AdExcept_secTapiGetAddrFail,	"Failed to get TAPI address"
+	AdExcept_sTAPIdisabled16bit,	"TAPI disabled for 16-bit environments"
+	AdExcept_secTapiUnexpected,	"Unexpected TAPI error"
+	AdExcept_secTapiVoiceNotSupported,	"TAPI device does not support voice extensions"
+	AdExcept_secTapiWaveFail,	"TAPI wave file error"
+	AdExcept_secTapiCIDBlocked,	"Caller ID Blocked"
 	AdExcept_secNoConference,	"No conference"
 	AdExcept_secNoDevice,	"No device"
 	AdExcept_secNoDriver,	"No driver"
@@ -2026,12 +1992,12 @@ BEGIN
 	AdExcept_secOperationFailed,	"Operation failed"
 	AdExcept_secOperationUnavail,	"Operation unavailable"
 	AdExcept_secRateUnavail,	"Rate unavailable"
-	AdExcept_secInvalGroupID,	"Invalid group ID"
-	AdExcept_secInvalLineHandle,	"Invalid line handle"
-	AdExcept_secInvalLineState,	"Invalid line state"
-	AdExcept_secInvalLocation,	"Invalid location"
-	AdExcept_secInvalMediaList,	"Invalid media list"
-	AdExcept_secInvalMediaMode,	"Invalid media mode"
+	AdExcept_secResourceUnavail,	"Resource unavailable"
+	AdExcept_secRequestOverrun,	"Request overrun"
+	AdExcept_secStructureTooSmall,	"Structure too small"
+	AdExcept_secTargetNotFound,	"Target not found"
+	AdExcept_secTargetSelf,	"Target is self"
+	AdExcept_secUninitialized,	"Uninitialized"
 	AdExcept_secInvalMessageID,	"Invalid message ID"
 	AdExcept_secInvalParam,	"Invalid parameter"
 	AdExcept_secInvalParkID,	"Invalid park ID"
@@ -2042,12 +2008,12 @@ BEGIN
 	AdExcept_secInvalRequestMode,	"Invalid request mode"
 	AdExcept_secInvalTerminalID,	"Invalid terminal ID"
 	AdExcept_secInvalTerminalMode,	"Invalid terminal mode"
-	AdExcept_secInvalCallPrivilege,	"Invalid call privilege"
-	AdExcept_secInvalCallSelect,	"Invalid call select"
-	AdExcept_secInvalCallState,	"Invalid call state"
-	AdExcept_secInvalCallStatelist,	"Invalid call state list"
-	AdExcept_secInvalCard,	"Invalid card"
-	AdExcept_secInvalCompletionID,	"Invalid completion ID"
+	AdExcept_secInvalTimeout,	"Invalid timeout"
+	AdExcept_secInvalTone,	"Invalid tone"
+	AdExcept_secInvalToneList,	"Invalid tone list"
+	AdExcept_secInvalToneMode,	"Invalid tone mode"
+	AdExcept_secInvalTransferMode,	"Invalid transfer mode"
+	AdExcept_secLineMapperFailed,	"Line mapper failed"
 	AdExcept_secInvalConfCallHandle,	"Invalid conference call handle"
 	AdExcept_secInvalConsultCallHandle,	"Invalid consultation call handle"
 	AdExcept_secInvalCountryCode,	"Invalid country code"
@@ -2058,12 +2024,12 @@ BEGIN
 	AdExcept_secInvalDigitMode,	"Invalid digit mode"
 	AdExcept_secInvalDigits,	"Invalid digits"
 	AdExcept_secInvalExtVersion,	"Invalid ext version"
-	AdExcept_secDialPrompt,	"Dial failed"
-	AdExcept_secDialQuiet,	"Dial failed"
-	AdExcept_secIncompatibleApiVersion,	"Incompatible API version"
-	AdExcept_secIncompatibleExtVersion,	"Incompatible EXT version"
-	AdExcept_secIniFileCorrupt,	"INI file corrupt"
-	AdExcept_secInUse,	"Resource in use"
+	AdExcept_secInvalGroupID,	"Invalid group ID"
+	AdExcept_secInvalLineHandle,	"Invalid line handle"
+	AdExcept_secInvalLineState,	"Invalid line state"
+	AdExcept_secInvalLocation,	"Invalid location"
+	AdExcept_secInvalMediaList,	"Invalid media list"
+	AdExcept_secInvalMediaMode,	"Invalid media mode"
 	AdExcept_secInvalAddress,	"Invalid address"
 	AdExcept_secInvalAddressID,	"Invalid address ID"
 	AdExcept_secInvalAddressMode,	"Invalid address mode"
@@ -2074,12 +2040,12 @@ BEGIN
 	AdExcept_secInvalCallComplMode,	"Invalid call completion mode"
 	AdExcept_secInvalCallHandle,	"Invalid call handle"
 	AdExcept_secInvalCallParams,	"Invalid call parameters"
-	AdExcept_sTAPIDisconnect_NoDialtone,	"No Dialtone"
-	AdExcept_sTAPIDisconnect_NumberChanged,	"Number Changed"
-	AdExcept_sTAPIDisconnect_OutOfOrder,	"Out of Order"
-	AdExcept_sTAPIDisconnect_TempFailure,	"Temporary Failure"
-	AdExcept_sTAPIDisconnect_QOSUnavail,	"Quality of Service Unavail"
-	AdExcept_sTAPIDisconnect_Blocked,	"Blocked"
+	AdExcept_secInvalCallPrivilege,	"Invalid call privilege"
+	AdExcept_secInvalCallSelect,	"Invalid call select"
+	AdExcept_secInvalCallState,	"Invalid call state"
+	AdExcept_secInvalCallStatelist,	"Invalid call state list"
+	AdExcept_secInvalCard,	"Invalid card"
+	AdExcept_secInvalCompletionID,	"Invalid completion ID"
 	AdExcept_sTAPIDisconnect_DoNotDisturb,	"Do Not Disturb"
 	AdExcept_sTAPIDisconnect_Cancelled,	"Cancelled"
 	AdExcept_secAllocated,	"Already allocated"
@@ -2090,12 +2056,12 @@ BEGIN
 	AdExcept_secConferenceFull,	"Conference full"
 	AdExcept_secDialBilling,	"Dial failed"
 	AdExcept_secDialDialtone,	"Dial failed, no dialtone"
-	AdExcept_sTAPIDialFail,	"Dial failed/no connection"
-	AdExcept_sTAPIRetryWait,	"Waiting for retry in %d seconds"
-	AdExcept_sTAPIDeviceInUse,	"Device is in use by another application"
-	AdExcept_sTAPIDisconnect_Unspecified,	"Reason Unspecified"
-	AdExcept_sTAPIDisconnect_Normal,	"Normal Hangup by Remote"
-	AdExcept_sTAPIDisconnect_Unknown,	"Reason Unknown"
+	AdExcept_secDialPrompt,	"Dial failed"
+	AdExcept_secDialQuiet,	"Dial failed"
+	AdExcept_secIncompatibleApiVersion,	"Incompatible API version"
+	AdExcept_secIncompatibleExtVersion,	"Incompatible EXT version"
+	AdExcept_secIniFileCorrupt,	"INI file corrupt"
+	AdExcept_secInUse,	"Resource in use"
 	AdExcept_sTAPIDisconnect_Reject,	"Remote Rejected Call"
 	AdExcept_sTAPIDisconnect_PickUp,	"Call Picked Up Elsewhere"
 	AdExcept_sTAPIDisconnect_Forwarded,	"Call was Forwarded"
@@ -2106,12 +2072,12 @@ BEGIN
 	AdExcept_sTAPIDisconnect_Congestion,	"Network Congestion"
 	AdExcept_sTAPIDisconnect_Incompatible,	"Remote Equipment Incompatible"
 	AdExcept_sTAPIDisconnect_Unavail,	"Reason Unavailable"
-	AdExcept_stds_NumCompletions,	"Number of completions changed"
-	AdExcept_stds_Terminals,	"Terminals changed"
-	AdExcept_stds_RoamMode,	"Roam mode changed"
-	AdExcept_stds_Battery,	"Battery changed"
-	AdExcept_stds_Signal,	"Signal changed"
-	AdExcept_stds_DevSpecific,	"Device specific change"
+	AdExcept_sTAPIDisconnect_NoDialtone,	"No Dialtone"
+	AdExcept_sTAPIDisconnect_NumberChanged,	"Number Changed"
+	AdExcept_sTAPIDisconnect_OutOfOrder,	"Out of Order"
+	AdExcept_sTAPIDisconnect_TempFailure,	"Temporary Failure"
+	AdExcept_sTAPIDisconnect_QOSUnavail,	"Quality of Service Unavail"
+	AdExcept_sTAPIDisconnect_Blocked,	"Blocked"
 	AdExcept_stds_ReInit,	"Re-initialized"
 	AdExcept_stds_Lock,	"Lock change"
 	AdExcept_stds_CapsChange,	"Caps change"
@@ -2122,12 +2088,12 @@ BEGIN
 	AdExcept_sTAPILineReply,	"TAPI line reply"
 	AdExcept_sTAPIStateChange,	"TAPI state change"
 	AdExcept_sTAPICalledBusy,	"Called number is busy"
-	AdExcept_stcs_OnHoldPendConf,	"On hold pending conference..."
-	AdExcept_stcs_OnHoldPendTransfer,	"On hold pending transfer..."
-	AdExcept_stcs_Disconnected,	"Call disconnected (%s)"
-	AdExcept_stcs_Unknown,	"Unknown state"
-	AdExcept_stds_Other,	"Other"
-	AdExcept_stds_Ringing,	"Ringing"
+	AdExcept_sTAPIDialFail,	"Dial failed/no connection"
+	AdExcept_sTAPIRetryWait,	"Waiting for retry in %d seconds"
+	AdExcept_sTAPIDeviceInUse,	"Device is in use by another application"
+	AdExcept_sTAPIDisconnect_Unspecified,	"Reason Unspecified"
+	AdExcept_sTAPIDisconnect_Normal,	"Normal Hangup by Remote"
+	AdExcept_sTAPIDisconnect_Unknown,	"Reason Unknown"
 	AdExcept_stds_Connected,	"Connected"
 	AdExcept_stds_Disconnected,	"Disconnected"
 	AdExcept_stds_MsgWaitOn,	"Message wait on"
@@ -2138,12 +2104,12 @@ BEGIN
 	AdExcept_stds_Open,	"Ppen change"
 	AdExcept_stds_Close,	"Closed"
 	AdExcept_stds_NumCalls,	"Number of calls changed"
-	AdExcept_swsaHost_Not_Found,	"Host not found"
-	AdExcept_swsaTry_Again,	"Host not found, or SERVERFAIL, can try again"
-	AdExcept_swsaNo_Recovery,	"Non recoverable errors, FORMERR, REFUSED, NOTIMP"
-	AdExcept_swsaNo_Data,	"Valid name, but no data record of requested type"
-	AdExcept_stcs_Idle,	"Line is idle"
-	AdExcept_stcs_Offering,	"Offering line..."
+	AdExcept_stds_NumCompletions,	"Number of completions changed"
+	AdExcept_stds_Terminals,	"Terminals changed"
+	AdExcept_stds_RoamMode,	"Roam mode changed"
+	AdExcept_stds_Battery,	"Battery changed"
+	AdExcept_stds_Signal,	"Signal changed"
+	AdExcept_stds_DevSpecific,	"Device specific change"
 	AdExcept_stcs_Accepted,	"Accepting call..."
 	AdExcept_stcs_Dialtone,	"Dialtone detected"
 	AdExcept_stcs_Dialing,	"Dialing..."
@@ -2154,12 +2120,12 @@ BEGIN
 	AdExcept_stcs_Proceeding,	"Proceeding..."
 	AdExcept_stcs_OnHold,	"On hold..."
 	AdExcept_stcs_Conferenced,	"Call conferenced"
-	AdExcept_swsaETimedOut,	"The operation timed out"
-	AdExcept_swsaEConnRefused,	"The attempt to connect was forcibly refused"
-	AdExcept_swsaELoop,	"WSAELOOP: see WSAELOOP"
-	AdExcept_swsaENameTooLong,	"The name is too long"
-	AdExcept_swsaEHostDown,	"The host machine is down"
-	AdExcept_swsaEHostUnreach,	"The host machine is unreachable"
+	AdExcept_stcs_OnHoldPendConf,	"On hold pending conference..."
+	AdExcept_stcs_OnHoldPendTransfer,	"On hold pending transfer..."
+	AdExcept_stcs_Disconnected,	"Call disconnected (%s)"
+	AdExcept_stcs_Unknown,	"Unknown state"
+	AdExcept_stds_Other,	"Other"
+	AdExcept_stds_Ringing,	"Ringing"
 	AdExcept_swsaENotEmpty,	"WSAENOTEMPTY"
 	AdExcept_swsaEProcLim,	"WSAEPROCLIM"
 	AdExcept_swsaEUsers,	"WSAEUSERS"
@@ -2170,12 +2136,12 @@ BEGIN
 	AdExcept_swsaVerNotSupported,	"Version requested by WSAStartUp not supported by loaded Winsock DLL"
 	AdExcept_swsaNotInitialised,	"WSAStartUp not yet called"
 	AdExcept_swsaEDiscOn,	"WSAEDISCON"
-	AdExcept_swsaESocktNoSupport,	"Specified socket type not supported in this address family"
-	AdExcept_swsaEOpNotSupp,	"Operation is not supported by this socket"
-	AdExcept_swsaEPfNoSupport,	"Specified protocol family is not supported"
-	AdExcept_swsaEAfNoSupport,	"Specified address family is not supported by this protocol"
-	AdExcept_swsaEAddrInUse,	"The address is already in use for this operation"
-	AdExcept_swsaEAddrNotAvail,	"The address is not available from this machine"
+	AdExcept_swsaHost_Not_Found,	"Host not found"
+	AdExcept_swsaTry_Again,	"Host not found, or SERVERFAIL, can try again"
+	AdExcept_swsaNo_Recovery,	"Non recoverable errors, FORMERR, REFUSED, NOTIMP"
+	AdExcept_swsaNo_Data,	"Valid name, but no data record of requested type"
+	AdExcept_stcs_Idle,	"Line is idle"
+	AdExcept_stcs_Offering,	"Offering line..."
 	AdExcept_swsaENetDown,	"The network subsystem has failed"
 	AdExcept_swsaENetUnreach,	"The network is unreachable from this machine at this time"
 	AdExcept_swsaENetReset,	"The network has been reset"
@@ -2186,12 +2152,12 @@ BEGIN
 	AdExcept_swsaENotConn,	"The socket is not connected"
 	AdExcept_swsaEShutDown,	"The socket has been shutdown"
 	AdExcept_swsaETooManyRefs,	"WSAETOOMANYREFS"
-	AdExcept_swsaBaseErr,	""
-	AdExcept_swsaEIntr,	"Interrupted function call"
-	AdExcept_swsaEBadF,	"Bad file number"
-	AdExcept_swsaEAcces,	"Permission denied"
-	AdExcept_swsaEFault,	"Unknown error"
-	AdExcept_swsaEInVal,	"Invalid argument"
+	AdExcept_swsaETimedOut,	"The operation timed out"
+	AdExcept_swsaEConnRefused,	"The attempt to connect was forcibly refused"
+	AdExcept_swsaELoop,	"WSAELOOP: see WSAELOOP"
+	AdExcept_swsaENameTooLong,	"The name is too long"
+	AdExcept_swsaEHostDown,	"The host machine is down"
+	AdExcept_swsaEHostUnreach,	"The host machine is unreachable"
 	AdExcept_swsaEMFile,	"Too many open files"
 	AdExcept_swsaEWouldBlock,	"Warning : the socket would block on this call"
 	AdExcept_swsaEInProgress,	"A blocking call is in progress"
@@ -2202,12 +2168,12 @@ BEGIN
 	AdExcept_swsaEPrototype,	"WSAEPROTOTYPE"
 	AdExcept_swsaENoProtoOpt,	"The option is unknown or not supported"
 	AdExcept_swsaEProtoNoSupport,	"Either (1) not enough buffer space to create socket (2) protocol not supported"
-	AdExcept_secSIMPUK2,	"SIM PUK2 required"
-	AdExcept_secMemFail,	"Memory failure"
-	AdExcept_secInvalidMemIndex,	"Invalid memory index"
-	AdExcept_secMemFull,	"Memory is full"
-	AdExcept_secSMSCAddUnknown,	"SMS Center Address unknown"
-	AdExcept_secNoNetwork,	"No network service"
+	AdExcept_swsaESocktNoSupport,	"Specified socket type not supported in this address family"
+	AdExcept_swsaEOpNotSupp,	"Operation is not supported by this socket"
+	AdExcept_swsaEPfNoSupport,	"Specified protocol family is not supported"
+	AdExcept_swsaEAfNoSupport,	"Specified address family is not supported by this protocol"
+	AdExcept_swsaEAddrInUse,	"The address is already in use for this operation"
+	AdExcept_swsaEAddrNotAvail,	"The address is not available from this machine"
 	AdExcept_secNetworkTimeout,	"Network timeout"
 	AdExcept_secCNMAAck,	"No +CNMA acknowledgement expected"
 	AdExcept_secUnknown,	"Unknown error"
@@ -2218,12 +2184,12 @@ BEGIN
 	AdExcept_secADWSINVPORT,	"Specified port is not valid"
 	AdExcept_secADWSCANTCHANGE,	"Cannot change parameter while socket is connected"
 	AdExcept_secADWSCANTRESOLVE,	"Cannot resolve destination address"
-	AdExcept_secSMSTooLong,	"SMS message too long"
-	AdExcept_secSMSUnknownStatus,	"Status unknown"
-	AdExcept_secMEFailure,	"Mobile equipment failure"
-	AdExcept_secServiceRes,	"SMS service of ME reserved"
-	AdExcept_secBadOperation,	"Operation not allowed"
-	AdExcept_secUnsupported,	"Operation not supported"
+	AdExcept_swsaBaseErr,	""
+	AdExcept_swsaEIntr,	"Interrupted function call"
+	AdExcept_swsaEBadF,	"Bad file number"
+	AdExcept_swsaEAcces,	"Permission denied"
+	AdExcept_swsaEFault,	"Unknown error"
+	AdExcept_swsaEInVal,	"Invalid argument"
 	AdExcept_secInvalidPDU,	"Invalid PDU mode parameter"
 	AdExcept_secInvalidText,	"Invalid Text mode parameter"
 	AdExcept_secSIMInsert,	"SIM card not inserted"
@@ -2234,12 +2200,12 @@ BEGIN
 	AdExcept_secSIMWrong,	"SIM wrong"
 	AdExcept_secSIMPUK,	"SIM PUK required"
 	AdExcept_secSIMPIN2,	"SIM PIN2 required"
-	AdExcept_secFaxConverterInitFail,	"Initialization of fax converter failed"
-	AdExcept_secNoAnswer,	"Remote fax did not answer"
-	AdExcept_secAlreadyMonitored,	"Directory already being monitored"
-	AdExcept_secUniAlreadyInstalled,	"Unidrv support files already installed"
-	AdExcept_secUniCannotGetSysDir,	"Cannot determine windows system dir"
-	AdExcept_secUniCannotGetWinDir,	"Cannot determine windows dir"
+	AdExcept_secSIMPUK2,	"SIM PUK2 required"
+	AdExcept_secMemFail,	"Memory failure"
+	AdExcept_secInvalidMemIndex,	"Invalid memory index"
+	AdExcept_secMemFull,	"Memory is full"
+	AdExcept_secSMSCAddUnknown,	"SMS Center Address unknown"
+	AdExcept_secNoNetwork,	"No network service"
 	AdExcept_secUniUnknownLayout,	"Cannot determine setup file layout"
 	AdExcept_secUniCannotInstallFile,	"Cannot install Unidrv files to system dir"
 	AdExcept_secDrvCopyError,	"Error copying printer driver"
@@ -2250,12 +2216,12 @@ BEGIN
 	AdExcept_secInstallDriverFailed,	"AddPrinterDriver API failed"
 	AdExcept_secSMSBusy,	"Busy with another command"
 	AdExcept_secSMSTimedOut,	"Timed out, no response back"
-	AdExcept_secInvalidPageNumber,	"Invalid page number specified for fax"
-	AdExcept_secBmpTooBig,	"BMP size exceeds Windows' maxheight of 32767"
-	AdExcept_secEnhFontTooBig,	"Font selected for enhanced text converter too large"
-	AdExcept_secFaxBadMachine,	"Fax incompatible with remote fax"
-	AdExcept_secFaxBadModemResult,	"Bad response from modem"
-	AdExcept_secFaxTrainError,	"Modems failed to train"
+	AdExcept_secSMSTooLong,	"SMS message too long"
+	AdExcept_secSMSUnknownStatus,	"Status unknown"
+	AdExcept_secMEFailure,	"Mobile equipment failure"
+	AdExcept_secServiceRes,	"SMS service of ME reserved"
+	AdExcept_secBadOperation,	"Operation not allowed"
+	AdExcept_secUnsupported,	"Operation not supported"
 	AdExcept_secFaxInitError,	"Error while initializing modem"
 	AdExcept_secFaxBusy,	"Called fax number was busy"
 	AdExcept_secFaxVoiceCall,	"Called fax number answered with voice"
@@ -2266,12 +2232,12 @@ BEGIN
 	AdExcept_secFaxPageError,	"Fax failed at page end"
 	AdExcept_secFaxGDIPrintError,	"NextBand GDI error in fax print driver"
 	AdExcept_secFaxMixedResolution,	"Multiple resolutions per session not supported"
-	AdExcept_secDatabaseFull,	"Maximum database records (999) reached"
-	AdExcept_secDatabaseEmpty,	"No records in database"
-	AdExcept_secDatabaseNotPrepared,	"iPrepareIniDatabase not called"
-	AdExcept_secBadFieldList,	"Bad field list in INI component"
-	AdExcept_secBadFieldForIndex,	"Bad field index in INI component"
-	AdExcept_secNoStateMachine,	"No state machine specified"
+	AdExcept_secFaxConverterInitFail,	"Initialization of fax converter failed"
+	AdExcept_secNoAnswer,	"Remote fax did not answer"
+	AdExcept_secAlreadyMonitored,	"Directory already being monitored"
+	AdExcept_secUniAlreadyInstalled,	"Unidrv support files already installed"
+	AdExcept_secUniCannotGetSysDir,	"Cannot determine windows system dir"
+	AdExcept_secUniCannotGetWinDir,	"Cannot determine windows dir"
 	AdExcept_secNoStartState,	"StartState not set"
 	AdExcept_secNoSapiEngine,	"No SAPI engine specified"
 	AdExcept_secFaxBadFormat,	"File is not an APF file"
@@ -2282,12 +2248,12 @@ BEGIN
 	AdExcept_secNoImageLoaded,	"No image loaded into viewer"
 	AdExcept_secNoImageBlockMarked,	"No block of image marked"
 	AdExcept_secFontFileNotFound,	"APFAX.FNT not found, or resource bad"
-	AdExcept_secNoFilename,	"No filename specified in protocol receive"
-	AdExcept_secFileRejected,	"File was rejected"
-	AdExcept_secCantWriteFile,	"Cant write file"
-	AdExcept_secTableFull,	"Kermit window table is full, fatal error"
-	AdExcept_secAbortNoCarrier,	"Aborting due to carrier loss"
-	AdExcept_secBadProtocolFunction,	"Function not supported by protocol"
+	AdExcept_secInvalidPageNumber,	"Invalid page number specified for fax"
+	AdExcept_secBmpTooBig,	"BMP size exceeds Windows' maxheight of 32767"
+	AdExcept_secEnhFontTooBig,	"Font selected for enhanced text converter too large"
+	AdExcept_secFaxBadMachine,	"Fax incompatible with remote fax"
+	AdExcept_secFaxBadModemResult,	"Bad response from modem"
+	AdExcept_secFaxTrainError,	"Modems failed to train"
 	AdExcept_secProtocolAbort,	"Protocol aborted"
 	AdExcept_secKeyTooLong,	"Key string too long"
 	AdExcept_secDataTooLarge,	"Data string too long"
@@ -2298,12 +2264,12 @@ BEGIN
 	AdExcept_secRecordExists,	"Record already exists"
 	AdExcept_secRecordNotFound,	"Record not found in database"
 	AdExcept_secMustHaveIdxVal,	"Invalid index key name"
-	AdExcept_secBadTriggerHandle,	"Bad trigger handle"
-	AdExcept_secStartStringEmpty,	"Start string is empty"
-	AdExcept_secPacketTooSmall,	"Packet size cannot be smaller than start string"
-	AdExcept_secNoEndCharCount,	"CharCount packets must have an end-condition"
-	AdExcept_secEmptyEndString,	"End string is empty"
-	AdExcept_secZeroSizePacket,	"Packet size cannot be zero"
+	AdExcept_secDatabaseFull,	"Maximum database records (999) reached"
+	AdExcept_secDatabaseEmpty,	"No records in database"
+	AdExcept_secDatabaseNotPrepared,	"iPrepareIniDatabase not called"
+	AdExcept_secBadFieldList,	"Bad field list in INI component"
+	AdExcept_secBadFieldForIndex,	"Bad field index in INI component"
+	AdExcept_secNoStateMachine,	"No state machine specified"
 	AdExcept_secPacketTooLong,	"Packet too long"
 	AdExcept_secBadFileList,	"Bad format in file list"
 	AdExcept_secNoSearchMask,	"No search mask specified during transmit"
@@ -2314,12 +2280,12 @@ BEGIN
 	AdExcept_secProtocolError,	"Unrecoverable event during protocol"
 	AdExcept_secTooManyErrors,	"Too many errors during protocol"
 	AdExcept_secSequenceError,	"Block sequence error in Xmodem"
-	AdExcept_sfpAnswer,	"Answering incoming call"
-	AdExcept_sfpIncoming,	"Incoming call validated as fax"
-	AdExcept_sfpGetPage,	"Getting page data"
-	AdExcept_sfpGetPageResult,	"Getting end-of-page signal"
-	AdExcept_sfpCheckMorePages,	"Getting end-of-document status"
-	AdExcept_sfpGetHangup,	"Getting hangup command"
+	AdExcept_secNoFilename,	"No filename specified in protocol receive"
+	AdExcept_secFileRejected,	"File was rejected"
+	AdExcept_secCantWriteFile,	"Cant write file"
+	AdExcept_secTableFull,	"Kermit window table is full, fatal error"
+	AdExcept_secAbortNoCarrier,	"Aborting due to carrier loss"
+	AdExcept_secBadProtocolFunction,	"Function not supported by protocol"
 	AdExcept_sfpGotHangup,	"Got Class 2 FHNG code"
 	AdExcept_sfpSwitchModes,	"Switching modes"
 	AdExcept_sfpMonitorEnabled,	"Monitoring for incoming faxes"
@@ -2330,12 +2296,12 @@ BEGIN
 	AdExcept_sfpFinished,	"Finished"
 	AdExcept_secNoMoreTriggers,	"No more trigger slots"
 	AdExcept_secTriggerTooLong,	"Data trigger too long"
-	AdExcept_spsWaitAck,	"Waiting for B+ ACK"
-	AdExcept_spsNoHeader,	""
-	AdExcept_spsGotHeader,	""
-	AdExcept_spsGotData,	""
-	AdExcept_spsNoData,	""
-	AdExcept_spsAbort,	""
+	AdExcept_secBadTriggerHandle,	"Bad trigger handle"
+	AdExcept_secStartStringEmpty,	"Start string is empty"
+	AdExcept_secPacketTooSmall,	"Packet size cannot be smaller than start string"
+	AdExcept_secNoEndCharCount,	"CharCount packets must have an end-condition"
+	AdExcept_secEmptyEndString,	"End string is empty"
+	AdExcept_secZeroSizePacket,	"Packet size cannot be zero"
 	AdExcept_sfpInitModem,	"Initializing modem for fax processing"
 	AdExcept_sfpDialing,	"Dialing"
 	AdExcept_sfpBusyWait,	"Busy, waiting until redial..."
@@ -2346,12 +2312,12 @@ BEGIN
 	AdExcept_sfpConnecting,	"Connecting..."
 	AdExcept_sfpWaiting,	"Waiting for incoming call"
 	AdExcept_sfpNoConnect,	"No connect on this call"
-	AdExcept_spsTimeout,	"Time out in protocol"
-	AdExcept_spsBlockCheckError,	"Bad checksum or CRC"
-	AdExcept_spsLongPacket,	"Block too long"
-	AdExcept_spsDuplicateBlock,	"Duplicate block received and ignored "
-	AdExcept_spsProtocolError,	"Error in protocol"
-	AdExcept_spsCancelRequested,	"Cancel requested"
+	AdExcept_sfpAnswer,	"Answering incoming call"
+	AdExcept_sfpIncoming,	"Incoming call validated as fax"
+	AdExcept_sfpGetPage,	"Getting page data"
+	AdExcept_sfpGetPageResult,	"Getting end-of-page signal"
+	AdExcept_sfpCheckMorePages,	"Getting end-of-document status"
+	AdExcept_sfpGetHangup,	"Getting hangup command"
 	AdExcept_spsEndFile,	"At end of file"
 	AdExcept_spsResumeBad,	"B+ host refused resume request"
 	AdExcept_spsSequenceError,	"Block was out of sequence"
@@ -2362,12 +2328,12 @@ BEGIN
 	AdExcept_spsGotCrcQ,	"Got CrcQ packet (Zmodem)"
 	AdExcept_spsTryResume,	"B+ is trying to resume a download"
 	AdExcept_spsHostResume,	"B+ host is resuming"
-	AdExcept_sTAPS_LOGINFAIL,	"Login Fail"
-	AdExcept_sTAPS_MSGOKTOSEND,	"Message Ok To Send"
-	AdExcept_sTAPS_SENDINGMSG,	"Sending Message"
-	AdExcept_sTAPS_MSGACK,	"Message Acknowledged"
-	AdExcept_sTAPS_MSGNAK,	"Message Not Acknowledged"
-	AdExcept_sTAPS_MSGRS,	"Message Error"
+	AdExcept_spsWaitAck,	"Waiting for B+ ACK"
+	AdExcept_spsNoHeader,	""
+	AdExcept_spsGotHeader,	""
+	AdExcept_spsGotData,	""
+	AdExcept_spsNoData,	""
+	AdExcept_spsAbort,	""
 	AdExcept_sTAPS_MSGCOMPLETED,	"Message Completed"
 	AdExcept_sTAPS_DONE,	"Done"
 	AdExcept_spsOK,	"OK"
@@ -2378,12 +2344,12 @@ BEGIN
 	AdExcept_spsSkipFile,	"File skipped"
 	AdExcept_spsFileDoesntExist,	"File doesn't exist locally, skipped"
 	AdExcept_spsCantWriteFile,	"File skipped "
-	AdExcept_sPDS_WAITFORCONNECT,	"Wait For Connect"
-	AdExcept_sPDS_CONNECTED,	"Connected"
-	AdExcept_sPDS_WAITINGTOREDIAL,	"Waiting To Redial"
-	AdExcept_sPDS_REDIALING,	"Redialing"
-	AdExcept_sPDS_MSGNOTSENT,	"Message Not Sent"
-	AdExcept_sPDS_CANCELLING,	"Cancelling"
+	AdExcept_spsTimeout,	"Time out in protocol"
+	AdExcept_spsBlockCheckError,	"Bad checksum or CRC"
+	AdExcept_spsLongPacket,	"Block too long"
+	AdExcept_spsDuplicateBlock,	"Duplicate block received and ignored "
+	AdExcept_spsProtocolError,	"Error in protocol"
+	AdExcept_spsCancelRequested,	"Cancel requested"
 	AdExcept_sPDS_DISCONNECT,	"Disconnect"
 	AdExcept_sPDS_CLEANUP,	"Cleanup"
 	AdExcept_sPDE_NONE,	""
@@ -2394,12 +2360,12 @@ BEGIN
 	AdExcept_sTAPS_LOGINPROMPT,	"Login Prompt"
 	AdExcept_sTAPS_LOGGEDIN,	"Logged In"
 	AdExcept_sTAPS_LOGINERR,	"Login Error"
-	AdExcept_scsWaitForCallback,	"WaitForCallback"
-	AdExcept_scsProjected,	"Projected"
-	AdExcept_scsStartAuthentication,	"StartAuthentication"
-	AdExcept_scsCallbackComplete,	"CallbackComplete"
-	AdExcept_scsLogonNetwork,	"LogonNetwork"
-	AdExcept_scsSubEntryConnected,	"SubEntryConnected"
+	AdExcept_sTAPS_LOGINFAIL,	"Login Fail"
+	AdExcept_sTAPS_MSGOKTOSEND,	"Message Ok To Send"
+	AdExcept_sTAPS_SENDINGMSG,	"Sending Message"
+	AdExcept_sTAPS_MSGACK,	"Message Acknowledged"
+	AdExcept_sTAPS_MSGNAK,	"Message Not Acknowledged"
+	AdExcept_sTAPS_MSGRS,	"Message Error"
 	AdExcept_scsSubEntryDisconnected,	"SubEntryDisconnected"
 	AdExcept_scsRasInteractive,	"Interactive"
 	AdExcept_scsRasRetryAuthentication,	"RetryAuthentication"
@@ -2410,12 +2376,12 @@ BEGIN
 	AdExcept_sPDS_OFFHOOK,	"Off Hook"
 	AdExcept_sPDS_DIALING,	"Dialing"
 	AdExcept_sPDS_RINGING,	"Ringing"
-	AdExcept_scsPortOpened,	"PortOpened"
-	AdExcept_scsConnectDevice,	"ConnectDevice"
-	AdExcept_scsDeviceConnected,	"DeviceConnected"
-	AdExcept_scsAllDevicesConnected,	"AllDevicesConnected"
-	AdExcept_scsAuthenticate,	"Authenticate"
-	AdExcept_scsAuthNotify,	"AuthNotify"
+	AdExcept_sPDS_WAITFORCONNECT,	"Wait For Connect"
+	AdExcept_sPDS_CONNECTED,	"Connected"
+	AdExcept_sPDS_WAITINGTOREDIAL,	"Waiting To Redial"
+	AdExcept_sPDS_REDIALING,	"Redialing"
+	AdExcept_sPDS_MSGNOTSENT,	"Message Not Sent"
+	AdExcept_sPDS_CANCELLING,	"Cancelling"
 	AdExcept_scsAuthRetry,	"AuthRetry"
 	AdExcept_scsAuthCallback,	"AuthCallback"
 	AdExcept_scsAuthChangePassword,	"AuthChangePassword"
@@ -2426,12 +2392,12 @@ BEGIN
 	AdExcept_scsAuthenticated,	"Authenticated"
 	AdExcept_scsPrepareForCallback,	"PrepareForCallback"
 	AdExcept_scsWaitForModemReset,	"WaitForModemReset"
-	AdExcept_sdddCycling,	"Cycling dial attempt . . ."
-	AdExcept_sdddRetryWaiting,	"Waiting . . ."
-	AdExcept_sdddRetryWaitOver,	"Wait complete, redialing . . ."
-	AdExcept_sdddDialing,	"Dialing . . ."
-	AdExcept_sdddModemConnect,	"Modem connected!"
-	AdExcept_sdddModemConnectAt,	"Connected at %d baud"
+	AdExcept_scsWaitForCallback,	"WaitForCallback"
+	AdExcept_scsProjected,	"Projected"
+	AdExcept_scsStartAuthentication,	"StartAuthentication"
+	AdExcept_scsCallbackComplete,	"CallbackComplete"
+	AdExcept_scsLogonNetwork,	"LogonNetwork"
+	AdExcept_scsSubEntryConnected,	"SubEntryConnected"
 	AdExcept_sdddModemVoice,	"Connection Result: Remote answered with voice"
 	AdExcept_sdddModemError,	"Connection Result: Modem return an error"
 	AdExcept_sdddModemNoCarrier,	"Connection Result: No carrier, connection failed"
@@ -2442,12 +2408,12 @@ BEGIN
 	AdExcept_sdpeMustEnterNumber,	"You must enter a phone number"
 	AdExcept_sdpeNameExists,	"A phonebook entry with that name already exists"
 	AdExcept_scsOpenPort,	"OpenPort"
-	AdExcept_secInvalidFile,	"Invalid modemcap file"
-	AdExcept_spbeDeleteQuery,	"Are you sure you want to delete this entry?"
-	AdExcept_sdsmMsgBase,	""
-	AdExcept_sdsmMsgReady,	"Ready"
-	AdExcept_sdsmMsgInitialize,	"Initializing modem"
-	AdExcept_sdsmMsgInitializeTimeout,	"Initialize timed out"
+	AdExcept_scsPortOpened,	"PortOpened"
+	AdExcept_scsConnectDevice,	"ConnectDevice"
+	AdExcept_scsDeviceConnected,	"DeviceConnected"
+	AdExcept_scsAllDevicesConnected,	"AllDevicesConnected"
+	AdExcept_scsAuthenticate,	"Authenticate"
+	AdExcept_scsAuthNotify,	"AuthNotify"
 	AdExcept_sdsmMsgAutoAnswerBackground,	"AutoAnswer in background"
 	AdExcept_sdsmMsgAutoAnswerWait,	"Waiting for incoming call"
 	AdExcept_sdsmMsgAnswerWait,	"Answering call"
@@ -2458,12 +2424,12 @@ BEGIN
 	AdExcept_sdsmMsgConnected,	"Connected"
 	AdExcept_sdsmMsgHangup,	"Disconnecting"
 	AdExcept_sdsmMsgCancel,	"Canceling"
-	AdExcept_secModemNotDialing,	"Modem is not currently dialing"
-	AdExcept_secNotDialing,	"Dialer is not dialing"
-	AdExcept_secAlreadyDialing,	"Dialer is already dialing"
-	AdExcept_secModemNotResponding,	"Modem is not responding"
-	AdExcept_secModemRejectedCommand,	"Invalid command sent to modem"
-	AdExcept_secModemStatusMismatch,	"Wrong modem status requested"
+	AdExcept_sdddCycling,	"Cycling dial attempt . . ."
+	AdExcept_sdddRetryWaiting,	"Waiting . . ."
+	AdExcept_sdddRetryWaitOver,	"Wait complete, redialing . . ."
+	AdExcept_sdddDialing,	"Dialing . . ."
+	AdExcept_sdddModemConnect,	"Modem connected!"
+	AdExcept_sdddModemConnectAt,	"Connected at %d baud"
 	AdExcept_secDeviceNotSelected,	"Device not selected"
 	AdExcept_secModemDetectedBusy,	"Called number is busy"
 	AdExcept_secModemNoDialtone,	"No dialtone"
@@ -2474,12 +2440,12 @@ BEGIN
 	AdExcept_secMinorSrvErr,	"Minor Server Error"
 	AdExcept_secFatalSrvErr,	"Fatal Server Error"
 	AdExcept_secModemNotFound,	"Modem not found"
-	AdExcept_secNoHandles,	"No more handles, can't open port"
-	AdExcept_secNoTimers,	"No timers available"
-	AdExcept_secNoPortSelected,	"The ComNumber property of the TApdComPort has not been set"
-	AdExcept_secNotOpenedByTapi,	"Comport was not opened by Tapi"
-	AdExcept_secNullApi,	"No device layer specified"
-	AdExcept_secNotSupported,	"Function not supported by driver"
+	AdExcept_secInvalidFile,	"Invalid modemcap file"
+	AdExcept_spbeDeleteQuery,	"Are you sure you want to delete this entry?"
+	AdExcept_sdsmMsgBase,	""
+	AdExcept_sdsmMsgReady,	"Ready"
+	AdExcept_sdsmMsgInitialize,	"Initializing modem"
+	AdExcept_sdsmMsgInitializeTimeout,	"Initialize timed out"
 	AdExcept_secRegisterHandlerFailed,	"EnableCommNotification failed"
 	AdExcept_secPutBlockFail,	"Failed to put entire block"
 	AdExcept_secGetBlockFail,	"Failed to get entire block"
@@ -2490,12 +2456,12 @@ BEGIN
 	AdExcept_secBaseAddressNotSet,	"Base address not set"
 	AdExcept_secModemNotStarted,	"StartModem has not been called"
 	AdExcept_secModemBusy,	"Modem is busy elsewhere"
-	AdExcept_secBadArgument,	"Bad argument passed to function"
-	AdExcept_secGotQuitMsg,	"Got quit message"
-	AdExcept_secBufferTooBig,	"Terminal buffer greater than 65521"
-	AdExcept_secPortNotAssigned,	"ComPort component not assigned"
-	AdExcept_secInternal,	"Internal error creating window class"
-	AdExcept_secModemNotAssigned,	"Modem component not assigned"
+	AdExcept_secModemNotDialing,	"Modem is not currently dialing"
+	AdExcept_secNotDialing,	"Dialer is not dialing"
+	AdExcept_secAlreadyDialing,	"Dialer is already dialing"
+	AdExcept_secModemNotResponding,	"Modem is not responding"
+	AdExcept_secModemRejectedCommand,	"Invalid command sent to modem"
+	AdExcept_secModemStatusMismatch,	"Wrong modem status requested"
 	AdExcept_secPhonebookNotAssigned,	"Phonebook component not assigned"
 	AdExcept_secCannotUseWithWinSock,	"Component not compatible with WinSock"
 	AdExcept_secBadId,	"ie_BadId - Specified comport doesn't exist"
@@ -2506,12 +2472,12 @@ BEGIN
 	AdExcept_secMemory,	"ie_Memory - unable to allocate queues"
 	AdExcept_secCommNotOpen,	"ie_NOpen - device not open"
 	AdExcept_secAlreadyOpen,	"ie_Open - device already open"
-	AdExcept_secNotOpenInput,	"File/device not open for input"
-	AdExcept_secNotOpenOutput,	"File/device not open for output"
-	AdExcept_secWriteProtected,	"Disk is write-protected"
-	AdExcept_secUnknownUnit,	"Unknown disk unit"
-	AdExcept_secDriveNotReady,	"Drive is not ready"
-	AdExcept_secUnknownCommand,	"Unknown command"
+	AdExcept_secNoHandles,	"No more handles, can't open port"
+	AdExcept_secNoTimers,	"No timers available"
+	AdExcept_secNoPortSelected,	"The ComNumber property of the TApdComPort has not been set"
+	AdExcept_secNotOpenedByTapi,	"Comport was not opened by Tapi"
+	AdExcept_secNullApi,	"No device layer specified"
+	AdExcept_secNotSupported,	"Function not supported by driver"
 	AdExcept_secCrcError,	"Data error"
 	AdExcept_secBadStructLen,	"Bad request structure length"
 	AdExcept_secSeekError,	"Seek error"
@@ -2522,12 +2488,12 @@ BEGIN
 	AdExcept_secDeviceRead,	"Device read error"
 	AdExcept_secHardwareFailure,	"General failure"
 	AdExcept_secBadHandle,	"Bad handle passed to com function"
-	OleConst_SNoWindowHandle,	"No es posible obtener el handle para la ventana del control OLE"
-	OleConst_SInvalidLicense,	"La información de licencia para %s es inválida"
-	OleConst_SNotLicensed,	"Información de licencia para %s no encontrada. No puede utilizar éste control en modo de diseño."
-	AdExcept_secOK,	"OK"
-	AdExcept_secFileNotFound,	"File not found"
-	AdExcept_secPathNotFound,	"Path not found"
+	AdExcept_secBadArgument,	"Bad argument passed to function"
+	AdExcept_secGotQuitMsg,	"Got quit message"
+	AdExcept_secBufferTooBig,	"Terminal buffer greater than 65521"
+	AdExcept_secPortNotAssigned,	"ComPort component not assigned"
+	AdExcept_secInternal,	"Internal error creating window class"
+	AdExcept_secModemNotAssigned,	"Modem component not assigned"
 	AdExcept_secTooManyFiles,	"Too many open files"
 	AdExcept_secAccessDenied,	"File access denied"
 	AdExcept_secInvalidHandle,	"Invalid file handle"
@@ -2538,12 +2504,12 @@ BEGIN
 	AdExcept_secDiskFull,	"Disk is full"
 	AdExcept_secNotAssigned,	"File/device not assigned"
 	AdExcept_secNotOpen,	"File/device not open"
-	fib_FalseStr,	"False"
-	SIBFIBEA_SIB_RS_FIB_SET_NATIVEHANDLE,	"SIBfibEventAlerter does not allow you to set the NativeHandle property"
-	SIBFIBEA_SIB_RS_FIB_NO_DATABASE,	"Cannot register events, no database assigned or database not connected"
-	DECConst_sProtectionCircular,	"Circular Protection detected, Protection Object is invalid."
-	DECConst_sStringFormatExists,	"String Format \"%d\" not exists."
-	DECConst_sInvalidStringFormat,	"Input is not an valid %s Format."
+	AdExcept_secNotOpenInput,	"File/device not open for input"
+	AdExcept_secNotOpenOutput,	"File/device not open for output"
+	AdExcept_secWriteProtected,	"Disk is write-protected"
+	AdExcept_secUnknownUnit,	"Unknown disk unit"
+	AdExcept_secDriveNotReady,	"Drive is not ready"
+	AdExcept_secUnknownCommand,	"Unknown command"
 	DECConst_sInvalidFormatString,	"Input can not be convert to %s Format."
 	DECConst_sFMT_COPY,	"copy Input to Output"
 	DECConst_sFMT_HEX,	"Hexadecimal"
@@ -2554,12 +2520,12 @@ BEGIN
 	DECConst_sInvalidKeySize,	"Length from Encryptionkey is invalid.\r\nKeysize for %s must be to %d-%d bytes"
 	DECConst_sNotInitialized,	"%s is not initialized call Init() or InitKey() before."
 	OleConst_SCannotActivate,	"Falló la activación del control OLE"
-	FIBConsts_SFIBErrorCircularLinks,	"Circular link is not allowed."
-	FIBConsts_SFIBErrorParamNotExist,	"Parameter \"%s\" does not exist in %s"
-	FIBConsts_SFIBErrorWideStringValueTooLong,	"%s. Value for WideString Parameter \"%s\" too long"
-	FIBConsts_SFIBErrorEOFInComments,	"EOF in comment detected"
-	FIBConsts_SFIBErrorEOFInString,	"EOF in string detected"
-	FIBConsts_SFIBErrorParamNameExpected,	"Parameter name expected"
+	OleConst_SNoWindowHandle,	"No es posible obtener el handle para la ventana del control OLE"
+	OleConst_SInvalidLicense,	"La información de licencia para %s es inválida"
+	OleConst_SNotLicensed,	"Información de licencia para %s no encontrada. No puede utilizar éste control en modo de diseño."
+	AdExcept_secOK,	"OK"
+	AdExcept_secFileNotFound,	"File not found"
+	AdExcept_secPathNotFound,	"Path not found"
 	FIBConsts_SFIBErrorNotDataSet,	"%s is not TpFIBDataSet"
 	FIBConsts_SFIBErrorAbortUpdates,	"User abort apply updates for %s %s"
 	FIBConsts_SFIBErrorUnableGetRecordCount,	"%s unable to get number of records"
@@ -2570,12 +2536,12 @@ BEGIN
 	FIBConsts_reVarArrayCreate,	"Unable to create variant array."
 	FIBConsts_SNoTimers,	"Not enough timers available"
 	fib_TrueStr,	"True"
-	FIBConsts_SDBEditUserName,	"&User name"
-	FIBConsts_SDBEditPassword,	"&Password"
-	FIBConsts_SDBEditSQLRole,	"Rol&e"
-	FIBConsts_SLoginDlgLoginCaption,	"Database login"
-	FIBConsts_SLoginDlgDatabase,	"Database:"
-	FIBConsts_SCompEditDataSet_ID,	".DataSet_ID should be greater than 0"
+	fib_FalseStr,	"False"
+	SIBFIBEA_SIB_RS_FIB_SET_NATIVEHANDLE,	"SIBfibEventAlerter does not allow you to set the NativeHandle property"
+	SIBFIBEA_SIB_RS_FIB_NO_DATABASE,	"Cannot register events, no database assigned or database not connected"
+	DECConst_sProtectionCircular,	"Circular Protection detected, Protection Object is invalid."
+	DECConst_sStringFormatExists,	"String Format \"%d\" not exists."
+	DECConst_sInvalidStringFormat,	"Input is not an valid %s Format."
 	FIBConsts_SCompEditDataSetInfoNotExists,	"Table FIB$DATASETS_INFO does not exist."
 	FIBConsts_SCompEditDataSetInfoForbid,	"Can't use FIB$DATASETS_INFO.\r\nurDataSetInfo not included into Database.UseRepositories."
 	FIBConsts_SCompEditUnableInsertInfoRecord,	"Error of inserting new information record"
@@ -2586,12 +2552,12 @@ BEGIN
 	FIBConsts_SFIBErrorNoDBLoginDialog,	"Unable to find Database login dialog. "
 	FIBConsts_SFIBErrorInstallPropertyEditorPackage,	"Please, install package with property editors."
 	FIBConsts_SFIBErrorIncludeDBLoginDialog,	"Please, add FIBDBLoginDlg into USES statement of your project."
-	SIBGlobals_SIB_RS_ALREADY_REGISTERED,	"Events already registered"
-	SIBGlobals_SIB_RS_EMPTY_STRINGS,	"Can not assign empty strings as events.  "
-	SIBGlobals_SIB_RS_TOO_LONG,	"Some event were longer than %d and were truncated.  "
-	FIBConsts_SCantFindApiProc,	"Can't find procedure %s in %s"
-	FIBConsts_SCantLoadLibrary,	"Can't load library %s "
-	FIBConsts_SUnknownClientLibrary,	"Can't perform operation %s. Unknown client library"
+	FIBConsts_SFIBErrorCircularLinks,	"Circular link is not allowed."
+	FIBConsts_SFIBErrorParamNotExist,	"Parameter \"%s\" does not exist in %s"
+	FIBConsts_SFIBErrorWideStringValueTooLong,	"%s. Value for WideString Parameter \"%s\" too long"
+	FIBConsts_SFIBErrorEOFInComments,	"EOF in comment detected"
+	FIBConsts_SFIBErrorEOFInString,	"EOF in string detected"
+	FIBConsts_SFIBErrorParamNameExpected,	"Parameter name expected"
 	FIBConsts_STransactionForOtherLibrary,	"%s.\r\nTransaction can't work with different client library."
 	FIBConsts_SEdErrorPrefix,	"Error of record updating:"
 	FIBConsts_SEdDeadLockMess,	"Deadlock detected"
@@ -2602,12 +2568,12 @@ BEGIN
 	FIBConsts_SDataBaseNotAssigned,	"Database is not assigned"
 	FIBConsts_SOKButton,	"&OK"
 	FIBConsts_SCancelButton,	"&Cancel"
-	ADOConst_SInvalidEnumValue,	"Valor Enum inválido"
-	ADOConst_SMissingConnection,	"Falta Connection o ConnectionString"
-	ADOConst_SNoDetailFilter,	"La propiedad Filter no puede ser utilizada para tablas de detalle"
-	ADOConst_SBookmarksRequired,	"El Dataset no soporta separadores, los cuales son requeridos para controles de datos multiregistros"
-	ADOConst_SMissingCommandText,	"Falta propiedad %s"
-	ADOConst_SNoResultSet,	"COmmandText no devuelve un conjunto de resultados"
+	FIBConsts_SDBEditUserName,	"&User name"
+	FIBConsts_SDBEditPassword,	"&Password"
+	FIBConsts_SDBEditSQLRole,	"Rol&e"
+	FIBConsts_SLoginDlgLoginCaption,	"Database login"
+	FIBConsts_SLoginDlgDatabase,	"Database:"
+	FIBConsts_SCompEditDataSet_ID,	".DataSet_ID should be greater than 0"
 	ADOConst_SADOCreateError,	"Error creando objeto. Por favor verifique que Microsoft Data Access Components 2.1 (o posterior) hayan sido correctamente instalados"
 	ADOConst_SEventsNotSupported,	"Los eventos por parte del servidor no soportan cursores TableDirect"
 	ADOConst_SUsupportedFieldType,	"Tipo de campo no soportado (%s) en el campo %s"
@@ -2618,25 +2584,12 @@ BEGIN
 	ADOConst_sNameAttr,	"Name"
 	ADOConst_sValueAttr,	"Value"
 	SIBGlobals_SIB_RS_NOT_REGISTERED,	"Events not registered"
-	IdResourceStrings_RSSSLLoadingKeyError,	"Could not load key, check password."
-	IdResourceStrings_RSSSLGetMethodError,	"Error geting SSL method."
-	IdResourceStrings_RSSSLDataBindingError,	"Error binding data to SSL socket."
-	IdResourceStrings_RSOSSLModeNotSet,	"Mode has not been set."
-	IdResourceStrings_RSOSSLCouldNotLoadSSLLibrary,	"Could not load SSL library."
-	IdResourceStrings_RSOSSLStatusString,	"SSL status: \"%s\""
-	IdResourceStrings_RSUnevenSizeInDecodeStream,	"Uneven size in DecodeToStream."
-	IdResourceStrings_RSUnevenSizeInEncodeStream,	"Uneven size in Encode."
-	IdResourceStrings_RSHL7StatusStopped,	"Stopped"
-	IdResourceStrings_RSHL7StatusFailedToStop,	"Failed to Stop: %s"
-	IdResourceStrings_RSHL7NotWhileWorking,	"You cannot set %s while the HL7 Component is working"
-	IdResourceStrings_RSHL7AlreadyStopped,	"Interface was already stopped"
-	IdResourceStrings_RSHL7ClientThreadNotStopped,	"Unable to stop client thread"
-	IdResourceStrings_RSURINoProto,	"Protocol field is empty"
-	IdResourceStrings_RSURINoHost,	"Host field is empty"
-	IdResourceStrings_RSThreadTerminateAndWaitFor,	"Cannot call TerminateAndWaitFor on FreeAndTerminate threads"
-	IdResourceStrings_RSSocksAuthMethodError,	"Invalid socks authentication method."
-	IdResourceStrings_RSSocksAuthError,	"Authentication error to socks server."
-	IdResourceStrings_RSSocksServerGeneralError,	"General SOCKS server failure."
+	SIBGlobals_SIB_RS_ALREADY_REGISTERED,	"Events already registered"
+	SIBGlobals_SIB_RS_EMPTY_STRINGS,	"Can not assign empty strings as events.  "
+	SIBGlobals_SIB_RS_TOO_LONG,	"Some event were longer than %d and were truncated.  "
+	FIBConsts_SCantFindApiProc,	"Can't find procedure %s in %s"
+	FIBConsts_SCantLoadLibrary,	"Can't load library %s "
+	FIBConsts_SUnknownClientLibrary,	"Can't perform operation %s. Unknown client library"
 	IdResourceStrings_RSSocksServerPermissionError,	"Connection not allowed by ruleset."
 	IdResourceStrings_RSSocksServerNetUnreachableError,	"Network unreachable."
 	IdResourceStrings_RSSocksServerHostUnreachableError,	"Host unreachable."
@@ -2644,15 +2597,15 @@ BEGIN
 	IdResourceStrings_RSSocksServerTTLExpiredError,	"TTL expired."
 	IdResourceStrings_RSSocksServerCommandError,	"Command not supported."
 	IdResourceStrings_RSSocksServerAddressError,	"Address type not supported."
-	IdResourceStrings_RSSSLAcceptError,	"Error accepting connection with SSL."
-	IdResourceStrings_RSSSLConnectError,	"Error connecting with SSL."
-	IdResourceStrings_RSSSLSettingCipherError,	"SetCipher failed."
-	IdResourceStrings_RSSSLCreatingContextError,	"Error creating SSL context."
-	IdResourceStrings_RSSSLLoadingRootCertError,	"Could not load root certificate."
-	IdResourceStrings_RSSSLLoadingCertError,	"Could not load certificate."
-	IdResourceStrings_RSStackENOTCONN,	"Socket is not connected."
-	IdResourceStrings_RSStackESHUTDOWN,	"Cannot send or receive after socket is closed."
-	IdResourceStrings_RSStackETOOMANYREFS,	"Too many references, cannot splice."
+	IdResourceStrings_RSUnevenSizeInDecodeStream,	"Uneven size in DecodeToStream."
+	IdResourceStrings_RSUnevenSizeInEncodeStream,	"Uneven size in Encode."
+	IdResourceStrings_RSThreadTerminateAndWaitFor,	"Cannot call TerminateAndWaitFor on FreeAndTerminate threads"
+	ADOConst_SInvalidEnumValue,	"Valor Enum inválido"
+	ADOConst_SMissingConnection,	"Falta Connection o ConnectionString"
+	ADOConst_SNoDetailFilter,	"La propiedad Filter no puede ser utilizada para tablas de detalle"
+	ADOConst_SBookmarksRequired,	"El Dataset no soporta separadores, los cuales son requeridos para controles de datos multiregistros"
+	ADOConst_SMissingCommandText,	"Falta propiedad %s"
+	ADOConst_SNoResultSet,	"COmmandText no devuelve un conjunto de resultados"
 	IdResourceStrings_RSStackETIMEDOUT,	"Connection timed out."
 	IdResourceStrings_RSStackECONNREFUSED,	"Connection refused."
 	IdResourceStrings_RSStackELOOP,	"Too many levels of symbolic links."
@@ -2666,9 +2619,9 @@ BEGIN
 	IdResourceStrings_RSSocksRequestIdentFailed,	"Request rejected because the client program and identd report different user-ids."
 	IdResourceStrings_RSSocksUnknownError,	"Unknown socks error."
 	IdResourceStrings_RSSocksServerRespondError,	"Socks server did not respond."
-	IdResourceStrings_RSStackEPROTOTYPE,	"Protocol wrong type for socket."
-	IdResourceStrings_RSStackENOPROTOOPT,	"Bad protocol option."
-	IdResourceStrings_RSStackEPROTONOSUPPORT,	"Protocol not supported."
+	IdResourceStrings_RSSocksAuthMethodError,	"Invalid socks authentication method."
+	IdResourceStrings_RSSocksAuthError,	"Authentication error to socks server."
+	IdResourceStrings_RSSocksServerGeneralError,	"General SOCKS server failure."
 	IdResourceStrings_RSStackESOCKTNOSUPPORT,	"Socket type not supported."
 	IdResourceStrings_RSStackEOPNOTSUPP,	"Operation not supported on socket."
 	IdResourceStrings_RSStackEPFNOSUPPORT,	"Protocol family not supported."
@@ -2682,9 +2635,9 @@ BEGIN
 	IdResourceStrings_RSStackECONNRESET,	"Connection reset by peer."
 	IdResourceStrings_RSStackENOBUFS,	"No buffer space available."
 	IdResourceStrings_RSStackEISCONN,	"Socket is already connected."
-	IdResourceStrings_RSHTTPCannotSwitchSessionStateWhenActive,	"Cannot change session state when the server is active."
-	IdResourceStrings_RSHTTPAuthAlreadyRegistered,	"This authentication method is already registered with class name %s."
-	IdResourceStrings_RSInvalidServiceName,	"%s is not a valid service."
+	IdResourceStrings_RSStackENOTCONN,	"Socket is not connected."
+	IdResourceStrings_RSStackESHUTDOWN,	"Cannot send or receive after socket is closed."
+	IdResourceStrings_RSStackETOOMANYREFS,	"Too many references, cannot splice."
 	IdResourceStrings_RSStackError,	"Socket Error # %d\r\n%s"
 	IdResourceStrings_RSStackEINTR,	"Interrupted system call."
 	IdResourceStrings_RSStackEBADF,	"Bad file number."
@@ -2698,9 +2651,9 @@ BEGIN
 	IdResourceStrings_RSStackENOTSOCK,	"Socket operation on non-socket."
 	IdResourceStrings_RSStackEDESTADDRREQ,	"Destination address required."
 	IdResourceStrings_RSStackEMSGSIZE,	"Message too long."
-	IdResourceStrings_RSHTTPGone,	"Gone"
-	IdResourceStrings_RSHTTPLengthRequired,	"Length Required"
-	IdResourceStrings_RSHTTPPreconditionFailed,	"Precondition Failed"
+	IdResourceStrings_RSStackEPROTOTYPE,	"Protocol wrong type for socket."
+	IdResourceStrings_RSStackENOPROTOOPT,	"Bad protocol option."
+	IdResourceStrings_RSStackEPROTONOSUPPORT,	"Protocol not supported."
 	IdResourceStrings_RSHTTPRequestEntityToLong,	"Request Entity To Long"
 	IdResourceStrings_RSHTTPRequestURITooLong,	"Request-URI Too Long. 256 Chars max"
 	IdResourceStrings_RSHTTPUnsupportedMediaType,	"Unsupported Media Type"
@@ -2714,9 +2667,9 @@ BEGIN
 	IdResourceStrings_RSHTTPHeaderAlreadyWritten,	"Header has already been written."
 	IdResourceStrings_RSHTTPErrorParsingCommand,	"Error in parsing command."
 	IdResourceStrings_RSHTTPUnsupportedAuthorisationScheme,	"Unsupported authorization scheme."
-	IdResourceStrings_RSHTTPResetContent,	"Reset Content"
-	IdResourceStrings_RSHTTPPartialContent,	"Partial Content"
-	IdResourceStrings_RSHTTPMovedPermanently,	"Moved Permanently"
+	IdResourceStrings_RSHTTPCannotSwitchSessionStateWhenActive,	"Cannot change session state when the server is active."
+	IdResourceStrings_RSHTTPAuthAlreadyRegistered,	"This authentication method is already registered with class name %s."
+	IdResourceStrings_RSInvalidServiceName,	"%s is not a valid service."
 	IdResourceStrings_RSHTTPMovedTemporarily,	"Moved Temporarily"
 	IdResourceStrings_RSHTTPSeeOther,	"See Other"
 	IdResourceStrings_RSHTTPNotModified,	"Not Modified"
@@ -2730,8 +2683,9 @@ BEGIN
 	IdResourceStrings_RSHTTPProxyAuthenticationRequired,	"Proxy Authentication Required"
 	IdResourceStrings_RSHTTPRequestTimeout,	"Request Timeout"
 	IdResourceStrings_RSHTTPConflict,	"Conflict"
-	IdResourceStrings_RSMIMEMIMETypeEmpty,	"Mimetype is empty"
-	IdResourceStrings_RSMIMEMIMEExtAlreadyExists,	"Extension already exits"
+	IdResourceStrings_RSHTTPGone,	"Gone"
+	IdResourceStrings_RSHTTPLengthRequired,	"Length Required"
+	IdResourceStrings_RSHTTPPreconditionFailed,	"Precondition Failed"
 	IdResourceStrings_RSStatusResolving,	"Resolving hostname %s."
 	IdResourceStrings_RSStatusConnecting,	"Connecting to %s."
 	IdResourceStrings_RSStatusConnected,	"Connected."
@@ -2739,16 +2693,16 @@ BEGIN
 	IdResourceStrings_RSStatusDisconnected,	"Disconnected."
 	IdResourceStrings_RSStatusText,	"%s"
 	IdResourceStrings_RSConnectTimeout,	"Connect timed out."
-	IdResourceStrings_RSHTTPChunkStarted,	"Chunk Started"
 	IdResourceStrings_RSHTTPContinue,	"Continue"
 	IdResourceStrings_RSHTTPOK,	"OK"
 	IdResourceStrings_RSHTTPCreated,	"Created"
 	IdResourceStrings_RSHTTPAccepted,	"Accepted"
 	IdResourceStrings_RSHTTPNonAuthoritativeInformation,	"Non-authoritative Information"
 	IdResourceStrings_RSHTTPNoContent,	"No Content"
-	IdResourceStrings_RSFileNotFound,	"File \"%s\" not found"
+	IdResourceStrings_RSHTTPResetContent,	"Reset Content"
+	IdResourceStrings_RSHTTPPartialContent,	"Partial Content"
+	IdResourceStrings_RSHTTPMovedPermanently,	"Moved Permanently"
 	IdResourceStrings_RSOnlyOneAntiFreeze,	"Only one TIdAntiFreeze can exist per application."
-	IdResourceStrings_RSIOHandlerPropInvalid,	"IOHandler value is not valid"
 	IdResourceStrings_RSNotConnected,	"Not Connected"
 	IdResourceStrings_RSObjectTypeNotSupported,	"Object type not supported."
 	IdResourceStrings_RSTerminateThreadTimeout,	"Terminate Thread Timeout"
@@ -2762,6 +2716,8 @@ BEGIN
 	IdResourceStrings_RSWS2CallError,	"Error on call Winsock2 library function %s"
 	IdResourceStrings_RSWS2LoadError,	"Error on loading Winsock2 library (%s)"
 	IdResourceStrings_RSMIMEExtensionEmpty,	"Extension is empty"
+	IdResourceStrings_RSMIMEMIMETypeEmpty,	"Mimetype is empty"
+	IdResourceStrings_RSMIMEMIMEExtAlreadyExists,	"Extension already exits"
 	uRORes_err_ErrorCreatingMsXmlDoc,	"Error creating MSXML Document class\r\r%s: %s"
 	uRORes_err_NoXMLParsersAvailable,	"MSXML is not installed"
 	uRORes_err_IDispatchMarshalingNotSupported,	"Marshaling of IDispatch (%d) type variants is not supported."
@@ -2769,7 +2725,6 @@ BEGIN
 	uRORes_err_VariantIsNotArray,	"Variant must be Array, but is %d"
 	uRORes_err_InvalidVarArrayDimCount,	"Variant Array DimCount must be 1 but is %d"
 	uRORes_err_MessageNotAssigned,	"Message is NIL"
-	IdResourceStrings_RSAlreadyConnected,	"Already connected."
 	IdResourceStrings_RSCannotAllocateSocket,	"Cannot allocate socket."
 	IdResourceStrings_RSConnectionClosedGracefully,	"Connection Closed Gracefully."
 	IdResourceStrings_RSCouldNotBindSocket,	"Could not bind socket. Address and port are already in use."
@@ -2778,6 +2733,7 @@ BEGIN
 	IdResourceStrings_RSWinsockInitializationError,	"Winsock Initialization Error."
 	IdResourceStrings_RSSetSizeExceeded,	"Set Size Exceeded."
 	IdResourceStrings_RSThreadClassNotSpecified,	"Thread Class Not Specified."
+	IdResourceStrings_RSFileNotFound,	"File \"%s\" not found"
 	uRORes_err_ClassFactoryDidNotReturnInstance,	"Class factory did not return an instance of \"%s\""
 	uRORes_err_TypeNotSupported,	"Type \"%s\" not supported"
 	uRORes_err_ClassFactoryNotFound,	"Class factory for interface %s not found"

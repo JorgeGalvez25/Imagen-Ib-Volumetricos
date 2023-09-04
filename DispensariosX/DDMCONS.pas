@@ -622,6 +622,24 @@ type
     AliasConsolaEsts:string;
     GasId  :integer;
 
+    // GILBARCO 2W
+    GtwDivPresetLts,        // Divisor preset litros           **
+    GtwDivPresetPesos,      // Divisor preset pesos            **
+
+    GtwDivPrecio,           // Divisor precio para lecturas y cambio de precios       **
+    GtwDivImporte,          // Divisor importe para lecturas y ventas                 **
+    GtwDivLitros,           // Divisor litros para ventas                             **
+
+    GtwDivTotLts,           // Divisor totales litros     **
+    GtwDivTotImporte,       // Divisor totales pesos      **
+
+    GtwTimeOut,             // Timeout miliseg
+    GtwTiempoCmnd :integer; // Tiempo entre comandos miliseg
+
+    // KAIROS
+    GtwKairosFrec :integer; // Frecuencia Kairos
+
+
     // DECLARACION VARIABLES
     MinutosReinicioTanques,
     CortesPorDia        :integer;
@@ -651,6 +669,7 @@ type
     Inocuidad31FechaVence,
     TipoClb,
     GuardaLogEntradaTanques,
+    CierraBD,
     ValorDispensarios           :String;
     FlujoPorVehiculo            :string;
     MaximoPresetPam,
@@ -664,13 +683,14 @@ type
     MaxRegCmnd,
     ValorHongYang,
     BennettReintentosPreset,
+    PosTarjeta2,
     ModoAutorizaBennett                :Integer;
     ValorTeam,
     ValorTeam1,
     ValorTeam2,
     ValorTeam3,
-    ModoAutorizaPAM,
-    PosTarjeta2                        :Integer;
+    ModoAutorizaPAM                :Integer;
+    TresDecimTotTeam,
     WayneFusion,
     MapeoFusion,
     WayneFusionNivelPrecio,
@@ -678,19 +698,17 @@ type
     BennettOmitirComandoF,
     BennettPresetExtendido,
     BennettPararVentaCompleta,
+    Bennett8Digitos,
     BennettProtec,
-    BennettNivelPrecio,
-    UsuarioFDC,
-    UrlFDC,
-    UrlServFDC,
-    ServidorGateway               :string;
+    BennettNivelPrecio               :string;
     // FIN VARIABLES
     TabProtec       :array[1..10] of integer;
     CantProtec,
-    IntervaloFDC,
     PuertoGatewayDisp,
     PuertoGatewayTanq,
     emEstacionServicio            :integer;
+    PreciosInicio           :Boolean;
+    ServidorGateway         :string;
 
     TabComb:array[1..MaxComb] of RegComb;
     PrimeraCarga:boolean;
@@ -719,8 +737,8 @@ type
     FechaHoraComando,
     HoraUltimoCorte,
     xFechaCorte:TDateTime;
-    SwMapOff,
     SwEmular,
+    SwMapOff,
     SwSolicitud:boolean;
     SwChecaVentaTarjeta:boolean;
     FechaUltimoCorte,
@@ -1371,6 +1389,22 @@ begin
   T_EstsIb.active:=true;
   T_EstsIb.Locate('Clave',emEstacionServicio,[]);
   TipoClb:='1';
+                                  
+  // Gilbarco 2W
+  GtwDivPresetLts:=100;
+  GtwDivPresetPesos:=100;
+
+  GtwDivPrecio:=100;
+  GtwDivImporte:=100;
+  GtwDivLitros:=100;
+
+  GtwDivTotLts:=100;
+  GtwDivTotImporte:=100;
+
+  GtwTimeOut:=1000;
+  GtwTiempoCmnd:=100;
+  GtwKairosFrec:=1;
+
   ReconexionesAros:=2;
   ModoPrecioWayne:='2';
   TierLavelWayne:='0';
@@ -1387,6 +1421,7 @@ begin
   InicializaWayne:='Si';
   ValorHongYang:=-1;
   ControlAros:='No';
+  TresDecimTotTeam:='No';
   WayneFusion:='No';
   MapeoFusion:='No';
   WayneFusionNivelPrecio:='2X';
@@ -1406,6 +1441,7 @@ begin
   BennettOmitirComandoF:='Si';
   BennettPresetExtendido:='No';
   BennettPararVentaCompleta:='No';
+  Bennett8Digitos:='No';
   BennettNivelPrecio:='12';
   BennettProtec:='';
   PuertoServicio:='http://127.0.0.1:8199/bin/';
@@ -1418,6 +1454,7 @@ begin
   CodigoSeguridadVeederRoot:='';
   TipoVolumenEntradaTanques:='Bruto';
   SincHoraVeederRoot:='No';
+  CierraBD:='Si';
   GuardaLogEntradaTanques:='No';
   BitacoraTanques:='No';
   MaximoPresetPam:=9999;
@@ -1455,6 +1492,35 @@ begin
         BitacoraTanques:=ExtraeElemStrSep(lin,2,'=');
       if Mayusculas(ss)='VALIDACHECKSUMAUTOSTIK' then
         ValidaCheckSumAutoStik:=ExtraeElemStrSep(lin,2,'=');
+
+      // VARIABLES GILBARCO 2W
+      if Mayusculas(ss)='GTWDIVPRESETLTS' then
+        GtwDivPresetLts:=StrToIntDef(ExtraeElemStrSep(lin,2,'='),100);
+      if Mayusculas(ss)='GTWDIVPRESETPESOS' then
+        GtwDivPresetPesos:=StrToIntDef(ExtraeElemStrSep(lin,2,'='),100);
+
+      if Mayusculas(ss)='GTWDIVPRECIO' then
+        GtwDivPrecio:=StrToIntDef(ExtraeElemStrSep(lin,2,'='),100);
+      if Mayusculas(ss)='GTWDIVIMPORTE' then
+        GtwDivImporte:=StrToIntDef(ExtraeElemStrSep(lin,2,'='),100);
+      if Mayusculas(ss)='GTWDIVLITROS' then
+        GtwDivLitros:=StrToIntDef(ExtraeElemStrSep(lin,2,'='),100);
+
+      if Mayusculas(ss)='GTWDIVTOTLTS' then
+        GtwDivTotLts:=StrToIntDef(ExtraeElemStrSep(lin,2,'='),100);
+      if Mayusculas(ss)='GTWDIVTOTIMPORTE' then
+        GtwDivTotImporte:=StrToIntDef(ExtraeElemStrSep(lin,2,'='),100);
+
+      if Mayusculas(ss)='GTWTIMEOUT' then
+        GtwTimeout:=StrToIntDef(ExtraeElemStrSep(lin,2,'='),1000);
+      if Mayusculas(ss)='GTWTIEMPOCMND' then
+        GtwTiempoCmnd:=StrToIntDef(ExtraeElemStrSep(lin,2,'='),100);
+      if Mayusculas(ss)='GTWKAIROSFREC' then
+        GtwKairosFrec:=StrToIntDef(ExtraeElemStrSep(lin,2,'='),1);
+
+      // VARIABLES TEAM
+      if Mayusculas(ss)='TRESDECIMTOTTEAM' then
+        TresDecimTotTeam:=ExtraeElemStrSep(lin,2,'=');
 
       // VARIABLES WAYNE
       if Mayusculas(ss)='DECIMALESPRESETWAYNE' then
@@ -1523,6 +1589,8 @@ begin
         BennettOmitirComandoF:=ExtraeElemStrSep(lin,2,'=');
       if Mayusculas(ss)='BENNETTPARARVENTACOMPLETA' then
         BennettPararVentaCompleta:=ExtraeElemStrSep(lin,2,'=');
+      if Mayusculas(ss)='BENNETT8DIGITOS' then
+        Bennett8Digitos:=ExtraeElemStrSep(lin,2,'=');
       if Mayusculas(ss)='BENNETTNIVELPRECIO' then begin
         BennettNivelPrecio:=ExtraeElemStrSep(lin,2,'=');
         while length(BennettNivelPrecio)<2 do
@@ -1537,17 +1605,9 @@ begin
           TabProtec[j]:=strtointdef(ExtraeElemStrSep(BennettProtec,j,';'),0);
       end;
 
-      // VARIABLES FUSION
-      if Mayusculas(ss)='USUARIOFDC' then
-        UsuarioFDC:=ExtraeElemStrSep(lin,2,'=');
-      if Mayusculas(ss)='URLFDC' then
-        UrlFDC:=ExtraeElemStrSep(lin,2,'=');
-      if Mayusculas(ss)='URLSERVFDC' then
-        UrlServFDC:=ExtraeElemStrSep(lin,2,'=');
-      if Mayusculas(ss)='INTERVALOFDC' then
-        IntervaloFDC:=StrToIntDef(ExtraeElemStrSep(lin,2,'='),250);
-
       // OTRAS VARIABLES
+      if Mayusculas(ss)='CIERRABD' then
+        CierraBD:=ExtraeElemStrSep(lin,2,'=');
       if Mayusculas(ss)='VALORTEAM' then
         ValorTeam:=StrToIntDef(ExtraeElemStrSep(lin,2,'='),5);
       if Mayusculas(ss)='VALORTEAM1' then
@@ -1585,7 +1645,8 @@ begin
         PuertoGatewayDisp:=StrToInt(ExtraeElemStrSep(lin,2,'='));
       if Mayusculas(ss)='PUERTOGATEWAYTANQ' then
         PuertoGatewayTanq:=StrToInt(ExtraeElemStrSep(lin,2,'='));      
-
+      if Mayusculas(ss)='PRECIOSINICIO' then
+        PreciosInicio:=Mayusculas(ExtraeElemStrSep(lin,2,'='))='SI';
     end;
   finally
     lista.Free;
@@ -1687,7 +1748,7 @@ begin
     TabCmnd[i].SwNuevo:=true;
     TabCmnd[i].Comando:='';
   end;
-  //EjecutaComando('FLUSTD');
+  EjecutaComando('FLUSTD');
   FolioCmnd:=0;
   ThousandSeparator := ',';
   DecimalSeparator := '.';
