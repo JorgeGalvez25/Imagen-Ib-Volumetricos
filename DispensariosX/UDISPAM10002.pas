@@ -1001,7 +1001,10 @@ begin
                        end
                        else if (FluStd) and (SwFlu) then begin
                          with DMCONS do begin
-                           ss:='P'+IntToClaveNum(xpos,2)+'0'+'1'+'000937150';
+                           if VersionPam1000='3' then
+                             ss:='@020'+IntToClaveNum(xpos,2)+'010937150111000'
+                           else
+                             ss:='P'+IntToClaveNum(xpos,2)+'0'+'1'+'000937150';
                            ComandoConsola(ss);
                            EsperaMiliseg(500);
                            ss:='E'+IntToClaveNum(xpos,2);
@@ -1013,7 +1016,10 @@ begin
                        end
                        else if (FluMin) and (SwFlu) then begin
                          with DMCONS do begin
-                           ss:='P'+IntToClaveNum(xpos,2)+'0'+'1'+'000924760';
+                           if VersionPam1000='3' then
+                             ss:='@020'+IntToClaveNum(xpos,2)+'010924760111000'
+                           else
+                             ss:='P'+IntToClaveNum(xpos,2)+'0'+'1'+'000924760';
                            ComandoConsola(ss);
                            EsperaMiliseg(500);
                            ss:='E'+IntToClaveNum(xpos,2);
