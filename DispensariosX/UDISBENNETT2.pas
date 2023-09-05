@@ -1772,25 +1772,6 @@ begin
                       EmularEstatus[2*xpos]:='1';
                     ComandoConsola(ss);
                     TPosCarga[xpos].SwCargaTotales:=true;
-                    try
-                      Q_Auxi.Active:=false;
-                      Q_AuxiEntero1.FieldKind:=fkInternalCalc;
-                      Q_Auxi.SQL.Clear;
-                      Q_Auxi.SQL.Add('Select Max(Folio) as Entero1 from DPVGMOVI');
-                      Q_Auxi.SQL.Add('Where PosCarga='+inttostr(xpos));
-                      Q_Auxi.Active:=true;
-                      if Q_AuxiEntero1.AsInteger>0 then begin
-                        xfolio:=Q_AuxiEntero1.AsInteger;
-                        Q_Auxi.Active:=false;
-                        Q_Auxi.SQL.Clear;
-                        Q_Auxi.SQL.Add('Update DPVGMOVI set tipopago='+inttostr(TPosCarga[xpos].tipopago));
-                        Q_Auxi.SQL.Add('Where Folio='+inttostr(xfolio));
-                        Q_Auxi.ExecSQL;
-                        TPosCarga[xpos].tipopago:=0;
-                      end;
-                    except
-                      DMCONS.AgregaLogCmnd('Se genero una excepcion al intentar modificar el tipo de pago');
-                    end;
                     DespliegaPosCarga(xpos);
                   end
                   else
