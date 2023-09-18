@@ -2231,14 +2231,20 @@ begin
                       xPosStop2:=PosTarjeta2;
                   end;
                   if ValorPAM1<>'' then begin
-                    ss:='P'+IntToClaveNum(xposstop,2)+'0'+'1'+'000'+ValorPAM1+'0';
+                    if VersionPam1000='3' then
+                      ss:='@020'+IntToClaveNum(xposstop,2)+'010'+ValorPAM1+'111000'
+                    else
+                      ss:='P'+IntToClaveNum(xposstop,2)+'0'+'1'+'000'+ValorPAM1+'0';
                     ComandoConsola(ss);
                     EsperaMiliseg(500);
                     ss:='E'+IntToClaveNum(xposstop,2);
                     ComandoConsola(ss);
                     EsperaMiliseg(500);
                     if PosTarjeta2>0 then begin
-                      ss:='P'+IntToClaveNum(xPosStop2,2)+'0'+'1'+'000'+ValorPAM1+'0';
+                      if VersionPam1000='3' then
+                        ss:='@020'+IntToClaveNum(xPosStop2,2)+'010'+ValorPAM1+'111000'
+                      else
+                        ss:='P'+IntToClaveNum(xPosStop2,2)+'0'+'1'+'000'+ValorPAM1+'0';
                       ComandoConsola(ss);
                       EsperaMiliseg(500);
                       ss:='E'+IntToClaveNum(xPosStop2,2);
@@ -2256,7 +2262,10 @@ begin
                   until (xpos>MaxPosCarga)or((xPosStop2>0));
                   if xposstop2>0 then begin
                     if ValorPAM2<>'' then begin
-                      ss:='P'+IntToClaveNum(xposstop2,2)+'0'+'1'+'000'+ValorPAM2+'0';
+                      if VersionPam1000='3' then
+                        ss:='@020'+IntToClaveNum(xposstop2,2)+'010'+ValorPAM2+'111000'
+                      else
+                        ss:='P'+IntToClaveNum(xposstop2,2)+'0'+'1'+'000'+ValorPAM2+'0';
                       ComandoConsola(ss);
                       EsperaMiliseg(500);
                       ss:='E'+IntToClaveNum(xposstop2,2);
@@ -2338,14 +2347,20 @@ begin
                       xPosStop2:=PosTarjeta2;
                   end;
                   if ValorPAM1<>'' then begin
-                    ss:='P'+IntToClaveNum(xposstop,2)+'0'+'1'+'000'+ValorPam1+'0';
+                    if VersionPam1000='3' then
+                      ss:='@020'+IntToClaveNum(xposstop,2)+'010'+ValorPAM1+'111000'
+                    else
+                      ss:='P'+IntToClaveNum(xposstop,2)+'0'+'1'+'000'+ValorPAM1+'0';
                     ComandoConsola(ss);
                     EsperaMiliseg(500);
                     ss:='E'+IntToClaveNum(xPosStop,2);
                     ComandoConsola(ss);
                     EsperaMiliseg(500);
                     if PosTarjeta2>0 then begin
-                      ss:='P'+IntToClaveNum(xPosStop2,2)+'0'+'1'+'000'+ValorPAM1+'0';
+                      if VersionPam1000='3' then
+                        ss:='@020'+IntToClaveNum(xPosStop2,2)+'010'+ValorPAM1+'111000'
+                      else
+                        ss:='P'+IntToClaveNum(xPosStop2,2)+'0'+'1'+'000'+ValorPAM1+'0';
                       ComandoConsola(ss);
                       EsperaMiliseg(500);
                       ss:='E'+IntToClaveNum(xPosStop2,2);
