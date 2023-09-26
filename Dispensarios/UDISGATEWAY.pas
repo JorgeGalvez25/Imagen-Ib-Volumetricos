@@ -1898,6 +1898,7 @@ begin
     SwEsperaRsp:=primeraRespuesta;
   except
     DMCONS.AgregaLog('ERROR CON SOCKET');
+    Socket1.Active:=False;
     Button1Click(nil);
   end;
 end;
