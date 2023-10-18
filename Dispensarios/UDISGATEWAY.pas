@@ -160,6 +160,7 @@ type
        estatusant:integer;
        NoComb   :integer; // Cuantos combustibles hay en la posicion
        TComb    :array[1..MCxP] of integer; // Claves de los combustibles
+       TCombx   :array[1..MCxP] of integer; // Clave real de los combustibles
        TPosx      :array[1..MCxP] of integer;
        TDiga    :array[1..MCxP] of integer;
        TDigvol    :array[1..MCxP] of integer;
@@ -357,6 +358,7 @@ begin
       TL_Bomb.Next;
     end;
     // FIN
+    TL_Tcmb.Active:=True;
     Q_BombIb.First;
     while not Q_BombIb.Eof do begin
       xisla:=Q_BombIbIsla.asinteger;
@@ -384,6 +386,8 @@ begin
           if not existe then begin
             inc(NoComb);
             TComb[NoComb]:=xcomb;
+            TL_Tcmb.Locate('CLAVE',xcomb,[]);
+            TCombx[NoComb]:=TL_TcmbCON_PRODUCTOPRECIO.AsInteger;
             if (xcomb=3) then
               esDiesel:=True;
             if Q_BombIbCon_Posicion.AsInteger>0 then
@@ -1897,9 +1901,11 @@ begin
     Socket1.Socket.SendText(s1);
     SwEsperaRsp:=primeraRespuesta;
   except
-    DMCONS.AgregaLog('ERROR CON SOCKET');
-    Socket1.Active:=False;
-    Button1Click(nil);
+    on e:Exception do begin
+      DMCONS.AgregaLog('ERROR CON SOCKET: '+e.Message);
+      Socket1.Active:=False;
+      Button1Click(nil);
+    end;
   end;
 end;
 
@@ -2165,9 +2171,9 @@ begin
         if xcomb>0 then begin // un producto
           if TComb[xc]=xcomb then
             if xp in [1..6] then
-              xprodauto[xcomb]:='1';
+              xprodauto[TCombx[xc]]:='1';
         end
-        else xprodauto[xp]:='1';
+        else xprodauto[TCombx[xc]]:='1';
       end;
     end;
     if TPosCarga[xpos].FinVenta=1 then
@@ -2506,11 +2512,16 @@ begin
         LineaTimer:='';
       end
       else SwEspera:=true;
-    finally
-      Timer1.Enabled:=true;
+    except
+      on e:Exception do begin
+        DMCONS.AgregaLog('ERROR LECTURA PUERTO: '+e.Message);
+        Socket1.Active:=false;
+        Button1Click(nil);
+      end;
     end;
-  except
-    DMCONS.AgregaLog('ERROR LECTURA PUERTO');
+  finally
+    primeraRespuesta:=False;
+    Timer1.Enabled:=true;
   end;
 end;
 
