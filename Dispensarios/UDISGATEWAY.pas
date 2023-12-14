@@ -72,6 +72,7 @@ type
     Image1: TImage;
     NotificationIcon1: TRxTrayIcon;
     StaticText8: TStaticText;
+    TL_TcmbIDPRODUCTOOG: TIntegerField;
     procedure FormShow(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
@@ -387,7 +388,7 @@ begin
             inc(NoComb);
             TComb[NoComb]:=xcomb;
             TL_Tcmb.Locate('CLAVE',xcomb,[]);
-            TCombx[NoComb]:=TL_TcmbCON_PRODUCTOPRECIO.AsInteger;
+            TCombx[NoComb]:=TL_TcmbIDPRODUCTOOG.AsInteger;
             if (xcomb=3) then
               esDiesel:=True;
             if Q_BombIbCon_Posicion.AsInteger>0 then
@@ -1120,11 +1121,17 @@ begin
              if (xpos in [1..maxposcarga]) then begin
                with TPosCarga[xpos] do begin
                  xgrade:=lin[8];
-                 for i:=1 to nocomb do if IntToStr(TComb[i])=xgrade then begin
-                   SwTotales[i]:=false;
-                   TotalLitros[i]:=StrToFloat(copy(lin,9,10))/100;
-                   DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
-                   DespliegaPosCarga(xpos,true);
+                 for i:=1 to nocomb do begin
+                   if UpperCase(DMCONS.ProdOGTotals)='SI' then
+                     xcomb:=TCombx[i]
+                   else
+                     xcomb:=TComb[i];
+                   if IntToStr(xcomb)=xgrade then begin
+                     SwTotales[i]:=false;
+                     TotalLitros[i]:=StrToFloat(copy(lin,9,10))/100;
+                     DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
+                     DespliegaPosCarga(xpos,true);
+                   end;
                  end;
                  if nocomb=1 then begin
                    for i:=1 to 4 do
@@ -1132,27 +1139,45 @@ begin
                  end
                  else if nocomb>=2 then begin
                    xgrade:=lin[37];
-                   for i:=1 to nocomb do if IntToStr(TComb[i])=xgrade then begin
-                     SwTotales[i]:=false;
-                     TotalLitros[i]:=StrToFloat(copy(lin,38,10))/100;
-                     DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
-                     DespliegaPosCarga(xpos,true);
-                   end;
-                   if nocomb>=3 then begin
-                     xgrade:=lin[66];
-                     for i:=1 to nocomb do if IntToStr(TComb[i])=xgrade then begin
+                   for i:=1 to nocomb do begin
+                     if UpperCase(DMCONS.ProdOGTotals)='SI' then
+                       xcomb:=TCombx[i]
+                     else
+                       xcomb:=TComb[i];
+                     if IntToStr(xcomb)=xgrade then begin
                        SwTotales[i]:=false;
-                       TotalLitros[i]:=StrToFloat(copy(lin,67,10))/100;
+                       TotalLitros[i]:=StrToFloat(copy(lin,38,10))/100;
                        DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
                        DespliegaPosCarga(xpos,true);
                      end;
-                     if nocomb=4 then begin
-                       xgrade:=lin[95];
-                       for i:=1 to nocomb do if IntToStr(TComb[i])=xgrade then begin
+                   end;
+                   if nocomb>=3 then begin
+                     xgrade:=lin[66];
+                     for i:=1 to nocomb do begin
+                       if UpperCase(DMCONS.ProdOGTotals)='SI' then
+                         xcomb:=TCombx[i]
+                       else
+                         xcomb:=TComb[i];
+                       if IntToStr(xcomb)=xgrade then begin
                          SwTotales[i]:=false;
-                         TotalLitros[i]:=StrToFloat(copy(lin,96,10))/100;
+                         TotalLitros[i]:=StrToFloat(copy(lin,67,10))/100;
                          DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
                          DespliegaPosCarga(xpos,true);
+                       end;
+                     end;
+                     if nocomb=4 then begin
+                       xgrade:=lin[95];
+                       for i:=1 to nocomb do begin
+                         if UpperCase(DMCONS.ProdOGTotals)='SI' then
+                           xcomb:=TCombx[i]
+                         else
+                           xcomb:=TComb[i];
+                         if IntToStr(xcomb)=xgrade then begin
+                           SwTotales[i]:=false;
+                           TotalLitros[i]:=StrToFloat(copy(lin,96,10))/100;
+                           DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
+                           DespliegaPosCarga(xpos,true);
+                         end;
                        end;
                      end;
                    end;
@@ -1418,20 +1443,6 @@ begin
         StaticText5.Caption:=IntToStr(NumPaso);
       end;
     end;
-//    if (NumPaso=5) then with DMCONS do begin
-//      Q_Auxi.Close;
-//      Q_Auxi.SQL.Clear;
-//      Q_AuxiEntero1.FieldKind:=fkInternalCalc;
-//      Q_AuxiEntero2.FieldKind:=fkInternalCalc;
-//      Q_Auxi.SQL.Add('select min(folio) as  Entero1, poscarga as Entero2 from DPVGMOVI WHERE hora between '+QuotedStr(FormatDateTime('mm/dd/yyyy hh:nn:ss',IncSecond(Now,-40)))+
-//                     ' and '+QuotedStr(FormatDateTime('mm/dd/yyyy hh:nn:ss',IncSecond(Now,-8)))+' and IDTRANSACCIONOG is null group by Entero2 order by Entero1');
-//      Q_Auxi.Open;
-//
-//      if not Q_Auxi.IsEmpty then
-//        ComandoConsola('V'+IntToClaveNum(Q_AuxiEntero2.AsInteger,2));
-//
-//      NumPaso:=6;
-//    end;
     if (NumPaso=5) then with DMCONS do begin
       try
         // Checa Comandos

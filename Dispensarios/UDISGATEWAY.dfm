@@ -4809,6 +4809,9 @@ object FDISGATEWAY: TFDISGATEWAY
     object TL_TcmbPRECIOFISICO: TFloatField
       FieldName = 'PRECIOFISICO'
     end
+    object TL_TcmbIDPRODUCTOOG: TIntegerField
+      FieldName = 'IDPRODUCTOOG'
+    end
   end
   object Socket1: TClientSocket
     Active = False
