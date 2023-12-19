@@ -1122,13 +1122,9 @@ begin
                with TPosCarga[xpos] do begin
                  xgrade:=lin[8];
                  for i:=1 to nocomb do begin
-                   if UpperCase(DMCONS.ProdOGTotals)='SI' then
-                     xcomb:=TCombx[i]
-                   else
-                     xcomb:=TComb[i];
-                   if IntToStr(xcomb)=xgrade then begin
+                   if TPosx[i]=1 then begin
                      SwTotales[i]:=false;
-                     TotalLitros[i]:=StrToFloat(copy(lin,9,10))/100;
+                     TotalLitros[i]:=StrToFloat(copy(lin,9,12))/100;
                      DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
                      DespliegaPosCarga(xpos,true);
                    end;
@@ -1138,43 +1134,31 @@ begin
                      SwTotales[i]:=false;
                  end
                  else if nocomb>=2 then begin
-                   xgrade:=lin[37];
+                   xgrade:=lin[41];
                    for i:=1 to nocomb do begin
-                     if UpperCase(DMCONS.ProdOGTotals)='SI' then
-                       xcomb:=TCombx[i]
-                     else
-                       xcomb:=TComb[i];
-                     if IntToStr(xcomb)=xgrade then begin
+                     if TPosx[i]=2 then begin
                        SwTotales[i]:=false;
-                       TotalLitros[i]:=StrToFloat(copy(lin,38,10))/100;
+                       TotalLitros[i]:=StrToFloat(copy(lin,42,12))/100;
                        DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
                        DespliegaPosCarga(xpos,true);
                      end;
                    end;
                    if nocomb>=3 then begin
-                     xgrade:=lin[66];
+                     xgrade:=lin[74];
                      for i:=1 to nocomb do begin
-                       if UpperCase(DMCONS.ProdOGTotals)='SI' then
-                         xcomb:=TCombx[i]
-                       else
-                         xcomb:=TComb[i];
-                       if IntToStr(xcomb)=xgrade then begin
+                       if TPosx[i]=3 then begin
                          SwTotales[i]:=false;
-                         TotalLitros[i]:=StrToFloat(copy(lin,67,10))/100;
+                         TotalLitros[i]:=StrToFloat(copy(lin,75,12))/100;
                          DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
                          DespliegaPosCarga(xpos,true);
                        end;
                      end;
                      if nocomb=4 then begin
-                       xgrade:=lin[95];
+                       xgrade:=lin[107];
                        for i:=1 to nocomb do begin
-                         if UpperCase(DMCONS.ProdOGTotals)='SI' then
-                           xcomb:=TCombx[i]
-                         else
-                           xcomb:=TComb[i];
-                         if IntToStr(xcomb)=xgrade then begin
+                         if TPosx[i]=4 then begin
                            SwTotales[i]:=false;
-                           TotalLitros[i]:=StrToFloat(copy(lin,96,10))/100;
+                           TotalLitros[i]:=StrToFloat(copy(lin,108,12))/100;
                            DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
                            DespliegaPosCarga(xpos,true);
                          end;
