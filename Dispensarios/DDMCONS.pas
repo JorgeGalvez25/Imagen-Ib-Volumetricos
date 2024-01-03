@@ -719,6 +719,7 @@ type
     PuertoGatewayDisp,
     PuertoGatewayTanq,    
     emEstacionServicio            :integer;
+    SegundosFINV            :Integer;
     PreciosInicio           :Boolean;
 
     TabComb:array[1..MaxComb] of RegComb;
@@ -1405,6 +1406,7 @@ begin
   BitacoraTanques:='No';
   Inocuidad31Licencia:='';
   Inocuidad31FechaVence:='';
+  SegundosFINV:=10;
   lista:=TStringList.Create;
   // CARGA VARIBLES
   try
@@ -1576,6 +1578,8 @@ begin
         PuertoGatewayTanq:=StrToInt(ExtraeElemStrSep(lin,2,'='));
       if Mayusculas(ss)='PRECIOSINICIO' then
         PreciosInicio:=Mayusculas(ExtraeElemStrSep(lin,2,'='))='SI';
+      if Mayusculas(ss)='SEGUNDOSFINV' then
+        SegundosFINV:=StrToIntDef(ExtraeElemStrSep(lin,2,'='),10);
     end;
   finally
     lista.Free;

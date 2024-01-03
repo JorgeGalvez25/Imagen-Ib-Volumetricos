@@ -877,7 +877,7 @@ begin
                          SwOcc:=false;
                          ContOcc:=0;
                        end;
-                       if (SecondsBetween(Now,HoraFinv)>10) and (TotsFinv) then begin
+                       if (SecondsBetween(Now,HoraFinv)>DMCONS.SegundosFINV) and (TotsFinv) then begin
                          SwTotales[1]:=true;
                          SwTotales[2]:=true;
                          SwTotales[3]:=true;
@@ -2129,7 +2129,8 @@ begin
       Label4x.Visible:=true;
     end;
   except
-    DMCONS.AgregaLog('ERROR TIMER1');
+    on e:Exception do
+      DMCONS.AgregaLog('ERROR TIMER1: '+e.Message);
   end;
 end;
 
