@@ -173,7 +173,6 @@ type
        TotalLitros:array[1..MCxP] of real;
        SwTotales:array[1..MCxP] of boolean;
        SwDesp,swprec:boolean;
-       SwA:boolean;
        Hora:TDateTime;
        SwInicio:boolean;
        SwInicio2:boolean;
@@ -376,7 +375,6 @@ begin
           Isla:=xisla;
           SwDesp:=false;
           SwPrec:=false;
-          SwA:=false;
           existe:=false;
           ModoOpera:=Q_BombIbModoOperacion.AsString;
           esDiesel:=False;
@@ -703,6 +701,8 @@ begin
                 swcerrar:=true; FDISGATEWAY.Close;
               end;
             except
+              on e:Exception do
+                AgregaLog('Error al guardar venta: '+e.Message);
             end;
           finally
             T_MoviIb.Active:=false;
@@ -823,8 +823,6 @@ begin
                    Next;
                  SwAutorizando:=false;
                  SwCmndB:=true;
-                 if estatusant<>estatus then
-                   SwA:=true; //CAMBIO
                  estatusant:=estatus;
                  estatus:=StrToIntDef(ss[xpos],0);
                  if dmcons.Swemular then
@@ -1106,6 +1104,8 @@ begin
                          EsperaMiliSeg(100);
                        end;
                      except
+                       on e:Exception do
+                         DMCONS.AgregaLog('Error Procesa linea A: '+e.Message);
                      end;
                    end;
                  end;
@@ -1261,9 +1261,8 @@ begin
           repeat
             Inc(PosicionCargaActual);
             with TPosCarga[PosicionCargaActual] do if NoComb>0 then begin
-              if (estatus<>estatusant)or(estatus>1) or (((SwA)or(swinicio2))and(estatus>0)) then begin //CAMBIO
+              if (estatus<>estatusant)or(estatus>1) or ((swinicio2)and(estatus>0)) then begin //CAMBIO
                 if (estatus in [1,2,3,7,8]) then begin
-                  SwA:=false;
                   ComandoConsolaBuff('A'+IntToClaveNum(PosicionCargaActual,2));
                   exit;
                 end;
