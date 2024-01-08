@@ -691,6 +691,14 @@ begin
                 swprec:=false;
               end;
 
+              try
+                TotalLitros[PosActual]:=TotalLitros[PosActual]+volumen;
+                RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
+              except
+                on e:Exception do
+                  AgregaLog('Error al guardar totales: '+e.Message);
+              end;                                              
+
               T_MoviIb.post;
 
               apunt:=8;
