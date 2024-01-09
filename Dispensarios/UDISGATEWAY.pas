@@ -615,16 +615,18 @@ begin
     for i:=1 to MaxPosCarga do with TPosCarga[i] do begin
       if ModoOpera='Normal' then begin
         case estatus of
-          1,3,7:ListView1.Items[i-1].ImageIndex:=1;
+          1,7:ListView1.Items[i-1].ImageIndex:=1;
           2:ListView1.Items[i-1].ImageIndex:=2;
+          3:ListView1.Items[i-1].ImageIndex:=9;
           5,9:ListView1.Items[i-1].ImageIndex:=3;
           else ListView1.Items[i-1].ImageIndex:=0;
         end;
       end
       else begin
         case estatus of
-          1,3,7:ListView1.Items[i-1].ImageIndex:=4;
+          1,7:ListView1.Items[i-1].ImageIndex:=4;
           2:ListView1.Items[i-1].ImageIndex:=5;
+          3:ListView1.Items[i-1].ImageIndex:=10;
           5,9:ListView1.Items[i-1].ImageIndex:=6;
           else ListView1.Items[i-1].ImageIndex:=0;
         end;
@@ -1101,7 +1103,7 @@ begin
                        end;
 
                        DespliegaPosCarga(xpos,true);
-                       if (TPosCarga[xpos].finventa=0) and (Estatus=3) and ((now-HoraFinv)>(tmsegundo*8)) then begin // EOT
+                       if (TPosCarga[xpos].finventa=0) and (Estatus=3) then begin // EOT
                          TPosCarga[xpos].finventa:=0;
                          TipoPago:=0;
                          ss:='R'+IntToClaveNum(xpos,2); // VENTA COMPLETA

@@ -1406,7 +1406,7 @@ begin
   BitacoraTanques:='No';
   Inocuidad31Licencia:='';
   Inocuidad31FechaVence:='';
-  SegundosFINV:=10;
+  SegundosFINV:=3;
   lista:=TStringList.Create;
   // CARGA VARIBLES
   try
