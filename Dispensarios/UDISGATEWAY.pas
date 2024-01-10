@@ -1041,7 +1041,8 @@ begin
                    importe:=StrToFloat(simp)/1000;
                    volumen:=0;
                    precio:=0;
-                   swAvanzoVenta:=importe>0;
+                   if not swAvanzoVenta then
+                     swAvanzoVenta:=importe>0;
 
                    if (DMCONS.ControlAros='Si')and(importe<0.01)and(not swarosmag)and(ModoOpera='Normal') then begin
                      swarosmag:=DMCONS.ControlArosMagneticos2(xpos,aros_mang,aros_cte,aros_vehi);
