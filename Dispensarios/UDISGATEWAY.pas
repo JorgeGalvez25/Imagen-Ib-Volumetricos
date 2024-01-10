@@ -73,6 +73,7 @@ type
     NotificationIcon1: TRxTrayIcon;
     StaticText8: TStaticText;
     TL_TcmbIDPRODUCTOOG: TIntegerField;
+    CheckBox1: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
@@ -233,6 +234,7 @@ var
   SegEspCierre  :TDateTime;
   TAdicf        :array[1..32,1..3] of integer;
   Txp           :array[1..32] of integer;
+  HoraLog     :TDateTime;
 
 
 implementation
@@ -421,6 +423,7 @@ procedure TFDISGATEWAY.FormShow(Sender: TObject);
 begin
   if SwInicio then begin
     try
+      HoraLog:=Now;
       ContDA:=0;
       SwEsperaRsp:=false;
       ErrorInic:=true;
@@ -1998,6 +2001,13 @@ begin
           Sleep(1000);
         end;
         SwCerrar:=i=0;
+      end;
+    end;
+
+    if CheckBox1.Checked then begin
+      if (Now-HoraLog)>10*tmMinuto then begin
+        HoraLog:=Now;
+        Button1.Click;
       end;
     end;
 
