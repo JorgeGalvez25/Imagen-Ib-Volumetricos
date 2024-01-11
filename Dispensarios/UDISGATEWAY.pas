@@ -1907,7 +1907,10 @@ begin
     s1:=#2+ss+#3+CC;
     DMCONS.AgregaLog('E '+s1);
     Socket1.Socket.SendText(s1);
-    SwEsperaRsp:=primeraRespuesta;
+    if (Copy(ss,1,1)<>'R') and (Copy(ss,1,3)<>'@02') then
+      SwEsperaRsp:=primeraRespuesta
+    else
+      SwEsperaRsp:=False;
   except
     on e:Exception do begin
       DMCONS.AgregaLog('ERROR CON SOCKET: '+e.Message);
