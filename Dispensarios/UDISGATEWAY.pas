@@ -697,12 +697,14 @@ begin
               end;
 
               try
-                TotalLitros[PosActual]:=TotalLitros[PosActual]+volumen;
-                RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
+                for xp:=1 to NoComb do if TComb[xp]=xcomb then begin
+                  TotalLitros[xp]:=TotalLitros[xp]+volumen;
+                  RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
+                end;
               except
                 on e:Exception do
                   AgregaLog('Error al guardar totales: '+e.Message);
-              end;                                              
+              end;
 
               T_MoviIb.post;
 
@@ -1096,7 +1098,7 @@ begin
                        end;
 
                        if not swAvanzoVenta then begin
-                         swAvanzoVenta:=(importe<>importeant) and (Estatus=2) and (importe>0) and (importe-importeant<IfThen(xcomb=3,80,20));
+                         swAvanzoVenta:=(importe<>importeant) and (Estatus=2) and (importe>0) and ((importeant>0) or (importe-importeant<IfThen(xcomb=3,80,40)));
                          DMCONS.AgregaLog(ifthen(swAvanzoVenta,'swAvanzoVenta','NOT')+' Estatus='+IntToStr(Estatus)+' ImporteAnt: '+FloatToStr(importeant)+' Importe: '+FloatToStr(importe));
                        end;      
 
@@ -2012,6 +2014,7 @@ begin
       if (Now-HoraLog)>10*tmMinuto then begin
         HoraLog:=Now;
         Button1.Click;
+        Button3.Click;
       end;
     end;
 
