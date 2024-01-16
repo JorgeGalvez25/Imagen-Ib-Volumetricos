@@ -541,7 +541,8 @@ begin
               xFechaHoraI:=StrToFechaHora('20'+xfechahoraini);
               xFechaHoraEnt:=StrToFechaHora('20'+xfechahorafin);
               if abs(xfechahoraent-xfechahorai)<2 then begin
-                if (xfechaHoraEnt>=Trunc(X_CvolFecha))or(CheckBox1.Checked) then begin
+                if (Abs(xfechaHoraEnt-Trunc(X_CvolFecha))<1)or(CheckBox1.Checked) then begin
+                  AgregaLog('FechaCorte: '+FechaHoraPaq(X_CvolFecha)+' CheckBox1 Checked: '+BoolToStr(CheckBox1.Checked));
                   DMCONS.DBGASCON.Connected:=true;
                   try
                     T_Etan.Active:=true;
