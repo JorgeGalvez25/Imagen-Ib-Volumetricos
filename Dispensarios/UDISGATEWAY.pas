@@ -187,6 +187,7 @@ type
        swautorizando,
        swcargando:boolean;
        swAvanzoVenta:boolean;
+       swSinGuardar:Boolean;
        SwActivo,
        SwOCC,SwCmndB,
        SwDesHabilitado:boolean;
@@ -332,6 +333,7 @@ begin
       SwCargando:=false;
       SwAutorizada:=false;
       SwAutorizando:=false;
+      swSinGuardar:=False;
       for j:=1 to MCxP do begin
         SwTotales[j]:=true;
         TotalLitrosAnt[j]:=0;
@@ -697,10 +699,12 @@ begin
               end;
 
               try
-                for xp:=1 to NoComb do if TComb[xp]=xcomb then begin
-                  TotalLitros[xp]:=TotalLitros[xp]+volumen;
-                  RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
-                end;
+                for xp:=1 to NoComb do
+                  if TComb[xp]=xcomb then
+                  begin
+                    TotalLitros[xp]:=TotalLitros[xp]+volumen;
+                    RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
+                  end;
               except
                 on e:Exception do
                   AgregaLog('Error al guardar totales: '+e.Message);
@@ -1085,28 +1089,22 @@ begin
                        xcomb:=CombustibleEnPosicion(xpos,PosActual);
                        precio:=StrToFloat(spre)/100;
                        importe:=StrToFloat(simp)/1000;
-                       if (2*volumen*precio<importe) then
-                         importe:=importe/10;
-                       if (2*importe<volumen*precio) then
-                         importe:=importe*10;
 
-
-                       if DMCONS.AjustePAM='Si' then begin
-                         ximporte:=AjustaFloat(volumen*precio,2);
-                         if abs(importe-ximporte)>=0.015 then
-                           importe:=ximporte;
-                       end;
-
-                       if not swAvanzoVenta then begin
-                         swAvanzoVenta:=(importe<>importeant) and (Estatus=2) and (importe>0) and ((importeant>0) or (importe-importeant<IfThen(xcomb=3,80,40)));
+                       if (not swAvanzoVenta) and (SwCargando) then begin
+                         swAvanzoVenta:=(importe<>importeant) and (importe>0) and ((importeant>0) or (importe-importeant<IfThen(xcomb=3,80,40)));
                          DMCONS.AgregaLog(ifthen(swAvanzoVenta,'swAvanzoVenta','NOT')+' Estatus='+IntToStr(Estatus)+' ImporteAnt: '+FloatToStr(importeant)+' Importe: '+FloatToStr(importe));
                        end;      
 
-                       if ((Estatus=3) or (Estatus=1)) and (SwCargando) and (swAvanzoVenta) then begin// EOT
+                       if (SwCargando) and (Estatus in [1,3,5,9]) then
+                         swSinGuardar:=True;
+                       if (swAvanzoVenta) and (SwCargando) and (Estatus in [1,3,5,9]) then begin// EOT
                          SwCargando:=false;
                          swAvanzoVenta:=False;
+                         swSinGuardar:=False;
                          swdesp:=true;
                        end;
+
+                       TotsFinv:=swSinGuardar;
 
                        DespliegaPosCarga(xpos,true);
                        if (TPosCarga[xpos].finventa=0) and (Estatus=3) then begin // EOT
@@ -1140,6 +1138,11 @@ begin
                  for i:=1 to nocomb do begin
                    if TPosx[i]=1 then begin
                      SwTotales[i]:=false;
+                     if (swSinGuardar) and (((StrToFloat(copy(lin,9,12))/100)-TotalLitros[i])>0.5) then begin
+                       DMCONS.AgregaLog('Venta posterior guardada Poscarga: '+IntToStr(xpos)+' Importe: '+FloatToStr(importe));
+                       SwDesp := True;
+                       swSinGuardar:=False;
+                     end;
                      TotalLitros[i]:=StrToFloat(copy(lin,9,12))/100;
                      DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
                      DespliegaPosCarga(xpos,true);
@@ -1154,6 +1157,11 @@ begin
                    for i:=1 to nocomb do begin
                      if TPosx[i]=2 then begin
                        SwTotales[i]:=false;
+                       if (swSinGuardar) and (((StrToFloat(copy(lin,42,12))/100) - TotalLitros[i])>0.5) then begin
+                         DMCONS.AgregaLog('Venta posterior guardada Poscarga: '+IntToStr(xpos)+' Importe: '+FloatToStr(importe));
+                         SwDesp:=True;
+                         swSinGuardar:=False;
+                       end;
                        TotalLitros[i]:=StrToFloat(copy(lin,42,12))/100;
                        DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
                        DespliegaPosCarga(xpos,true);
@@ -1164,6 +1172,11 @@ begin
                      for i:=1 to nocomb do begin
                        if TPosx[i]=3 then begin
                          SwTotales[i]:=false;
+                         if (swSinGuardar) and (((StrToFloat(copy(lin,75,12))/100) - TotalLitros[i])>0.5) then begin
+                           DMCONS.AgregaLog('Venta posterior guardada Poscarga: '+IntToStr(xpos)+' Importe: '+FloatToStr(importe));
+                           SwDesp:=True;
+                           swSinGuardar:=False;
+                         end;
                          TotalLitros[i]:=StrToFloat(copy(lin,75,12))/100;
                          DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
                          DespliegaPosCarga(xpos,true);
@@ -1174,6 +1187,11 @@ begin
                        for i:=1 to nocomb do begin
                          if TPosx[i]=4 then begin
                            SwTotales[i]:=false;
+                           if (swSinGuardar) and (((StrToFloat(copy(lin,108,12))/100) - TotalLitros[i])>0.5) then begin
+                             DMCONS.AgregaLog('Venta posterior guardada Poscarga: '+IntToStr(xpos)+' Importe: '+FloatToStr(importe));
+                             SwDesp:=True;
+                             swSinGuardar:=False;
+                           end;
                            TotalLitros[i]:=StrToFloat(copy(lin,108,12))/100;
                            DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
                            DespliegaPosCarga(xpos,true);
@@ -1182,6 +1200,7 @@ begin
                      end;
                    end;
                  end;
+                 swSinGuardar:=False;
                end;
              end;
            except
