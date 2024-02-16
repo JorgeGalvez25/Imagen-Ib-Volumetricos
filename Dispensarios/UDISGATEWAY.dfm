@@ -4199,6 +4199,8 @@ object FDISGATEWAY: TFDISGATEWAY
         Width = 169
         Height = 17
         Caption = 'Guardar Log cada 10 min'
+        Checked = True
+        State = cbChecked
         TabOrder = 7
       end
     end
