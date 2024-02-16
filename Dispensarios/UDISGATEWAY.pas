@@ -698,18 +698,6 @@ begin
                 swprec:=false;
               end;
 
-              try
-                for xp:=1 to NoComb do
-                  if TComb[xp]=xcomb then
-                  begin
-                    TotalLitros[xp]:=TotalLitros[xp]+volumen;
-                    RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
-                  end;
-              except
-                on e:Exception do
-                  AgregaLog('Error al guardar totales: '+e.Message);
-              end;
-
               T_MoviIb.post;
 
               apunt:=8;
@@ -1095,13 +1083,24 @@ begin
                          DMCONS.AgregaLog(ifthen(swAvanzoVenta,'swAvanzoVenta','NOT')+' Estatus='+IntToStr(Estatus)+' ImporteAnt: '+FloatToStr(importeant)+' Importe: '+FloatToStr(importe));
                        end;      
 
-                       if (SwCargando) and (Estatus in [1,3,5,9]) then
+                       if (SwCargando) and (Estatus in [1,3,5,9]) then begin
                          swSinGuardar:=True;
-                       if (swAvanzoVenta) and (SwCargando) and (Estatus in [1,3,5,9]) then begin// EOT
-                         SwCargando:=false;
-                         swAvanzoVenta:=False;
-                         swSinGuardar:=False;
-                         swdesp:=true;
+                         SwCargando:=False;
+                         if (swAvanzoVenta) then begin
+                           swAvanzoVenta:=False;
+                           swSinGuardar:=False;
+                           swdesp:=true;
+                           try
+                             for xp:=1 to NoComb do if TComb[xp]=xcomb then begin
+                               TotalLitros[xp]:=TotalLitros[xp]+volumen;
+                               DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
+                               DMCONS.AgregaLog('Registró total calculado: '+FloatToStr(TotalLitros[xp])+' en TOTAL0'+IntToStr(xp));
+                             end;
+                           except
+                             on e:Exception do
+                               DMCONS.AgregaLog('Error al guardar totales: '+e.Message);
+                           end;
+                         end;
                        end;
 
                        TotsFinv:=swSinGuardar;
@@ -1113,7 +1112,7 @@ begin
                          ss:='R'+IntToClaveNum(xpos,2); // VENTA COMPLETA
                          if DMCONS.swemular then
                            EmularEstatus[xpos]:='1';
-                         ComandoConsolaBuff(ss);                     
+                         ComandoConsolaBuff(ss);
                          HoraFinv:=now;
                          EsperaMiliSeg(100);
                        end;
