@@ -1092,9 +1092,8 @@ begin
                            swdesp:=true;
                            try
                              for xp:=1 to NoComb do if TComb[xp]=xcomb then begin
-                               TotalLitros[xp]:=TotalLitros[xp]+volumen;
+                               TotalLitros[xp]:=AjustaFloat(TotalLitros[xp]+volumen,2);
                                DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
-                               DMCONS.AgregaLog('Registró total calculado: '+FloatToStr(TotalLitros[xp])+' en TOTAL0'+IntToStr(xp));
                              end;
                            except
                              on e:Exception do
