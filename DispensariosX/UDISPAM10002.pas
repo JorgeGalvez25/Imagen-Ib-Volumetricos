@@ -195,6 +195,7 @@ type
        FluAct:Boolean;
        FluStd:Boolean;
        FluMin:Boolean;
+       HoraPresetFlu:TDateTime;
 
        swarosmag:boolean;
        aros_cont,
@@ -391,6 +392,7 @@ begin
       SwArosMag_stop:=false;
       SwOCC:=false;
       ContOcc:=0;
+      HoraPresetFlu:=0;
     end;
     // CARGA DEFAULTS PAM
     TL_Bomb.Active:=true;
@@ -834,7 +836,7 @@ var lin,ss,rsp,ss2,
     xvol,ximp:real;
     swerr,SwAplicaMapa,SwFlu:boolean;
     tagx:array[1..3] of integer;
-
+    
 begin
   try
     if LineaTimer='' then
@@ -1105,6 +1107,17 @@ begin
                            end;
                            if swemular then
                              EmularEstatus[xpos]:='1';
+                         end;
+                       end;
+                       if SecondsBetween(Now,HoraPresetFlu) in [2..10] then begin
+                         ss:='E'+IntToClaveNum(xpos,2); // STOP
+                         ComandoConsola(ss);
+                         HoraPresetFlu:=0;
+                         EsperaMiliSeg(100);
+                         if SwEspMin then begin
+                           SwCerrar:=True;
+                           Button1Click(nil);
+                           Close;
                          end;
                        end;
                      end;
@@ -2230,24 +2243,39 @@ begin
                     if xPosStop2=0 then
                       xPosStop2:=PosTarjeta2;
                   end;
+
                   if ValorPAM1<>'' then begin
+                    xprodauto:='000000';
+                    with TPosCarga[xposstop] do begin
+                      for xc:=1 to NoComb do if xc in [1..4] then begin
+                        xp:=TPosx[xc];
+                        if xp in [1..6] then
+                          xprodauto[xp]:='1';
+                      end;
+                    end;
+
                     if VersionPam1000='3' then
-                      ss:='@020'+IntToClaveNum(xposstop,2)+'010'+ValorPAM1+'111000'
+                      ss:='@020'+IntToClaveNum(xposstop,2)+'010'+ValorPAM1+xprodauto
                     else
                       ss:='P'+IntToClaveNum(xposstop,2)+'0'+'1'+'000'+ValorPAM1+'0';
-                    ComandoConsola(ss);
-                    EsperaMiliseg(500);
-                    ss:='E'+IntToClaveNum(xposstop,2);
+                    TPosCarga[xposstop].HoraPresetFlu:=Now;
                     ComandoConsola(ss);
                     EsperaMiliseg(500);
                     if PosTarjeta2>0 then begin
+                      xprodauto:='000000';
+                      with TPosCarga[xPosStop2] do begin
+                        for xc:=1 to NoComb do if xc in [1..4] then begin
+                          xp:=TPosx[xc];
+                          if xp in [1..6] then
+                            xprodauto[xp]:='1';
+                        end;
+                      end;          
+
                       if VersionPam1000='3' then
-                        ss:='@020'+IntToClaveNum(xPosStop2,2)+'010'+ValorPAM1+'111000'
+                        ss:='@020'+IntToClaveNum(xPosStop2,2)+'010'+ValorPAM1+xprodauto
                       else
                         ss:='P'+IntToClaveNum(xPosStop2,2)+'0'+'1'+'000'+ValorPAM1+'0';
-                      ComandoConsola(ss);
-                      EsperaMiliseg(500);
-                      ss:='E'+IntToClaveNum(xPosStop2,2);
+                      TPosCarga[xPosStop2].HoraPresetFlu:=Now;
                       ComandoConsola(ss);
                       EsperaMiliseg(500);
                     end;
@@ -2262,13 +2290,20 @@ begin
                   until (xpos>MaxPosCarga)or((xPosStop2>0));
                   if xposstop2>0 then begin
                     if ValorPAM2<>'' then begin
+                      xprodauto:='000000';
+                      with TPosCarga[xposstop2] do begin
+                        for xc:=1 to NoComb do if xc in [1..4] then begin
+                          xp:=TPosx[xc];
+                          if xp in [1..6] then
+                            xprodauto[xp]:='1';
+                        end;
+                      end;
+
                       if VersionPam1000='3' then
-                        ss:='@020'+IntToClaveNum(xposstop2,2)+'010'+ValorPAM2+'111000'
+                        ss:='@020'+IntToClaveNum(xposstop2,2)+'010'+ValorPAM2+xprodauto
                       else
                         ss:='P'+IntToClaveNum(xposstop2,2)+'0'+'1'+'000'+ValorPAM2+'0';
-                      ComandoConsola(ss);
-                      EsperaMiliseg(500);
-                      ss:='E'+IntToClaveNum(xposstop2,2);
+                      TPosCarga[xposstop2].HoraPresetFlu:=Now;
                       ComandoConsola(ss);
                       EsperaMiliseg(500);
                     end
@@ -2288,9 +2323,9 @@ begin
             else if ss='FLUMIN' then begin  // FLUJO MINIMO
               if true then begin //Licencia3Ok then begin // VERSION 2012
                 StAdic:=1;
+                SwEspMin:=True;
                 rsp:='OK';
                 if tipoclb='6' then begin
-                  SwEspMin:=True;
                   xpos:=0;
                   repeat
                     inc(xpos);
@@ -2300,7 +2335,6 @@ begin
                 end
                 else if tipoclb='7' then begin
                   try
-                    SwEspMin:=True;
                     Q_Pcar.Active:=false;
                     Q_Pcar.Active:=true;
                     while not Q_Pcar.Eof do begin
@@ -2347,23 +2381,37 @@ begin
                       xPosStop2:=PosTarjeta2;
                   end;
                   if ValorPAM1<>'' then begin
+                    xprodauto:='000000';
+                    with TPosCarga[xposstop] do begin
+                      for xc:=1 to NoComb do if xc in [1..4] then begin
+                        xp:=TPosx[xc];
+                        if xp in [1..6] then
+                          xprodauto[xp]:='1';
+                      end;
+                    end;
+
                     if VersionPam1000='3' then
-                      ss:='@020'+IntToClaveNum(xposstop,2)+'010'+ValorPAM1+'111000'
+                      ss:='@020'+IntToClaveNum(xposstop,2)+'010'+ValorPAM1+xprodauto
                     else
                       ss:='P'+IntToClaveNum(xposstop,2)+'0'+'1'+'000'+ValorPAM1+'0';
-                    ComandoConsola(ss);
-                    EsperaMiliseg(500);
-                    ss:='E'+IntToClaveNum(xPosStop,2);
+                    TPosCarga[xposstop].HoraPresetFlu:=Now;
                     ComandoConsola(ss);
                     EsperaMiliseg(500);
                     if PosTarjeta2>0 then begin
+                      xprodauto:='000000';
+                      with TPosCarga[xPosStop2] do begin
+                        for xc:=1 to NoComb do if xc in [1..4] then begin
+                          xp:=TPosx[xc];
+                          if xp in [1..6] then
+                            xprodauto[xp]:='1';
+                        end;
+                      end;
+
                       if VersionPam1000='3' then
-                        ss:='@020'+IntToClaveNum(xPosStop2,2)+'010'+ValorPAM1+'111000'
+                        ss:='@020'+IntToClaveNum(xPosStop2,2)+'010'+ValorPAM1+xprodauto
                       else
                         ss:='P'+IntToClaveNum(xPosStop2,2)+'0'+'1'+'000'+ValorPAM1+'0';
-                      ComandoConsola(ss);
-                      EsperaMiliseg(500);
-                      ss:='E'+IntToClaveNum(xPosStop2,2);
+                      TPosCarga[xposstop2].HoraPresetFlu:=Now;
                       ComandoConsola(ss);
                       EsperaMiliseg(500);
                     end;
@@ -2394,12 +2442,6 @@ begin
                   end;
                   //PasoPumpStop:=10;
                 end;
-
-//                if rsp='OK' then
-//                  ActualizaAdic(0);
-
-                if not (tipoclb[1] in ['6','7']) then
-                  SwCerrar:=true;
               end
               else begin // if licencia2ok
                 rsp:='Opción no Habilitada';
