@@ -886,6 +886,7 @@ var lin,ss,rsp,descrsp,
     ximporte,xvolumen,
     xprecio,xprec,
     xvalor,ximpo,xvol           :real;
+    centavos:Integer;
 begin
   try
     saux:=LineaTimer;
@@ -1139,61 +1140,39 @@ begin
                try
                  if estatus<>9 then begin
                    xpda:=StrToIntDef(lin[4],0);
-                   if DMCONS.ManejaCanalWayne='No' then begin
-                     if (xpda>0)and(xpda<=4) then
-                       PosDispActual:=xpda
-                     else if PosDispActual=0 then
-                       PosDispActual:=1;
-                   end
-                   else PosDispActual:=CanalToPc(xpos,xpda);
-
-                   xvolumen:=StrToFloat(copy(lin,6,8))/1000;
+                   if xpda>0 then
+                     PosDispActual:=xpda
+                   else if PosDispActual=0 then
+                     PosDispActual:=1;
+                   volumen:=StrToFloat(copy(lin,6,8))/1000;
                    simp:=copy(lin,14+Tdiga,8);
                    spre:=copy(lin,22+Tdiga,5-Tdiga);
                    while length(spre)<5 do
                      spre:=spre+'0';
-                   ximporte:=StrToFloat(simp)/1000;
-                   if DMCONS.WayneAjusteImporte='Si' then
-                     ximporte:=10*ximporte;
-                   xprecio:=StrToFloat(spre)/1000;
-                   if (2*xvolumen*xprecio<ximporte) then // ajuste por error en digitos
-                     ximporte:=ximporte/10;
+                   importe:=StrToFloat(simp)/1000;
+                   precio:=StrToFloat(spre)/1000;
+                   if (2*volumen*precio<importe) then // ajuste por error en digitos
+                     importe:=importe/10;
                    if DMCONS.AjusteWayne='Si' then begin
-                     ximporte:=AjustaFloat(xvolumen*xprecio,2);
-                     DMCONS.AgregaLog('Calcula importe 1');
+                     importe:=AjustaFloat(volumen*precio,2);
                    end
-                   else if (DMCONS.AjusteWayne2='Si')and(abs(xvolumen-trunc(xvolumen))<0.0001) then begin
-                     ximporte:=AjustaFloat(xvolumen*xprecio,2);
-                     DMCONS.AgregaLog('Calcula importe 3');
-                   end
-                   else begin
-                     if (ximporte<(xvolumen*xprecio*0.9)) then begin
-                       DMCONS.AgregaLog('Calcula importe 2   vol:'+FormatoMoneda(xvolumen)+'  precio:'+FormatoMoneda(xprecio)+'  imp:'+FormatoMoneda(ximporte));
-                       ximporte:=trunc(xvolumen*xprecio*100)/100;
-                     end
+                   else if DMCONS.AjusteWayne='No' then begin
+                     if DMCONS.AjusteWayne2='Si' then begin
+                       ximpo:=Trunc(importe);
+                       centavos:=Round(Frac(importe) * 100);
+                       if centavos >= 95 then
+                         importe:=ximpo+1
+                       else if centavos <= 5 then
+                         importe:=ximpo;
+                     end;
+                     if (importe<(volumen*precio*0.9)) then
+                       importe:=trunc(volumen*precio*100)/100
                      else begin
-                       xvolumen:=ajustafloat(dividefloat(ximporte,xprecio),3);
+                       xvol:=ajustafloat(dividefloat(importe,precio),3);
+                       if abs(volumen-xvol)<0.02 then
+                         volumen:=xvol;
                      end;
                    end;
-                   
-                   if swcargando then begin
-                     if DMCONS.WayneValidaImporteDespacho<>'Si' then begin
-                       importe:=ximporte;
-                       volumen:=xvolumen;
-                       precio:=xprecio;
-                     end
-                     else if (ximporte>=importeant-0.05) then begin
-                       importe:=ximporte;
-                       volumen:=xvolumen;
-                       precio:=xprecio;
-                     end;
-                   end
-                   else begin
-                     importe:=ximporte;
-                     volumen:=xvolumen;
-                     precio:=xprecio;
-                   end;
-                   importeant:=importe;
                    if (Estatus=3)or(Estatus=1) then begin
                      if (swcargando) then begin // FIN DE CARGA
                        swcargando:=false;
@@ -1203,15 +1182,12 @@ begin
                    if (TPosCarga[xpos].finventa=0) then begin
                      if (Estatus=3) then begin // FIN DE CARGA
                        ComandoConsolaBuff('R'+inttoclavenum(xpos,2)+'0');
-                       esperamiliseg(100);
                        if sw3virtual then begin
                          sw3virtual:=false;
                          finventa:=0;
                          estatus:=1;
                          estatusant:=1;
                        end;
-                       if DMCONS.swemular then
-                         EmularEstatus[xpos]:='1';
                      end;
                    end;
                  end;
