@@ -89,6 +89,7 @@ type
     Button4: TButton;
     AbrirUbicacin1: TMenuItem;
     PuertoSerial: TApdComPort;
+    CheckBox1: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
     procedure Restaurar1Click(Sender: TObject);
@@ -213,6 +214,7 @@ var
   SwCerrar    :boolean;
   // CONTROL TRAFICO COMANDOS
   ListaCmnd     :TStrings;
+  HoraLog     :TDateTime;
 
 implementation
 
@@ -1814,6 +1816,15 @@ begin
     lee_registro;
   except
   end;
+
+  if CheckBox1.Checked then begin
+    if (Now-HoraLog)>10*tmMinuto then begin
+      HoraLog:=Now;
+      Button1.Click;
+      Button3.Click;
+    end;
+  end;
+
   //
   if (swespera)and((now-horaespera)>3*tmsegundo) then
     swespera:=false;

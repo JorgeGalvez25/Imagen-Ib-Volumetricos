@@ -79,6 +79,7 @@ type
     Button2: TButton;
     Button3: TButton;
     AbrirUbicacin1: TMenuItem;
+    CheckBox1: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure Ap1TriggerAvail(CP: TObject; Count: Word);
     procedure Timer1Timer(Sender: TObject);
@@ -233,6 +234,7 @@ var
 
   NumPaso      :integer;
   SwCerrar    :boolean;
+  HoraLog     :TDateTime;
 
 implementation
 
@@ -1885,6 +1887,13 @@ begin
          else LineaTimer:=idNak;
         end;
         ProcesaLinea;
+      end;
+    end;
+    if CheckBox1.Checked then begin
+      if (Now-HoraLog)>10*tmMinuto then begin
+        HoraLog:=Now;
+        Button1.Click;
+        Button3.Click;
       end;
     end;
   except
