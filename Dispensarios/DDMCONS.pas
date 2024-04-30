@@ -715,6 +715,7 @@ type
     LogTotales,
     ValidaCambioPrecio,
     ServidorGateway         :string;
+    FlujoPorVehiculo:Boolean;
     // FIN VARIABLES
     PuertoGatewayDisp,
     PuertoGatewayTanq,    
@@ -1354,6 +1355,7 @@ begin
   InicializaWayne:='Si';
   ManejaCanalWayne:='No';
   ControlAros:='No';
+  FlujoPorVehiculo:=False;
 
   // Gilbarco 2W
   GtwDivPresetLts:=100;
@@ -1580,6 +1582,8 @@ begin
         PreciosInicio:=Mayusculas(ExtraeElemStrSep(lin,2,'='))='SI';
       if Mayusculas(ss)='SEGUNDOSFINV' then
         SegundosFINV:=StrToIntDef(ExtraeElemStrSep(lin,2,'='),10);
+      if Mayusculas(ss)='FLUJOPORVEHICULO' then
+        FlujoPorVehiculo:=Mayusculas(ExtraeElemStrSep(lin,2,'='))='SI';
     end;
   finally
     lista.Free;

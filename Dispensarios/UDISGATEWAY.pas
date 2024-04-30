@@ -208,6 +208,7 @@ type
        aros_vehi:integer;
        swarosmag_stop:boolean;
        esDiesel:Boolean;
+       swFlujoVehic:Boolean;
 
      end;
 
@@ -1593,7 +1594,14 @@ begin
                             xcomb:=StrToIntDef(ss,0);
                             xp:=PosicionDeCombustible(SnPosCarga,xcomb);
                             if xp>0 then begin
-
+                              if FlujoPorVehiculo then begin
+                                ss:=ExtraeElemStrSep(TabCmnd[xcmnd].Comando,8,' ');
+                                ss:=FiltraStrNum(FormatFloat('0.00',StrToFloat(ss)));
+                                if ss<>'' then begin
+                                  SnImporte:=StrToFloat(FormatFloat('0000.00',SnImporte)+ss);
+                                  TPosCarga[SnPosCarga].swFlujoVehic:=True;
+                                end;
+                              end;
                               TPosCarga[SnPosCarga].finventa:=StrToIntDef(ExtraeElemStrSep(TabCmnd[xcmnd].Comando,6,' '),0);
                               EnviaPreset3(rsp,xcomb);
                             end
@@ -1706,62 +1714,27 @@ begin
             // ORDENA FIN DE VENTA
             else if ss='FINV' then begin
               xpos:=StrToIntDef(ExtraeElemStrSep(TabCmnd[xcmnd].Comando,2,' '),0);
-              rsp:='OK';
-              if (xpos in [1..MaxPosCarga]) then begin
-                TPosCarga[xpos].tipopago:=StrToIntDef(ExtraeElemStrSep(TabCmnd[xcmnd].Comando,3,' '),0);
-                if (TPosCarga[xpos].Estatus in [1,3]) then begin // EOT
-                  if (not TPosCarga[xpos].swcargando) then begin
+              if not TPosCarga[xpos].swcargando then begin
+                rsp:='OK';
+                if (xpos in [1..MaxPosCarga]) then begin
+                  TPosCarga[xpos].tipopago:=StrToIntDef(ExtraeElemStrSep(TabCmnd[xcmnd].Comando,3,' '),0);
+                  if (TPosCarga[xpos].Estatus in [1,3]) then begin // EOT
                     TPosCarga[xpos].finventa:=0;
                     ss:='R'+IntToClaveNum(xpos,2); // VENTA COMPLETA
                     ComandoConsolaBuff(ss);
                     EsperaMiliSeg(100);
                     if DMCONS.swemular then
                       EmularEstatus[xpos]:='1';
-                    try
-                      EsperaMiliSeg(100);
-                      try
-                        if not DBGASCON.Connected then
-                          DBGASCON.Connected:=true;
-                        Q_Auxi.Active:=false;
-                        Q_AuxiEntero1.FieldKind:=fkInternalCalc;
-                        Q_Auxi.SQL.Clear;
-                        Q_Auxi.SQL.Add('Select Max(Folio) as Entero1 from DPVGMOVI');
-                        Q_Auxi.SQL.Add('Where PosCarga='+inttostr(xpos));
-                        Q_Auxi.Active:=true;
-                        if Q_AuxiEntero1.AsInteger>0 then begin
-                          EsperaMiliSeg(100);
-                          xfolio:=Q_AuxiEntero1.AsInteger;
-                          Q_Auxi.Active:=false;
-                          Q_Auxi.SQL.Clear;
-                          Q_Auxi.SQL.Add('Update DPVGMOVI set tipopago='+inttostr(TPosCarga[xpos].tipopago));
-                          Q_Auxi.SQL.Add('Where Folio='+inttostr(xfolio));
-                          Q_Auxi.ExecSQL;
-                          TPosCarga[xpos].tipopago:=0;
-                        end;
-                      finally
-                        Q_Auxi.Active:=false;
-                      end;
-                    except
-                      on e:exception do
-                      DMCONS.AgregaLog('ERROR al cambiar tipo de pago: '+e.Message);
-                    end;
                     DespliegaPosCarga(xpos,true);
                   end
-
-
-                  else begin
-                    if (TPosCarga[xpos].swcargando)and(TPosCarga[xpos].Estatus=1) then begin
-                      TPosCarga[xpos].swcargando:=false;
-                      rsp:='OK';
-                    end
-                    else rsp:='Posicion no esta despachando';
+                  else begin // EOT
+                    rsp:='Posicion aun no esta en fin de venta';
                   end;
                 end
-                else begin // EOT
-                  rsp:='Posicion aun no esta en fin de venta';
-                end;
+                else rsp:='Posicion de Carga no Existe';
               end
-              else rsp:='Posicion de Carga no Existe';
+              else
+                SwAplicaCmnd:=False;
             end
             // ORDENA ESPERA FIN DE VENTA
             else if ss='EFV' then begin
@@ -2220,7 +2193,8 @@ begin
     else
       efv:='1';
     if not swlitros then begin // PRESET EN IMPORTE
-      ss:='@02'+'0'+IntToClaveNum(xpos,2)+'0'+efv+FiltraStrNum(FormatFloat('0000.00',snimporte))+xprodauto;
+      ss:='@02'+'0'+IntToClaveNum(xpos,2)+'0'+efv+FiltraStrNum(FormatFloat(IfThen(TPosCarga[xpos].swFlujoVehic,'0000.00000','0000.00'),snimporte))+xprodauto;
+      TPosCarga[xpos].swFlujoVehic:=False;
       TPosCarga[xpos].ImportePreset:=SnImporte;
       TPosCarga[xpos].MontoPreset:='$ '+FormatoMoneda(SnImporte);
     end
@@ -2479,6 +2453,7 @@ end;
   
 procedure TFDISGATEWAY.Button1Click(Sender: TObject);
 begin
+  DMCONS.AgregaLog('Version: d700b8fac7004569995ccc6b9ce03fa3a2f615d9');
   DMCONS.ListaLog.SaveToFile('\ImagenCo\Log'+FiltraStrNum(FechaHoraToStr(Now))+'.Txt');
 end;
 
