@@ -302,6 +302,7 @@ type
     SwTimer1:boolean;
     ContTimer1:integer;
     folioOGGen:Integer;
+    entOG:TDateTime;
     function CalculaAgua(VolTotal,Diametro,AlturaAgua:real):real;
   public
     { Public declarations }
@@ -1546,6 +1547,7 @@ begin
     end;
     T_Tanq.Active:=true;
     Q_CombIb.Active:=true;
+    entOG:=now;
     while not T_Tanq.Eof do begin
       try
         xtan:=T_TanqTanque.AsInteger;
@@ -2450,16 +2452,6 @@ begin
                     ComandoConsolaSocket(DMCONS.CodigoSeguridadVeederRoot+'i202'+inttoclavenum(TanqueActual,2)); // Gateway
                   end;
               end;
-              Q_Auxi.Close;
-              Q_Auxi.SQL.Clear;
-              Q_AuxiEntero1.FieldKind:=fkInternalCalc;
-              Q_AuxiEntero2.FieldKind:=fkInternalCalc;
-              Q_Auxi.SQL.Add('select min(folio) as  Entero1, tanque as Entero2 from DPVGETAN WHERE fechahorafinal between '+QuotedStr(FormatDateTime('mm/dd/yyyy hh:nn:ss',IncSecond(Now,-180)))+
-                             ' and '+QuotedStr(FormatDateTime('mm/dd/yyyy hh:nn:ss',IncSecond(Now,-8)))+' and IDRECEPCIONOG is null group by Entero2 order by Entero1');
-              Q_Auxi.Open;
-
-              if not Q_Auxi.IsEmpty then
-                ComandoConsolaSocket('R'+IntToClaveNum(Q_AuxiEntero2.AsInteger,2));
             end;
           finally
             DMCONS.DBGASCON.Connected:=false;
@@ -2491,6 +2483,30 @@ begin
       RxTrayIcon1.Tag:=1;
       FTanMenu.Visible:=false;
       RxTrayIcon1.Show;
+    end;
+    if SecondsBetween(Now,entOG)>20 then begin
+      entOG:=Now;
+      with DMCONS do begin
+        try
+          Q_Auxi.Close;
+          Q_Auxi.SQL.Clear;
+          Q_AuxiEntero1.FieldKind:=fkInternalCalc;
+          Q_AuxiEntero2.FieldKind:=fkInternalCalc;
+          Q_Auxi.SQL.Add('select min(folio) as  Entero1, tanque as Entero2 from DPVGETAN WHERE fechahorafinal between '+QuotedStr(FormatDateTime('mm/dd/yyyy hh:nn:ss',IncDay(Now,-1)))+
+                         ' and '+QuotedStr(FormatDateTime('mm/dd/yyyy hh:nn:ss',Now))+' and IDRECEPCIONOG is null group by Entero2 order by Entero1');
+          Q_Auxi.Open;
+
+          if not Q_Auxi.IsEmpty then begin
+            ComandoConsolaSocket('R'+IntToClaveNum(Q_AuxiEntero2.AsInteger,2));
+            Button1Click(nil);
+          end;
+        except
+          on e:Exception do begin
+            AgregaLog('Error ComandoR: '+e.Message+' '+Q_Auxi.SQL.Text);
+            Button1Click(nil);
+          end;
+        end;
+      end;
     end;
   except
     //DMCONS.AgregaLog('Exception 021');
