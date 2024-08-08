@@ -117,6 +117,7 @@ type
     SnPosCarga      :integer;
     SnImporte,
     SnLitros        :real;
+    SnFlujo :String;
     EmularEstatus,
     ValorPam1,
     ValorPam2,
@@ -388,10 +389,18 @@ begin
             if TComb[i]=xcomb then
               existe:=true;
           if not existe then begin
+            TL_Tcmb.Locate('CLAVE',xcomb,[]);
+            if TL_TcmbIDPRODUCTOOG.AsInteger<=0 then begin
+              Q_BombIb.Next;
+              Continue;
+            end;
             inc(NoComb);
             TComb[NoComb]:=xcomb;
             TL_Tcmb.Locate('CLAVE',xcomb,[]);
-            TCombx[NoComb]:=TL_TcmbIDPRODUCTOOG.AsInteger;
+            if TL_TcmbIDPRODUCTOOG.AsInteger>0 then
+              TCombx[NoComb]:=TL_TcmbIDPRODUCTOOG.AsInteger
+            else
+              TCombx[NoComb]:=xcomb;
             if (xcomb=3) then
               esDiesel:=True;
             if Q_BombIbCon_Posicion.AsInteger>0 then
@@ -860,6 +869,13 @@ begin
                        end;
                      end;
                  1,7:begin              // IDLE
+                       if (SecondsBetween(Now,HoraFinv)>DMCONS.SegundosFINV) and (TotsFinv) then begin
+                         SwTotales[1]:=true;
+                         SwTotales[2]:=true;
+                         SwTotales[3]:=true;
+                         SwTotales[4]:=true;
+                         TotsFinv:=False;
+                       end;
                        if (estatusant in [9,2])and(DMCONS.ReautorizaPam='Si') then begin
                          if (now-TPosCarga[xpos].HoraOcc)<=60*tmsegundo then begin
                            DMCONS.AgregaLog('Reenvia: '+TPosCarga[xpos].CmndOcc);
@@ -882,13 +898,6 @@ begin
                          SwArosMag:=false;
                          SwOcc:=false;
                          ContOcc:=0;
-                       end;
-                       if (SecondsBetween(Now,HoraFinv)>DMCONS.SegundosFINV) and (TotsFinv) then begin
-                         SwTotales[1]:=true;
-                         SwTotales[2]:=true;
-                         SwTotales[3]:=true;
-                         SwTotales[4]:=true;
-                         TotsFinv:=False;
                        end;
                      end;
                    2:begin              // BUSY
@@ -1078,6 +1087,7 @@ begin
                        xcomb:=CombustibleEnPosicion(xpos,PosActual);
                        precio:=StrToFloat(spre)/100;
                        importe:=StrToFloat(simp)/1000;
+                       DespliegaPosCarga(xpos,true);
 
                        if (not swAvanzoVenta) and (SwCargando) then begin
                          swAvanzoVenta:=(importe<>importeant) and (importe>0) and ((importeant>0) or (importe-importeant<IfThen(xcomb=3,80,40)));
@@ -1091,21 +1101,10 @@ begin
                            swAvanzoVenta:=False;
                            swSinGuardar:=False;
                            swdesp:=true;
-                           try
-                             for xp:=1 to NoComb do if TComb[xp]=xcomb then begin
-                               TotalLitros[xp]:=AjustaFloat(TotalLitros[xp]+volumen,2);
-                               DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
-                             end;
-                           except
-                             on e:Exception do
-                               DMCONS.AgregaLog('Error al guardar totales: '+e.Message);
-                           end;
+                           DespliegaPosCarga(xpos,true);
                          end;
                        end;
 
-                       TotsFinv:=swSinGuardar;
-
-                       DespliegaPosCarga(xpos,true);
                        if (TPosCarga[xpos].finventa=0) and (Estatus=3) then begin // EOT
                          TPosCarga[xpos].finventa:=0;
                          TipoPago:=0;
@@ -1113,7 +1112,6 @@ begin
                          if DMCONS.swemular then
                            EmularEstatus[xpos]:='1';
                          ComandoConsolaBuff(ss);
-                         HoraFinv:=now;
                          EsperaMiliSeg(100);
                        end;
                      except
@@ -1596,9 +1594,10 @@ begin
                             if xp>0 then begin
                               if FlujoPorVehiculo then begin
                                 ss:=ExtraeElemStrSep(TabCmnd[xcmnd].Comando,8,' ');
-                                ss:=FiltraStrNum(FormatFloat('0.00',StrToFloat(ss)));
                                 if ss<>'' then begin
-                                  SnImporte:=StrToFloat(FormatFloat('0000.00',SnImporte)+ss);
+                                  ss:=FiltraStrNum(FormatFloat('0.00',StrToFloat(ss)));
+                                  SnFlujo:=ss;
+                                  SnImporte:=StrToFloat(FormatFloat('0000.00',SnImporte));
                                   TPosCarga[SnPosCarga].swFlujoVehic:=True;
                                 end;
                               end;
@@ -2193,7 +2192,9 @@ begin
     else
       efv:='1';
     if not swlitros then begin // PRESET EN IMPORTE
-      ss:='@02'+'0'+IntToClaveNum(xpos,2)+'0'+efv+FiltraStrNum(FormatFloat(IfThen(TPosCarga[xpos].swFlujoVehic,'0000.00000','0000.00'),snimporte))+xprodauto;
+      if TPosCarga[xpos].swFlujoVehic then
+        xprodauto:=copy(xprodauto,1,3)+SnFlujo;
+      ss:='@02'+'0'+IntToClaveNum(xpos,2)+'0'+efv+FiltraStrNum(FormatFloat('0000.00',snimporte))+xprodauto;
       TPosCarga[xpos].swFlujoVehic:=False;
       TPosCarga[xpos].ImportePreset:=SnImporte;
       TPosCarga[xpos].MontoPreset:='$ '+FormatoMoneda(SnImporte);
