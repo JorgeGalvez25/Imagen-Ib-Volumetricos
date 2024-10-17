@@ -1102,6 +1102,15 @@ begin
                            swSinGuardar:=False;
                            swdesp:=true;
                            DespliegaPosCarga(xpos,true);
+                           if UpperCase(DMCONS.TotalCalculado)='SI' then begin
+                             case PosActual of
+                               1:TotalLitros[1]:=TotalLitros[1]+volumen;
+                               2:TotalLitros[2]:=TotalLitros[2]+volumen;
+                               3:TotalLitros[3]:=TotalLitros[3]+volumen;
+                               4:TotalLitros[4]:=TotalLitros[4]+volumen;
+                             end;
+                             DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
+                           end;
                          end;
                        end;
 
@@ -1140,8 +1149,10 @@ begin
                        SwDesp := True;
                        swSinGuardar:=False;
                      end;
-                     TotalLitros[i]:=StrToFloat(copy(lin,9,12))/100;
-                     DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
+                     if (StrToFloat(copy(lin,9,12))/100)-TotalLitros[i]>0.01 then begin
+                       TotalLitros[TPosx[i]]:=StrToFloat(copy(lin,9,12))/100;
+                       DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
+                     end;
                      DespliegaPosCarga(xpos,true);
                    end;
                  end;
@@ -1159,8 +1170,10 @@ begin
                          SwDesp:=True;
                          swSinGuardar:=False;
                        end;
-                       TotalLitros[i]:=StrToFloat(copy(lin,42,12))/100;
-                       DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
+                       if (StrToFloat(copy(lin,42,12))/100)-TotalLitros[i]>0.01 then begin
+                         TotalLitros[TPosx[i]]:=StrToFloat(copy(lin,42,12))/100;
+                         DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
+                       end;
                        DespliegaPosCarga(xpos,true);
                      end;
                    end;
@@ -1174,8 +1187,10 @@ begin
                            SwDesp:=True;
                            swSinGuardar:=False;
                          end;
-                         TotalLitros[i]:=StrToFloat(copy(lin,75,12))/100;
-                         DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
+                         if (StrToFloat(copy(lin,75,12))/100)-TotalLitros[i]>0.01 then begin
+                           TotalLitros[TPosx[i]]:=StrToFloat(copy(lin,75,12))/100;
+                           DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
+                         end;
                          DespliegaPosCarga(xpos,true);
                        end;
                      end;
@@ -1189,8 +1204,10 @@ begin
                              SwDesp:=True;
                              swSinGuardar:=False;
                            end;
-                           TotalLitros[i]:=StrToFloat(copy(lin,108,12))/100;
-                           DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
+                           if (StrToFloat(copy(lin,108,12))/100)-TotalLitros[i]>0.01 then begin
+                             TotalLitros[TPosx[i]]:=StrToFloat(copy(lin,108,12))/100;
+                             DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
+                           end;
                            DespliegaPosCarga(xpos,true);
                          end;
                        end;
@@ -1343,7 +1360,10 @@ begin
               end;
             end
             else xestado:=xestado+'7'; // Deshabilitado
-            xcomb:=CombustibleEnPosicion(xpos,PosActual);
+            if (estatus=0) or (PosActual=0) then
+              xcomb:=TComb[1]
+            else
+              xcomb:=CombustibleEnPosicion(xpos,PosActual);
             ss:=inttoclavenum(xpos,2)+'/'+inttostr(xcomb);
             ss:=ss+'/'+FormatFloat('###0.##',volumen);
             ss:=ss+'/'+FormatFloat('#0.##',precio);
@@ -1561,7 +1581,7 @@ begin
                       TPosCarga[SnPosCarga].SwOCC:=true;
                       TPosCarga[SnPosCarga].SwCmndB:=false;
                       if TPosCarga[SnPosCarga].ContOCC=0 then
-                        TPosCarga[SnPosCarga].ContOCC:=3
+                        TPosCarga[SnPosCarga].ContOCC:=6
                       else begin
                         dec(TPosCarga[SnPosCarga].ContOCC);
                         esperamiliseg(500);
@@ -1655,7 +1675,7 @@ begin
                       TPosCarga[SnPosCarga].SwOCC:=true;
                       TPosCarga[SnPosCarga].SwCmndB:=false;
                       if TPosCarga[SnPosCarga].ContOCC=0 then
-                        TPosCarga[SnPosCarga].ContOCC:=3
+                        TPosCarga[SnPosCarga].ContOCC:=6
                       else begin
                         dec(TPosCarga[SnPosCarga].ContOCC);
                         esperamiliseg(500);
@@ -2177,15 +2197,16 @@ begin
     NivelPrec:='1';
     xprodauto:='000000';
     with TPosCarga[xpos] do begin
-      for xc:=1 to NoComb do if xc in [1..4] then begin
-        xp:=TPosx[xc];
-        if xcomb>0 then begin // un producto
+      if xcomb>0 then begin
+        for xc:=1 to NoComb do if xc in [1..4] then begin
+          xp:=TPosx[xc];
           if TComb[xc]=xcomb then
             if xp in [1..6] then
               xprodauto[TCombx[xc]]:='1';
-        end
-        else xprodauto[TCombx[xc]]:='1';
-      end;
+        end;
+      end
+      else
+        xprodauto:='111000';
     end;
     if TPosCarga[xpos].FinVenta=1 then
       efv:='2'
@@ -2194,6 +2215,8 @@ begin
     if not swlitros then begin // PRESET EN IMPORTE
       if TPosCarga[xpos].swFlujoVehic then
         xprodauto:=copy(xprodauto,1,3)+SnFlujo;
+      if SnImporte>9999 then
+        SnImporte:=9999;
       ss:='@02'+'0'+IntToClaveNum(xpos,2)+'0'+efv+FiltraStrNum(FormatFloat('0000.00',snimporte))+xprodauto;
       TPosCarga[xpos].swFlujoVehic:=False;
       TPosCarga[xpos].ImportePreset:=SnImporte;
@@ -2454,7 +2477,7 @@ end;
   
 procedure TFDISGATEWAY.Button1Click(Sender: TObject);
 begin
-  DMCONS.AgregaLog('Version: d700b8fac7004569995ccc6b9ce03fa3a2f615d9');
+  DMCONS.AgregaLog('Version: ad1ba7b5395be60df37e85c311c0c781d44c3895');
   DMCONS.ListaLog.SaveToFile('\ImagenCo\Log'+FiltraStrNum(FechaHoraToStr(Now))+'.Txt');
 end;
 
