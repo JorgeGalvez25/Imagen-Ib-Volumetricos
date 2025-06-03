@@ -141,6 +141,7 @@ type
     function CombustibleEnPosicion(xpos,xposcarga:integer):integer;
     function PosicionDeCombustible(xpos,xcomb:integer):integer;
     procedure EnviaPreset(var rsp:string;xcomb:integer);
+    procedure LeventaTotalesEmu; 
   end;
 
 type
@@ -202,6 +203,7 @@ type
        PresetComb,
        PresetImpoN:integer;
        PresetImpo:real;
+       PresetEmuVol:real;
        SwPresetHora:boolean;
        PresetHora:TDateTime;
      end;
@@ -238,7 +240,7 @@ var
 
 implementation
 
-uses ULIBGRAL, ULIBLICENCIAS, DDMCONS, UDISMENU;
+uses ULIBGRAL, ULIBLICENCIAS, DDMCONS, UDISMENU, DateUtils;
 
 {$R *.DFM}
 
@@ -377,6 +379,8 @@ begin
       PresetCont:=0;
       SwPresetHora:=false;
     end;
+    if SwEmular then
+      LeventaTotalesEmu;    
     // CARGA DEFAULTS BENNETT
     TL_Bomb.Active:=true;
     while not TL_Bomb.Eof do begin
@@ -881,7 +885,7 @@ begin
                            ss:='F'+IntToClaveNum(xpos,2)+'9999';
                            ComandoConsolaBuff(ss,false);
                            SwCmndF:=false;
-                         end;
+                         end;                                              
                        end;
                        if estatusant=0 then begin
                          for xcomb:=1 to nocomb do
@@ -1476,6 +1480,10 @@ begin
                       TPosCarga[SnPosCarga].finventa:=StrToIntDef(ExtraeElemStrSep(TabCmnd[xcmnd].Comando,6,' '),0);
                       TPosCarga[SnPosCarga].boucher:=ExtraeElemStrSep(TabCmnd[xcmnd].Comando,7,' ');
                       TPosCarga[SnPosCarga].swarosmag:=false;
+                      if SwEmular then begin
+                        TPosCarga[SnPosCarga].PosActual:=xp;
+                        EmularEstatus[2*xpos-1]:=char(xp+48);
+                      end;
                       if (TPosCarga[SnPosCarga].tipopago in [4,5]) then with TPosCarga[SnPosCarga] do begin
                         swarosmag:=DMCONS.ControlArosMagneticos(SnPosCarga,aros_mang,aros_cte,aros_vehi);
                         aros_cont:=0;
@@ -1893,7 +1901,6 @@ begin
       if (Now-HoraLog)>10*tmMinuto then begin
         HoraLog:=Now;
         Button1.Click;
-        Button3.Click;
       end;
     end;
   except
@@ -1945,12 +1952,14 @@ begin
   if DMCONS.swemular then begin
     if EmularEstatus[2*xpos]='1' then
       EmularEstatus[2*xpos]:='5';
+    if xcomb=0 then
+      xcomb:=1;
     TPosCarga[xpos].Hora:=Time;
     TPosCarga[xpos].estatus:=5;
-    TPosCarga[xpos].volumen:=SnImporte/5;
+    TPosCarga[xpos].volumen:=SnImporte/DMCONS.TabComb[xcomb].Precio;
+    TPosCarga[xpos].PresetEmuVol:=TPosCarga[xpos].volumen;
     TPosCarga[xpos].importe:=SnImporte;
-    TPosCarga[xpos].precio:=5;
-    TPosCarga[xpos].posactual:=1;
+    TPosCarga[xpos].precio:=DMCONS.TabComb[xcomb].Precio;
   end;
 end;
 
@@ -1961,6 +1970,7 @@ const timpo:array[0..4] of real = (50,100,150,200,300);
 var xpos,rr,i:integer;
     lin:string;
     p1,p2,xp,xcomb:integer;
+    xVol,xImpo:Double;
 begin
   if LineaEmular='' then
     exit;
@@ -1984,10 +1994,12 @@ begin
                         xp:=Random(2)+1;
                         if xp>TPosCarga[xpos].NoComb then
                           xp:=TPosCarga[xpos].NoComb;
+                        TPosCarga[xpos].PosActual:=xp;
                         EmularEstatus[p1]:=char(xp+48);
                         xcomb:=CombustibleEnPosicion(xpos,xp);
                         TPosCarga[xpos].volumen:=dividefloat(Timpo[rr],TabComb[xcomb].Precio);
                         TPosCarga[xpos].importe:=timpo[rr];
+                        TPosCarga[xpos].PresetEmuVol:=TPosCarga[xpos].volumen;
                         TPosCarga[xpos].precio:=TabComb[xcomb].Precio;
                         TPosCarga[xpos].hora:=time;
                       end;
@@ -1997,27 +2009,56 @@ begin
               else begin
                 for xpos:=1 to MaxPosCarga do with TPosCarga[xpos] do begin
                   p2:=2*xpos;
-                  if (EmularEstatus[p2]='5')and((Time-Hora)>5*TmSegundo)then
+                  if (xpos=3) and (EmularEstatus[p2]='5')and((Time-Hora)>((3*TmSegundo)*PresetEmuVol)*0.5) then begin
+                    EmularEstatus[p2]:='0';
+                    Hora:=Time;
+                  end;
+                  if (xpos=3) and (EmularEstatus[p2]='0') and (SecondsBetween(Time,Hora)>=30) then
+                    EmularEstatus[p2]:='1';
+                  if (EmularEstatus[p2]='5')and((Time-Hora)>(3*TmSegundo)*PresetEmuVol) then begin
                     EmularEstatus[p2]:='7';
+                    if xpos=2 then
+                      volumen:=PresetEmuVol-(PresetEmuVol*0.1)
+                    else if xpos=4 then
+                      volumen:=0
+                    else
+                      volumen:=PresetEmuVol;
+                    importe:=volumen*precio;
+                    TotalLitros[PosActual]:=TotalLitros[PosActual]+volumen;
+                    RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
+                  end;
                 end;
               end;
               Linea:='B00'+EmularEstatus;
             end;
         'A':begin
               xpos:=StrToIntDef(copy(lin,2,2),1);
-              Linea:=copy(Lin,1,3)+'1'
-                     +FiltraStrNum(FormatFloat('0000.00',TPosCarga[xpos].volumen))
-                     +FiltraStrNum(FormatFloat('0000.00',TPosCarga[xpos].importe))
-                     +FiltraStrNum(FormatFloat('0.000',TPosCarga[xpos].precio));
-            end;
-        'N':begin
-              xpos:=StrToIntDef(copy(lin,2,2),1);
               with TPosCarga[xpos] do begin
-                Linea:=copy(Lin,1,3)+'0000000000'+'0000000000'+'0000000000'+'0000000000';
-                for i:=1 to NoComb do
-                  Linea[TPos[i]*10-5]:=Char(TComb[i]+48);
+                if estatus=5 then begin
+                  if xpos<>4 then
+                    xVol:=MilliSecondsBetween(Time,Hora)/3000;
+                  xImpo:=xVol*TPosCarga[xpos].precio;
+                  Linea:=copy(Lin,1,3)+'1'
+                         +FiltraStrNum(FormatFloat('0000.00',xVol))
+                         +FiltraStrNum(FormatFloat('0000.00',xImpo))
+                         +FiltraStrNum(FormatFloat('0.000',TPosCarga[xpos].precio));
+                end
+                else begin
+                  Linea:=copy(Lin,1,3)+'1'
+                         +FiltraStrNum(FormatFloat('0000.00',volumen))
+                         +FiltraStrNum(FormatFloat('0000.00',importe))
+                         +FiltraStrNum(FormatFloat('0.000',precio));
+                end;
               end;
             end;
+//        'N':begin
+//              xpos:=StrToIntDef(copy(lin,2,2),1);
+//              with TPosCarga[xpos] do begin
+//                Linea:=copy(Lin,1,3)+'0000000000'+'0000000000'+'0000000000'+'0000000000';
+//                for i:=1 to NoComb do
+//                  Linea[TPos[i]*10-5]:=Char(TComb[i]+48);
+//              end;
+//            end;
         else linea:=idACK;
       end;
       if linea<>idACK then
@@ -2126,7 +2167,7 @@ begin
     if xcomb>0 then begin
       for i:=1 to NoComb do begin
         if TComb[i]=xcomb then
-          result:=TComb[i];
+          result:=TPos[i];
       end;
     end
     else result:=1;
@@ -2224,6 +2265,34 @@ var
 begin
   ruta:=PChar(IncludeTrailingPathDelimiter(ExtractFilePath(Application.ExeName)));
   ShellExecute(Handle, 'open','explorer.exe',ruta, nil, SW_SHOWNORMAL);
+end;
+
+procedure TFDISBENNETT2.LeventaTotalesEmu;
+begin
+  with DMCONS do begin
+    Q_Auxi.Close;
+    Q_Auxi.SQL.Clear;
+    Q_AuxiEntero1.FieldKind:=fkInternalCalc;
+    Q_AuxiReal1.FieldKind:=fkInternalCalc;
+    Q_AuxiReal2.FieldKind:=fkInternalCalc;
+    Q_AuxiReal3.FieldKind:=fkInternalCalc;
+    Q_AuxiReal4.FieldKind:=fkInternalCalc;
+    Q_Auxi.SQL.Add('SELECT POSCARGA AS ENTERO1,TOTAL01 AS REAL1,TOTAL02 AS REAL2,');
+    Q_Auxi.SQL.Add('TOTAL03 AS REAL3,TOTAL04 AS REAL4 FROM DPVGCVOLD');
+    Q_Auxi.SQL.Add('WHERE FECHA=(SELECT MAX(FECHA) FROM DPVGCVOLD) ORDER BY ENTERO1');
+    Q_Auxi.Prepare;
+    Q_Auxi.Open;
+    while not Q_Auxi.Eof do begin
+      with TPosCarga[Q_AuxiEntero1.AsInteger] do begin
+        TotalLitros[1]:=Q_AuxiReal1.AsFloat;
+        TotalLitros[2]:=Q_AuxiReal2.AsFloat;
+        TotalLitros[3]:=Q_AuxiReal3.AsFloat;
+        TotalLitros[4]:=Q_AuxiReal4.AsFloat;
+//        MensajeInfo('Total'+IntToClaveNum(Q_AuxiEntero1.AsInteger,2)+' '+FloatToStr(TotalLitros[1])+', '+FloatToStr(TotalLitros[2])+', '+FloatToStr(TotalLitros[3])+', '+FloatToStr(TotalLitros[4]));
+      end;
+      Q_Auxi.Next;
+    end;
+  end;
 end;
 
 end.
