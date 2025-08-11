@@ -74,6 +74,9 @@ type
     StaticText8: TStaticText;
     TL_TcmbIDPRODUCTOOG: TIntegerField;
     CheckBox1: TCheckBox;
+    Label1: TLabel;
+    Memo2: TMemo;
+    Socket2: TClientSocket;
     procedure FormShow(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
@@ -88,6 +91,7 @@ type
     procedure Button3Click(Sender: TObject);
     procedure Socket1Read(Sender: TObject; Socket: TCustomWinSocket);
     function ServicioCorriendo(sService: PChar): Boolean;
+    procedure Socket2Read(Sender: TObject; Socket: TCustomWinSocket);
   private
     { Private declarations }
     xPosT,
@@ -266,6 +270,8 @@ begin
     Screen.Cursor:=crHourGlass;
     try
       // Carga Pos. Carga
+      if UpperCase(OrdenMangueras)='CONPOS' then
+        Q_BombIb.SQL[6]:='order by poscarga,con_posicion';
       Q_BombIb.Active:=false;
       Q_BombIb.Active:=true;
       if Q_BombIb.IsEmpty then
@@ -458,6 +464,8 @@ begin
       FinLinea:=false;
       IniciaEstacion;
       ListBox1.SetFocus;
+      if DMCONS.TimerDisp>0 then
+        Timer1.Interval:=DMCONS.TimerDisp;
       Timer1.Enabled:=true;
       DMCONS.T_ConfIb.Active:=true;
       if DMCONS.SwEmular then begin
@@ -651,7 +659,7 @@ begin
                     '  '+LlenaStr(FormatFloat('##,##0.00',importe),'D',10,' ');
       if SwDesp then with DMCONS do begin
         SwDesp:=false;
-        if (importe>0.01)and(PosActual in [1..MCxP]) then begin
+        if (volumen>0.01)and(PosActual in [1..MCxP]) then begin
           SwAutorizada:=false;
           apunt:=4;
           HoraFinv:=Now;
@@ -898,6 +906,8 @@ begin
                          SwArosMag:=false;
                          SwOcc:=false;
                          ContOcc:=0;
+                         if not swAvanzoVenta then
+                           SwCargando:=False;
                        end;
                      end;
                    2:begin              // BUSY
@@ -1094,7 +1104,7 @@ begin
                          DMCONS.AgregaLog(ifthen(swAvanzoVenta,'swAvanzoVenta','NOT')+' Estatus='+IntToStr(Estatus)+' ImporteAnt: '+FloatToStr(importeant)+' Importe: '+FloatToStr(importe));
                        end;      
 
-                       if (SwCargando) and (Estatus in [1,3,5,9]) then begin
+                       if (SwCargando) and (Estatus in [1,3,5,9]) and (volumen>0) and (importe>0) then begin
                          swSinGuardar:=True;
                          SwCargando:=False;
                          if (swAvanzoVenta) then begin
@@ -1113,6 +1123,7 @@ begin
                            end;
                          end;
                        end;
+
 
                        if (TPosCarga[xpos].finventa=0) and (Estatus=3) then begin // EOT
                          TPosCarga[xpos].finventa:=0;
@@ -1150,7 +1161,7 @@ begin
                        swSinGuardar:=False;
                      end;
                      if (StrToFloat(copy(lin,9,12))/100)-TotalLitros[i]>0.01 then begin
-                       TotalLitros[TPosx[i]]:=StrToFloat(copy(lin,9,12))/100;
+                       TotalLitros[i]:=StrToFloat(copy(lin,9,12))/100;
                        DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
                      end;
                      DespliegaPosCarga(xpos,true);
@@ -1171,7 +1182,7 @@ begin
                          swSinGuardar:=False;
                        end;
                        if (StrToFloat(copy(lin,42,12))/100)-TotalLitros[i]>0.01 then begin
-                         TotalLitros[TPosx[i]]:=StrToFloat(copy(lin,42,12))/100;
+                         TotalLitros[i]:=StrToFloat(copy(lin,42,12))/100;
                          DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
                        end;
                        DespliegaPosCarga(xpos,true);
@@ -1188,7 +1199,7 @@ begin
                            swSinGuardar:=False;
                          end;
                          if (StrToFloat(copy(lin,75,12))/100)-TotalLitros[i]>0.01 then begin
-                           TotalLitros[TPosx[i]]:=StrToFloat(copy(lin,75,12))/100;
+                           TotalLitros[i]:=StrToFloat(copy(lin,75,12))/100;
                            DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
                          end;
                          DespliegaPosCarga(xpos,true);
@@ -1205,7 +1216,7 @@ begin
                              swSinGuardar:=False;
                            end;
                            if (StrToFloat(copy(lin,108,12))/100)-TotalLitros[i]>0.01 then begin
-                             TotalLitros[TPosx[i]]:=StrToFloat(copy(lin,108,12))/100;
+                             TotalLitros[i]:=StrToFloat(copy(lin,108,12))/100;
                              DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
                            end;
                            DespliegaPosCarga(xpos,true);
@@ -1581,7 +1592,7 @@ begin
                       TPosCarga[SnPosCarga].SwOCC:=true;
                       TPosCarga[SnPosCarga].SwCmndB:=false;
                       if TPosCarga[SnPosCarga].ContOCC=0 then
-                        TPosCarga[SnPosCarga].ContOCC:=6
+                        TPosCarga[SnPosCarga].ContOCC:=16
                       else begin
                         dec(TPosCarga[SnPosCarga].ContOCC);
                         esperamiliseg(500);
@@ -1706,7 +1717,17 @@ begin
                             xcomb:=StrToIntDef(ss,0);
                             xp:=PosicionDeCombustible(SnPosCarga,xcomb);
                             if xp>0 then begin
-
+                              if FlujoPorVehiculo then begin
+                                ss:=ExtraeElemStrSep(TabCmnd[xcmnd].Comando,8,' ');
+                                if ss<>'' then begin
+                                  ss:=FiltraStrNum(FormatFloat('0.00',StrToFloat(ss)));
+                                  SnFlujo:=ss;
+                                  SnImporte:=SnLitros*TabComb[xcomb].Precio;
+                                  SnLitros:=0;
+                                  SnImporte:=StrToFloat(FormatFloat('0000.00',SnImporte));
+                                  TPosCarga[SnPosCarga].swFlujoVehic:=True;
+                                end;
+                              end;
                               TPosCarga[SnPosCarga].finventa:=StrToIntDef(ExtraeElemStrSep(TabCmnd[xcmnd].Comando,6,' '),0);
                               EnviaPreset3(rsp,xcomb);
                             end
@@ -1917,11 +1938,15 @@ begin
     cc:=CalculaBCC(ss+#3);
     s1:=#2+ss+#3+CC;
     DMCONS.AgregaLog('E '+s1);
-    Socket1.Socket.SendText(s1);
-    if (Copy(ss,1,1)<>'R') and (Copy(ss,1,3)<>'@02') then
-      SwEsperaRsp:=primeraRespuesta
-    else
-      SwEsperaRsp:=False;
+    if ss='B00' then
+      Socket2.Socket.SendText(s1)
+    else begin
+      Socket1.Socket.SendText(s1);
+      if (Copy(ss,1,1)<>'R') and (Copy(ss,1,3)<>'@02') then
+        SwEsperaRsp:=primeraRespuesta
+      else
+        SwEsperaRsp:=False;
+    end;
   except
     on e:Exception do begin
       DMCONS.AgregaLog('ERROR CON SOCKET: '+e.Message);
@@ -1989,6 +2014,7 @@ end;
 procedure TFDISGATEWAY.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   Socket1.Active:=false;
+  Socket2.Active:=false;
   DMCONS.AgregaLog('Termino Aplicacion');
   Button1.click;
   Application.Terminate;
@@ -2009,6 +2035,10 @@ begin
           Socket1.Host:=DMCONS.ServidorGateway;
           Socket1.Port:=DMCONS.PuertoGatewayDisp;
           Socket1.Open;
+
+          Socket2.Host:=DMCONS.ServidorGateway;
+          Socket2.Port:=DMCONS.PuertoGatewayDisp;
+          Socket2.Open;
           Break;
         end
         else begin
@@ -2041,20 +2071,8 @@ begin
     if (SwCerrar) and (not Socket1.Active) then
       Close;
     try
-      with DMCONS do begin
-        inc(ContadorTot);
-        if (ContadorTot>=100) then begin
-          ContadorTot:=0;
-          inc(ContadorTotPos);
-          if ContadorTotPos in [1..MaxPosCarga] then begin
-            TPosCarga[ContadorTotPos].SwTotales[1]:=true;
-            TPosCarga[ContadorTotPos].SwTotales[2]:=true;
-            TPosCarga[ContadorTotPos].SwTotales[3]:=true;
-            TPosCarga[ContadorTotPos].SwTotales[4]:=true;
-          end
-          else ContadorTotPos:=0;
-        end;
-      end;
+      if ContadorAlarma=3 then
+        Memo2.Lines.Add('P�rdida de comunicaci�n el: '+FechaHoraPaq(Now));
       if ContadorAlarma>=10 then begin
         if not StaticText17.Visible then
           Beep;
@@ -2143,7 +2161,7 @@ begin
       ContEspera1:=0;
       SwEspera:=true;
       StaticText6.Caption:='Esperando..';
-      ComandoConsolaBuff(ss);
+      ComandoConsola(ss);
     finally
       if NotificationIcon1.Tag=0 then begin
         if ErrorInic then begin
@@ -2477,7 +2495,7 @@ end;
   
 procedure TFDISGATEWAY.Button1Click(Sender: TObject);
 begin
-  DMCONS.AgregaLog('Version: ad1ba7b5395be60df37e85c311c0c781d44c3895');
+  DMCONS.AgregaLog('Version: 6c1af9705259b4d95b677235b4f5fa29102879ff');
   DMCONS.ListaLog.SaveToFile('\ImagenCo\Log'+FiltraStrNum(FechaHoraToStr(Now))+'.Txt');
 end;
 
@@ -2603,5 +2621,52 @@ begin
   end;
 end;
 
+procedure TFDISGATEWAY.Socket2Read(Sender: TObject;
+  Socket: TCustomWinSocket);
+var C:Char;
+begin
+  try
+    SwEspera:=false;
+    ContadorAlarma:=0;
+    Timer1.Enabled:=false;
+    try
+      LineaBuff:=Socket.ReceiveText;
+      while (not FinLinea)and(Length(LineaBuff)>0) do begin
+        c:=LineaBuff[1];
+        delete(LineaBuff,1,1);
+        Linea:=Linea+C;
+        if SwBcc then begin
+          FinLinea:=true;
+        end;
+        if C=idETX then begin
+          SwBcc:=true;
+        end;
+        if (C=idACK)or(c=idNAK) then begin
+          Linea:=c;
+          FinLinea:=true;
+        end;
+      end;
+      if FinLinea then begin
+        LineaTimer:=Linea;
+        DMCONS.AgregaLog('R '+LineaTimer);
+        Linea:='';
+        SwBcc:=false;
+        FinLinea:=false;
+        SwError:=(lineaTimer=idNak);
+        ProcesaLinea;
+        LineaTimer:='';
+      end
+      else SwEspera:=true;
+    except
+      on e:Exception do begin
+        DMCONS.AgregaLog('ERROR LECTURA PUERTO: '+e.Message);
+        Socket2.Active:=false;
+        Button1Click(nil);
+      end;
+    end;
+  finally
+    Timer1.Enabled:=true;
+  end;
+end;
 end.
 

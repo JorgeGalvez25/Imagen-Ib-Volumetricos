@@ -4124,6 +4124,13 @@ object FDISGATEWAY: TFDISGATEWAY
     end
     object TabSheet1: TTabSheet
       Caption = 'Trafico'
+      object Label1: TLabel
+        Left = 7
+        Top = 250
+        Width = 82
+        Height = 13
+        Caption = 'Errores conexi'#243'n:'
+      end
       object StaticText5: TStaticText
         Left = 4
         Top = 82
@@ -4203,11 +4210,18 @@ object FDISGATEWAY: TFDISGATEWAY
         State = cbChecked
         TabOrder = 7
       end
+      object Memo2: TMemo
+        Left = 7
+        Top = 268
+        Width = 297
+        Height = 102
+        TabOrder = 9
+      end
     end
   end
   object Timer1: TTimer
     Enabled = False
-    Interval = 250
+    Interval = 150
     OnTimer = Timer1Timer
     Left = 23
     Top = 83
@@ -4862,5 +4876,13 @@ object FDISGATEWAY: TFDISGATEWAY
     OnDblClick = NotificationIcon1DblClick
     Left = 121
     Top = 41
+  end
+  object Socket2: TClientSocket
+    Active = False
+    ClientType = ctNonBlocking
+    Port = 0
+    OnRead = Socket2Read
+    Left = 56
+    Top = 148
   end
 end
