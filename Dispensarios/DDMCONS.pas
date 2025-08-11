@@ -645,6 +645,8 @@ type
     Inocuidad31Licencia,
     Inocuidad31FechaVence,
     GuardaLogEntradaTanques,
+    TotalCalculado,
+    OrdenMangueras,
     ValorDispensarios           :String;
 
     // VEEDER ROOT
@@ -716,6 +718,7 @@ type
     ValidaCambioPrecio,
     ServidorGateway         :string;
     FlujoPorVehiculo:Boolean;
+    TimerDisp:Integer;
     // FIN VARIABLES
     PuertoGatewayDisp,
     PuertoGatewayTanq,    
@@ -1356,6 +1359,8 @@ begin
   ManejaCanalWayne:='No';
   ControlAros:='No';
   FlujoPorVehiculo:=False;
+  TotalCalculado:='No';
+  OrdenMangueras:='Combustible';
 
   // Gilbarco 2W
   GtwDivPresetLts:=100;
@@ -1409,6 +1414,7 @@ begin
   Inocuidad31Licencia:='';
   Inocuidad31FechaVence:='';
   SegundosFINV:=3;
+  TimerDisp:=0;
   lista:=TStringList.Create;
   // CARGA VARIBLES
   try
@@ -1581,9 +1587,15 @@ begin
       if Mayusculas(ss)='PRECIOSINICIO' then
         PreciosInicio:=Mayusculas(ExtraeElemStrSep(lin,2,'='))='SI';
       if Mayusculas(ss)='SEGUNDOSFINV' then
-        SegundosFINV:=StrToIntDef(ExtraeElemStrSep(lin,2,'='),10);
+        SegundosFINV:=StrToIntDef(ExtraeElemStrSep(lin,2,'='),3);
       if Mayusculas(ss)='FLUJOPORVEHICULO' then
         FlujoPorVehiculo:=Mayusculas(ExtraeElemStrSep(lin,2,'='))='SI';
+      if Mayusculas(ss)='TOTALCALCULADO' then
+        TotalCalculado:=ExtraeElemStrSep(lin,2,'=');
+      if Mayusculas(ss)='ORDENMANGUERAS' then
+        OrdenMangueras:=ExtraeElemStrSep(lin,2,'=');
+      if Mayusculas(ss)='TIMERDISP' then
+        TimerDisp:=StrToIntDef(ExtraeElemStrSep(lin,2,'='),0);
     end;
   finally
     lista.Free;
