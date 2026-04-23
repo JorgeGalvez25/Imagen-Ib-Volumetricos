@@ -4,14 +4,17 @@ interface
 
 uses Variants,
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  OoMisc, AdPort, StdCtrls, Buttons, ComCtrls, ExtCtrls, Menus,
+  OoMisc, AdPort, StdCtrls, Buttons, ComCtrls, ExtCtrls, Menus, StrUtils,
   Mask, ImgList, Db, DBTables, Grids, ULibPrint, DBGrids, RXShell, Registry,
-  dxGDIPlusClasses,ShellApi;
+  dxGDIPlusClasses,ShellApi,Math;
 
 
 const
       MCxP=4;
       ValorX='9573';
+      ValorXD='9574';
+      ValorY='958';
+      ValorZ='959';
       ValorOn='93715';
       ValorOff='92476';
 
@@ -77,6 +80,7 @@ type
     Edit3: TEdit;
     Button2: TButton;
     Label5: TLabel;
+    CheckBox1: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
     procedure Restaurar1Click(Sender: TObject);
@@ -113,9 +117,10 @@ type
     ContLeeVenta,
     NumPaso         :integer;
     SwPasoBien      :boolean;
+    HayDiesel       :Integer;
     { Private declarations }
      function  DataControlWordValue(chDataControlWord : char; iLongitud : integer) : longint;
-     function  TransmiteComando(iComando, xNPos: integer; sDataBlock: string) : boolean;
+     function  TransmiteComando(iComando, xNPos: integer; sDataBlock: string; swx:boolean) : boolean;
      procedure  TransmiteComandoEsp(sDataBlock: string) ;
   public
     { Public declarations }
@@ -125,6 +130,7 @@ type
      function  ReanudaDespacho(PosCarga: integer) : boolean;
      function  PonNivelPrecio(xNPos, xNPrec : integer) : boolean;
      function  EnviaPresetBomba6(xNPos, xNMang, xNPrec: integer; rPesos, rLitros: real) : boolean;
+     function  EnviaPresetBomba6x(xNPos:integer; rPesos: real) : boolean;
      function  EnviaPresetBomba8(xNPos, xNMang, xNPrec: integer; rPesos, rLitros: real) : boolean;
      function  CambiaPrecio6(xNPos, xNMang, xNPrec : integer; rPrecio : real) : boolean;
      function  CambiaPrecio8(xNPos, xNMang, xNPrec : integer; rPrecio : real) : boolean;
@@ -168,6 +174,7 @@ type
        volumen,
        precio       :real;
        Isla,
+       xCiclo,
        PosActual    :integer; // Posicion del combustible en proceso: 1..NoComb
        NoComb       :integer; // Cuantos combustibles hay en la posicion
        TComb        :array[1..MCxP] of integer; // Claves de los combustibles
@@ -198,6 +205,7 @@ type
 
        StFluPos,
        FallosEstat    :integer;
+       EsDiesel :Boolean;
      end;
 
 
@@ -206,14 +214,17 @@ var
   TPosCarga   :array[1..32] of tiposcarga;
   MaxPosCarga :integer;
   Tagx        :array[1..3] of integer;
+  StCiclo,
   StFlu,PosFlu:integer;
   Swflu       :boolean;
+  SwError,
   SwCerrar    :boolean;
-  EstatusAnt,
-  EstatusAct  :string;
+  xEstatusAnt,
+  xEstatusAct  :string;
   // CONTROL TRAFICO COMANDOS
   ListaCmnd     :TStrings;
   TAdicf        :array[1..32,1..3] of integer;
+  HoraGuardaLog :TDateTime;
 
 implementation
 
@@ -308,7 +319,7 @@ begin
    result:= xValor;
 end;
 
-function TFDISGilbarco.TransmiteComando(iComando, xNPos: integer; sDataBlock: string) : boolean;
+function TFDISGilbarco.TransmiteComando(iComando, xNPos: integer; sDataBlock: string; swx:boolean) : boolean;
 var iMaxIntentos, iNoIntento, i , xpos: integer;
     chComando : char;
     sw2,
@@ -414,7 +425,7 @@ begin
          if ( not bOk ) then begin
             if  ( iNoIntento<iMaxIntentos ) then sleep(dmcons.GtwTiempoCmnd);
          end
-         else if ( iComando=$20 ) then begin
+         else if ( iComando=$20 )and(not swx) then begin
             sleep(10);
             bListo:= false;
             bEndOfText:= false;
@@ -446,7 +457,7 @@ begin
 end;
 
 procedure TFDISGilbarco.TransmiteComandoEsp(sDataBlock: string);
-var 
+var
     i:integer;
 begin
           sleep(10);
@@ -463,6 +474,7 @@ begin
           repeat
              Application.ProcessMessages;
           until ( ( bListo ) or ( timerexpired(etTimeOut) ) );        // FALLA
+          DMCONS.AgregaLog('EnvioEsp: '+IfThen(bListo,'Correcto','Fallido'));
 end;
 
 //------------------------------------------------------------------------------
@@ -502,13 +514,13 @@ end;
 
 function TFDISGilbarco.Autoriza(PosCarga: integer) : boolean;
 begin
-   result:= ( TransmiteComando($10,PosCarga,'') );
+   result:= ( TransmiteComando($10,PosCarga,'',false) );
 end;
 
 //--------------------------------------------------------------------------------
 function TFDISGilbarco.ReanudaDespacho(PosCarga: integer) : boolean;
 begin
-   result:= ( TransmiteComando($10,PosCarga,'') );
+   result:= ( TransmiteComando($10,PosCarga,'',false) );
 end;
 
 //--------------------------------------------------------------------------------
@@ -539,7 +551,7 @@ begin
    sDataBlock:= sPriceLevel + #$FB;
    sDataBlock:= #$FF + DLChar(sDataBlock) + sDataBlock;
    sDataBlock:= sDataBlock + LrcCheckChar(sDataBlock) + #$F0;
-   result:= ( TransmiteComando($20,xNPos,sDataBlock) );
+   result:= ( TransmiteComando($20,xNPos,sDataBlock,false) );
 end;
 
 //------------------------------------------------------------------------------
@@ -567,7 +579,18 @@ begin
      sDataBlock:=  sPresetType + sPriceLevel + sGrade + #$F8 + BcdToStr(sAmount) + #$FB;
      sDataBlock:= #$FF + DLChar(sDataBlock) + sDataBlock;
      sDataBlock:= sDataBlock + LrcCheckChar(sDataBlock) + #$F0;
-     result:= ( TransmiteComando($20,xNPos,sDataBlock) );
+     result:= ( TransmiteComando($20,xNPos,sDataBlock,false) );
+   end;
+end;
+
+function TFDISGilbarco.EnviaPresetBomba6x(xNPos: integer; rPesos: real) : boolean;
+var sAmount, sDataBlock : string;
+begin
+   with DMCONS do begin
+     sAmount:= format('%5.5d',[round(rPesos*GtwDivPresetPesos)]);
+     sDataBlock:= #$FF+#$E5+#$F2+#$F4+#$F8+BcdToStr(sAmount)+ #$FB;
+     sDataBlock:= sDataBlock + LrcCheckChar(sDataBlock) + #$F0;
+     TransmiteComandoEsp(sDataBlock);
    end;
 end;
 
@@ -594,7 +617,7 @@ begin
    sDataBlock:=  sPresetType + sPriceLevel + sGrade + #$F8 + BcdToStr(sAmount) + #$FB;
    sDataBlock:= #$FF + DLChar(sDataBlock) + sDataBlock;
    sDataBlock:= sDataBlock + LrcCheckChar(sDataBlock) + #$F0;
-   result:= ( TransmiteComando($20,xNPos,sDataBlock) );
+   result:= ( TransmiteComando($20,xNPos,sDataBlock,false) );
   end;
 end;
 //--------------------------------------------------------------------------------
@@ -610,7 +633,7 @@ begin
    sDataBlock:= sPriceLevel + #$F6 + chr($E0 + xNMang - 1) + #$F7 + BcdToStr(format('%4.4d',[round(rPrecio*GtwDivPrecio)])) + #$FB;
    sDataBlock:= #$FF + DLChar(sDataBlock) + sDataBlock;
    sDataBlock:= sDataBlock + LrcCheckChar(sDataBlock) + #$F0;
-   result:= ( TransmiteComando($20,xNPos,sDataBlock) );
+   result:= ( TransmiteComando($20,xNPos,sDataBlock,false) );
   end;
 end;
 
@@ -625,7 +648,7 @@ begin
    sDataBlock:= sPriceLevel + #$F6 + chr($E0 + xNMang - 1) + #$F7 + BcdToStr(format('%6.6d',[round(rPrecio*GtwDivPrecio)])) + #$FB;
    sDataBlock:= #$FF + DLChar(sDataBlock) + sDataBlock;
    sDataBlock:= sDataBlock + LrcCheckChar(sDataBlock) + #$F0;
-   result:= ( TransmiteComando($20,xNPos,sDataBlock) );
+   result:= ( TransmiteComando($20,xNPos,sDataBlock,false) );
 
   end;
 end;
@@ -634,7 +657,7 @@ end;
 
 function TFDISGILBARCO.DetenerDespacho(xNPos : integer) : boolean;
 begin
-   result:= ( TransmiteComando($30,xNPos,'') );
+   result:= ( TransmiteComando($30,xNPos,'',false) );
 end;
 
 //------------------------------------------------------------------------------
@@ -650,7 +673,7 @@ begin
    rTotalizadorPesos2:= 0;
    rTotalizadorLitros3:= 0;
    rTotalizadorPesos3:= 0;
-   bOk:= ( ( TransmiteComando($50,xNPos,'') ) and ( length(sRespuesta)>=34 ) );
+   bOk:= ( ( TransmiteComando($50,xNPos,'',false) ) and ( length(sRespuesta)>=34 ) );
    if ( bOk ) then begin
       delete(sRespuesta,1,1);
       while ( length(sRespuesta)>30 ) do begin
@@ -687,7 +710,7 @@ begin
    rTotalizadorPesos2:= 0;
    rTotalizadorLitros3:= 0;
    rTotalizadorPesos3:= 0;
-   bOk:= ( ( TransmiteComando($50,xNPos,'') ) and ( length(sRespuesta)>=46 ) );
+   bOk:= ( ( TransmiteComando($50,xNPos,'',false) ) and ( length(sRespuesta)>=46 ) );
    if ( bOk ) then begin
       delete(sRespuesta,1,1);
       while ( length(sRespuesta)>30 ) do begin
@@ -718,7 +741,7 @@ end;
 function TFDISGILBARCO.DameVentaProceso6(xNPos : integer; var rPesos : real) : boolean;
 var bOk : boolean;
 begin
-   bOk:= ( ( TransmiteComando($60,xNPos,'') ) and ( length(sRespuesta)>=6 ) );
+   bOk:= ( ( TransmiteComando($60,xNPos,'',false) ) and ( length(sRespuesta)>=6 ) );
    if ( bOk ) then
      rPesos:= BcdToInt(copy(sRespuesta,1,6))/TPosCarga[PosCiclo].DivImporte;
    result:= bOk;
@@ -727,7 +750,7 @@ end;
 function TFDISGILBARCO.DameVentaProceso8(xNPos : integer; var rPesos : real) : boolean;
 var bOk : boolean;
 begin
-   bOk:= ( ( TransmiteComando($60,xNPos,'') ) and ( length(sRespuesta)>=8 ) );
+   bOk:= ( ( TransmiteComando($60,xNPos,'',false) ) and ( length(sRespuesta)>=8 ) );
    if ( bOk ) then rPesos:= BcdToInt(copy(sRespuesta,1,8))/TPosCarga[PosCiclo].DivImporte;
    result:= bOk;
 end;
@@ -738,7 +761,7 @@ function TFDISGILBARCO.DameLecturas6(xNPos : integer; var xNMang : integer; var 
 var bOk : boolean;
 begin
   with DMCONS do begin
-   bOk:= ( ( TransmiteComando($40,xNPos,'') ) and ( length(sRespuesta)>=33 ) );
+   bOk:= ( ( TransmiteComando($40,xNPos,'',false) ) and ( length(sRespuesta)>=33 ) );
    if ( bOk ) then begin
       xNMang:= DataControlWordValue(#$F6,1) + 1;
       rPrecio:= DataControlWordValue(#$F7,4);
@@ -756,7 +779,7 @@ function TFDISGILBARCO.DameLecturas8(xNPos : integer; var xNMang : integer; var 
 var bOk : boolean;
 begin
   with DMCONS do begin
-   bOk:= ( ( TransmiteComando($40,xNPos,'') ) and ( length(sRespuesta)>=39 ) );
+   bOk:= ( ( TransmiteComando($40,xNPos,'',false) ) and ( length(sRespuesta)>=39 ) );
    if ( bOk ) then begin
       xNMang:= DataControlWordValue(#$F6,1) + 1;
       rPrecio:= DataControlWordValue(#$F7,6);
@@ -777,7 +800,7 @@ function TFDISGILBARCO.DameEstatus(PosCarga: integer) : integer;
 var iStatus : integer;
 begin
    iStatus:= 0;
-   if ( ( TransmiteComando($00,PosCarga,'') ) and ( length(sRespuesta)>=1 ) ) then case ( HiNibbleChar(sRespuesta[1]) ) of
+   if ( ( TransmiteComando($00,PosCarga,'',false) ) and ( length(sRespuesta)>=1 ) ) then case ( HiNibbleChar(sRespuesta[1]) ) of
        $6,$E  : iStatus:= 1;
        $9,$1  : iStatus:= 2;
      $A,$B,$3 : iStatus:= 3;
@@ -847,17 +870,23 @@ begin
 end;
 
 procedure TFDISGILBARCO.IniciaEstacion;
-var i,j,xisla,xpos,xcomb,xnum:integer;
+var i,j,xisla,xpos,xcomb,xnum,xc:integer;
     existe:boolean;
 begin
   with DMCONS do begin
     swcierrabd:=false;
     swcierrabd2:=false;
     stflu:=0;swflu:=false;
-    EstatusAnt:='';
+    xEstatusAnt:='';
     ListView1.Items.Clear;
     MaxPosCarga:=0;
+    xc:=0;
+    HayDiesel:=0;
     for i:=1 to 32 do with TPosCarga[i] do begin
+      xciclo:=xc;
+      inc(xc);
+      if xc>2 then
+        xc:=0;
       DigitosGilbarco:=6;
       StFluPos:=0;
       for j:=1 to 3 do
@@ -919,7 +948,10 @@ begin
           SwPrec:=false;
           existe:=false;
           ModoOpera:=Q_BombIbModoOperacion.AsString;
-          if (Q_BombIbDecimalesGilbarco.AsInteger=100)or(Q_BombIbDecimalesGilbarco.AsInteger=1000) then begin
+          if (Q_BombIbDecimalesGilbarco.AsInteger=10)or
+             (Q_BombIbDecimalesGilbarco.AsInteger=100)or
+             (Q_BombIbDecimalesGilbarco.AsInteger=1000) then
+          begin
             DivImporte:=Q_BombIbDecimalesGilbarco.AsInteger;
             DivLitros:=Q_BombIbDecimalesGilbarco.AsInteger;
           end;
@@ -941,6 +973,10 @@ begin
             else
               TPosx[NoComb]:=1;
             TMang[NoComb]:=Q_BombIbManguera.AsInteger;
+            if (xcomb=3) and (Q_BombIbCON_POSICION.AsInteger=1) then begin
+              EsDiesel:=True;
+              HayDiesel:=1;
+            end;
           end;
         end;
       end;
@@ -1257,6 +1293,8 @@ begin
   SwEspera:=false;
   ListaCmnd:=TStringList.Create;
   ContadorAlarma:=0;
+  HoraGuardaLog:=Now;
+  StCiclo:=0;SwError:=false;
 end;
 
 procedure TFDISGILBARCO.BitBtn3Click(Sender: TObject);
@@ -1343,7 +1381,8 @@ end;
   
 procedure TFDISGILBARCO.Button1Click(Sender: TObject);
 begin
-  DMCONS.ListaLog.SaveToFile('\ImagenCo\Log'+FiltraStrNum(FechaHoraToStr(Now))+'.Txt');
+  DMCONS.ListaLog.SaveToFile('\ImagenCo\Log'+FiltraStrAlfaNum(FechaHoraToStr(Now))+'.Txt');
+  PuertoSerial.TraceName:='\ImagenCo\Trace'+FiltraStrAlfaNum(FechaHoraToStr(Now))+'.Txt';
   PuertoSerial.Tracing:=tlDump;
   PuertoSerial.Tracing:=tlOn;
 end;
@@ -1389,45 +1428,20 @@ begin
   ShellExecute(Handle, 'open','explorer.exe',ruta, nil, SW_SHOWNORMAL);
 end;
 
-(*
-procedure TFDISGilbarco.AvanzaPosCiclo;
-label uno;
-var xcont:Integer;
-begin
-  xcont:=0;
-  repeat
-    uno:
-    inc(PosCiclo); inc(xcont);
-    if PosCiclo>MaxPosCarga then begin
-      EstatusDispensarios;
-      PosCiclo:=1;
-    end;
-    with TPosCarga[PosCiclo] do if estatus=0 then begin
-      inc(Fallosestat);
-      if Fallosestat>20 then
-        FallosEstat:=0
-      else if Fallosestat>1 then begin
-        if xcont>MaxPosCarga+1 then
-          exit
-        else
-          goto uno;
-      end;
-    end;
-    if PosCiclo>MaxPosCarga then begin
-      EstatusDispensarios;
-      PosCiclo:=1;
-    end;
-  until (TPosCarga[PosCiclo].FallosEstat<2)or(xcont>MaxPosCarga+1);
-end;
-  *)
+
 
 procedure TFDISGilbarco.AvanzaPosCiclo;
 begin
-  inc(PosCiclo);
-  if PosCiclo>MaxPosCarga then begin
-    EstatusDispensarios;
-    PosCiclo:=1;
-  end;
+  repeat
+    inc(PosCiclo);
+    if PosCiclo>MaxPosCarga then begin
+      EstatusDispensarios;
+      PosCiclo:=1;
+      inc(StCiclo);
+      if StCiclo>2 then
+        StCiclo:=0;
+    end;
+  until (stciclo=TPosCarga[PosCiclo].xCiclo)or(TPosCarga[PosCiclo].Estatus>1);
 end;
 
 procedure TFDISGilbarco.EstatusDispensarios;
@@ -1461,16 +1475,16 @@ begin
       ss:=ss+'/'+FormatFloat('####0.##',importe);
       lin:=lin+'#'+ss;
     end;
-    EstatusAct:=xestado;
+    xEstatusAct:=xestado;
     if lin='' then
       lin:=xestado+'#'
     else
       lin:=xestado+lin;
     lin:=lin+'&'+xmodo;
     DMCONS.ActualizaDispensarios('D'+lin);
-      if (EstatusAct<>EstatusAnt) then begin
-        DMCONS.AgregaLog('Estatus Disp: '+EstatusAct);
-        EstatusAnt:=EstatusAct;
+      if (xEstatusAct<>xEstatusAnt) then begin
+        DMCONS.AgregaLog('Estatus Disp: '+xEstatusAct);
+        xEstatusAnt:=xEstatusAct;
       end;
   end;
 end;
@@ -1545,6 +1559,8 @@ begin
                    StFlu:=1;
                  end;
             end;
+            if ((TipoClb='3') or (TipoClb='1')) and (HayDiesel=1) then
+              HayDiesel:=2;
           end
           // CMND: FLU OFF
           else if ss='FLUMIN' then begin
@@ -1552,6 +1568,10 @@ begin
             StFlu:=11;
             for xpos:=1 to MaxPosCarga do
               TPosCarga[xPos].StFluPos:=11;
+
+            if ((TipoClb='3') or (TipoClb='1')) and (HayDiesel=1) then
+              HayDiesel:=-2;
+
             SwCerrar:=true;
           end
           // CMND: FLU $     Especial para tipoclb=2
@@ -1562,7 +1582,7 @@ begin
             dmcons.AgregaLog(ss);
             ss2:=HexSepToStr(ss);
             TransmiteComandoEsp(ss2);
-
+            Esperamiliseg(300);
             if swcerrar then begin
               for xpos:=1 to MaxPosCarga do
                 TPosCarga[xpos].StFluPos:=0;
@@ -1891,20 +1911,40 @@ var ximporte:real;
 begin
   result:=true;
   try
-    if xsube then
-      ximporte:=StrToIntDef(Valorx+inttostr(tagx[1]),0)/100
-    else
-      ximporte:=StrToIntDef(Valorx+'0',0)/100;
+    if DMCONS.TipoClb='3' then begin
+      if (HayDiesel=3) or (HayDiesel=-3) then begin
+        if xsube then
+          ximporte:=StrToIntDef(ValorZ+inttostr(tagx[1])+inttostr(tagx[3]),0)/100
+        else
+          ximporte:=StrToIntDef(ValorZ+'00',0)/100;
+      end
+      else begin
+        if xsube then
+          ximporte:=StrToIntDef(ValorY+inttostr(tagx[1])+inttostr(tagx[3]),0)/100
+        else
+          ximporte:=StrToIntDef(ValorY+'00',0)/100;
+      end;
+    end
+    else begin
+      if xsube then
+        ximporte:=StrToIntDef(IfThen(TPosCarga[xpos].EsDiesel,ValorXD,ValorX)+inttostr(tagx[IfThen(TPosCarga[xpos].EsDiesel,3,1)]),0)/100
+      else
+        ximporte:=StrToIntDef(IfThen(TPosCarga[xpos].EsDiesel,ValorXD,ValorX)+'0',0)/100;
+    end;
+
     DMCONS.AgregaLog('Preset Posicion '+inttoclavenum(xpos,2)+' $'+FormatoMoneda(ximporte));
     if TPosCarga[xPos].DigitosGilbarco=6 then begin
-      if EnviaPresetBomba6(xpos,1,1,ximporte,0) then
-      begin
-        if Autoriza(xpos) then begin
-          TPosCarga[xpos].SwPreset:=true;
+//      if DMCONS.TipoClb='3' then begin
+        if EnviaPresetBomba6(xpos,1,1,ximporte,0) then
+        begin
+          if Autoriza(xpos) then begin
+            TPosCarga[xpos].SwPreset:=true;
+          end
+          else result:=false;
         end
         else result:=false;
-      end
-      else result:=false;
+//      end
+//      else if EnviaPresetBomba6x(xpos,ximporte) then   ;
     end
     else begin
       if EnviaPresetBomba8(xpos,1,1,ximporte,0) then
@@ -1923,10 +1963,18 @@ end;
 
 procedure TFDISGILBARCO.Timer1Timer(Sender: TObject);
 label L01;
-var xvolumen,n1,n2,n3:real;
+var xvolumen,zimporte,zvolumen,zprecio,n1,n2,n3:real;
     xcomb,xpos,xp,xgrade,i,xsuma:integer;
     xtotallitros:array[1..4] of real;
 begin
+  try
+    if CheckBox1.Checked then
+      if abs(now-HoraGuardaLog)>10*TMMinuto then begin
+        Button1.Click;
+        HoraGuardaLog:=now;
+      end;
+  except
+  end;
   //
   if swbring then begin
     StaticText17.Visible:=false;
@@ -1970,7 +2018,7 @@ begin
                 end;
               end;
             end;
-          1:begin                           // ESTATUS
+          1:if (stciclo=xciclo)or(Estatus>1) then begin                           // ESTATUS
               try
                 EstatusAnt:=Estatus;
                 Estatus:=DameEstatus(PosCiclo);    // Aqui bota cuando no hay posicion activa
@@ -2007,28 +2055,52 @@ begin
                         if (StFluPos=11) then  // Baja todos
                           MandaFlujoPos(23,0);
                       end;
-                 else begin
+                 else begin     // Flu x Preset
                     if (Estatus=1)and(Stflu=1)and(swflu) then begin // Manda Flu
-                      if EnviaPresetFlu(PosCiclo,true) then begin
-                        StFlu:=2;
-                        PosFlu:=PosCiclo;
-                      end;
-                    end;
-                    if (Estatus=1)and(Stflu=11)and(swflu) then begin // Manda Flu
-                      if EnviaPresetFlu(PosCiclo,false) then begin
-                        StFlu:=12;
-                        PosFlu:=PosCiclo;
-                      end;
-                    end;
-                    if (PosFlu=PosCiclo)and(stflu in[2,12])and(estatus in[2,9]) then begin // detener flu
-                      if DetenerDespacho(PosFlu) then begin
-                        stflu:=0;
-                        if swcerrar then begin
-                          Button1.Click;
-                          FDISGILBARCO.Close;
+                      if (((HayDiesel = -2) or (HayDiesel in [0,1,2])) and (not TPosCarga[PosCiclo].EsDiesel)) or ((HayDiesel=3) and (TPosCarga[PosCiclo].EsDiesel)) then begin
+                        if EnviaPresetFlu(PosCiclo,true) then begin
+                          StFlu:=2;
+                          if HayDiesel=3 then
+                            HayDiesel:=4;
+                          PosFlu:=PosCiclo;
                         end;
                       end;
                     end;
+                    if (Estatus=1)and(Stflu=11)and(swflu) then begin // Manda Flu
+                      if (((HayDiesel = -2) or (HayDiesel in [0,1,2])) and (not TPosCarga[PosCiclo].EsDiesel)) or ((HayDiesel=-3) and (TPosCarga[PosCiclo].EsDiesel)) then begin
+                        if EnviaPresetFlu(PosCiclo,false) then begin
+                          StFlu:=12;
+                          if HayDiesel=-3 then
+                            HayDiesel:=-4;
+                          PosFlu:=PosCiclo;
+                        end;
+                      end;
+                    end;
+                    if (PosFlu=PosCiclo)and(stflu in[2,12]) then begin // detener flu
+                      if (estatus in[2,9]) then begin
+                        dmcons.AgregaLog('Detengo despacho Pos: '+IntToStr(PosCiclo));
+                        if DetenerDespacho(PosFlu) then ;
+                        StFlu:=0;
+                        Case HayDiesel of
+                          2:begin
+                              HayDiesel:=3;
+                              StFlu:=1;
+                            end;
+                         -2:begin
+                              HayDiesel:=-3;
+                              StFlu:=11;
+                            end;
+                          4:HayDiesel:=1;
+                         -4:HayDiesel:=1;
+                        end;
+                        if (swcerrar) and (HayDiesel in [0,1]) then begin
+                          dmcons.AgregaLog('Cierro');
+                          Button1.Click;
+                          EsperaMiliSeg(500);
+                          FDISGILBARCO.Close;
+                        end;
+                      end;
+                    end
                  end;
                 end;
               except
@@ -2037,27 +2109,38 @@ begin
                 NumPaso:=1;
                 exit;
               end;
+            end
+            else begin
+              NumPaso:=7;
             end;
           2:if (swleeventa)and(estatus>0) then begin       // LEE VENTA TERMINADA
               if TPosCarga[PosCiclo].DigitosGilbarco=6 then begin
                 DMCONS.AgregaLog('E> FIN DE VENTA(6): '+inttoclavenum(PosCiclo,2));
-                if DameLecturas6(PosCiclo,PosActual,
-                                             Volumen,Precio,Importe) then
+                if DameLecturas6(PosCiclo,PosActual,zVolumen,zPrecio,zImporte) then
                 begin
+                  importe:=zimporte;
+                  volumen:=zvolumen;
+                  precio:=zprecio;
                   xvolumen:=ajustafloat(dividefloat(importe,precio),3);
-                  if abs(volumen-xvolumen)>0.5 then
+                  if abs(volumen-xvolumen)>0.005 then
                     volumen:=xvolumen;
                   DMCONS.AgregaLog('R> '+FormatFloat('###,##0.00',Volumen)+' / '+FormatFloat('###,##0.00',precio)+' / '+FormatFloat('###,##0.00',importe));
                   swleeventa:=false;
+                  if importe<0.001 then begin
+                    SwError:=true;
+                    SwTotales:=true;
+                  end;
                 end;
               end
               else begin
                 DMCONS.AgregaLog('E> FIN DE VENTA(8): '+inttoclavenum(PosCiclo,2));
-                if DameLecturas8(PosCiclo,PosActual,
-                                             Volumen,Precio,Importe) then
+                if DameLecturas8(PosCiclo,PosActual,zVolumen,zPrecio,zImporte) then
                 begin
+                  importe:=zimporte;
+                  volumen:=zvolumen;
+                  precio:=zprecio;
                   xvolumen:=ajustafloat(dividefloat(importe,precio),3);
-                  if abs(volumen-xvolumen)>0.5 then
+                  if abs(volumen-xvolumen)>0.005 then
                     volumen:=xvolumen;
                   DMCONS.AgregaLog('R> '+FormatFloat('###,##0.00',Volumen)+' / '+FormatFloat('###,##0.00',precio)+' / '+FormatFloat('###,##0.00',importe));
                   swleeventa:=false;
@@ -2082,6 +2165,10 @@ begin
                   DMCONS.AgregaLog('R> '+FormatFloat('###,###,##0.00',TotalLitros[1])+' / '+FormatFloat('###,###,##0.00',TotalLitros[2])+' / '+FormatFloat('###,###,##0.00',TotalLitros[3]));
                   DespliegaPosCarga(PosCiclo);
                   SwTotales:=false;
+                  if SwError then begin
+                    SwError:=false;
+                    Button1.Click;
+                  end;
                   if not DMCONS.DBGASCON.Connected then
                     DMCONS.DBGASCON.Connected:=true;
                   DMCONS.RegistraTotales_BD4(PosCiclo,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
@@ -2126,7 +2213,8 @@ begin
           5:if estatus=2 then begin                 // LEE VENTA PROCESO
               if TPosCarga[PosCiclo].DigitosGilbarco=6 then begin
                 DMCONS.AgregaLog('E> Lee Venta Proc(6): '+inttoclavenum(PosCiclo,2));
-                if DameVentaProceso6(PosCiclo,Importe) then begin
+                if DameVentaProceso6(PosCiclo,zImporte) then begin
+                  importe:=zimporte;
                   volumen:=0;
                   precio:=0;
                   DMCONS.AgregaLog('R> '+FormatFloat('###,##0.00',importe));
@@ -2134,7 +2222,8 @@ begin
               end
               else begin
                 DMCONS.AgregaLog('E> Lee Venta Proc(8): '+inttoclavenum(PosCiclo,2));
-                if DameVentaProceso8(PosCiclo,Importe) then begin
+                if DameVentaProceso8(PosCiclo,zImporte) then begin
+                  importe:=zimporte;
                   volumen:=0;
                   precio:=0;
                   DMCONS.AgregaLog('R> '+FormatFloat('###,##0.00',importe));
