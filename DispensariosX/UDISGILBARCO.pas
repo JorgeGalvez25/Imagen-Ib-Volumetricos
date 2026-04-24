@@ -1959,19 +1959,20 @@ begin
     end
     else begin
       if TPosCarga[xpos].EsMixto then begin
-        // Comando 959.xy - posicion con magna(1) y diesel(3) en la misma posicion
-        // X = Con_Posicion de la manguera de magna; Y = Con_Posicion de la manguera de diesel
         xPosMagna:=PosicionDeCombustible(xpos,1);
         xPosDiesel:=PosicionDeCombustible(xpos,3);
-        if xsube then
-          ximporte:=StrToIntDef(ValorZ+IntToStr(tagx[1])+IntToStr(tagx[3]),0)/100
+        if xsube then begin
+          if xPosMagna=2 then
+            ximporte:=StrToIntDef(ValorZ+IntToStr(tagx[1])+IntToStr(tagx[3]),0)/100
+          else
+            ximporte:=StrToIntDef(ValorZ+IntToStr(tagx[3])+IntToStr(tagx[1]),0)/100;
+        end
         else
           ximporte:=StrToIntDef(ValorZ+'00',0)/100;
         DMCONS.AgregaLog('Preset Mixto Pos '+inttoclavenum(xpos,2)+' $'+FormatoMoneda(ximporte)+
                          ' (Magna ConPos='+IntToStr(xPosMagna)+', Diesel ConPos='+IntToStr(xPosDiesel)+')');
       end
       else begin
-        // Logica existente para posiciones de un solo combustible (957.3x o 957.4x)
         if xsube then
           ximporte:=StrToIntDef(IfThen(TPosCarga[xpos].EsDiesel,ValorXD,ValorX)+inttostr(tagx[IfThen(TPosCarga[xpos].EsDiesel,3,1)]),0)/100
         else
