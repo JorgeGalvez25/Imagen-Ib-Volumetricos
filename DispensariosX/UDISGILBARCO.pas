@@ -118,6 +118,7 @@ type
     NumPaso         :integer;
     SwPasoBien      :boolean;
     HayDiesel       :Integer;
+    HayMixto        :Integer;   // 1 cuando existen posiciones EsMixto; 0 = ninguna
     { Private declarations }
      function  DataControlWordValue(chDataControlWord : char; iLongitud : integer) : longint;
      function  TransmiteComando(iComando, xNPos: integer; sDataBlock: string; swx:boolean) : boolean;
@@ -206,6 +207,7 @@ type
        StFluPos,
        FallosEstat    :integer;
        EsDiesel :Boolean;
+       EsMixto  :Boolean;   // True cuando la posicion tiene exactamente magna(1) + diesel(3)
      end;
 
 
@@ -918,7 +920,9 @@ begin
       SwPreset:=false;
       Fallosestat:=0;
       HoraNivelPrecio:=Now;
+      EsMixto:=false;
     end;
+    HayMixto:=0;
     // CARGA DEFAULTS PAM
     TL_Bomb.Active:=true;
     while not TL_Bomb.Eof do begin
@@ -981,6 +985,29 @@ begin
         end;
       end;
       Q_BombIb.Next;
+    end;
+    // Determina posiciones mixtas (exactamente magna comb=1 y diesel comb=3, sin otros)
+    for i:=1 to MaxPosCarga do
+      with TPosCarga[i] do begin
+        EsMixto:=(NoComb=2) and
+                 (((TComb[1]=1) and (TComb[2]=3)) or
+                  ((TComb[1]=3) and (TComb[2]=1)));
+        if EsMixto then
+          EsDiesel:=False;
+        // Registra si la estacion tiene al menos una posicion mixta
+        if EsMixto then
+          HayMixto:=1;
+      end;
+    // Corrige HayDiesel: si fue activado (=1) unicamente por posiciones mixtas
+    // (ningun diesel puro existe), se resetea a 0 para que la maquina de estados
+    // no intente una segunda pasada que nunca se podria completar.
+    if HayDiesel=1 then begin
+      xpos:=0;
+      for i:=1 to MaxPosCarga do
+        if TPosCarga[i].EsDiesel then
+          xpos:=1;
+      if xpos=0 then
+        HayDiesel:=0;
     end;
   end;
   ListBox1.Items.Clear;
@@ -1559,7 +1586,9 @@ begin
                    StFlu:=1;
                  end;
             end;
-            if ((TipoClb='3') or (TipoClb='1')) and (HayDiesel=1) then
+            if (TipoClb='3') and (HayDiesel=1) then
+              HayDiesel:=2
+            else if (TipoClb='1') and ((HayDiesel=1) or (HayMixto=1)) then
               HayDiesel:=2;
           end
           // CMND: FLU OFF
@@ -1569,7 +1598,9 @@ begin
             for xpos:=1 to MaxPosCarga do
               TPosCarga[xPos].StFluPos:=11;
 
-            if ((TipoClb='3') or (TipoClb='1')) and (HayDiesel=1) then
+            if (TipoClb='3') and (HayDiesel=1) then
+              HayDiesel:=-2
+            else if (TipoClb='1') and ((HayDiesel=1) or (HayMixto=1)) then
               HayDiesel:=-2;
 
             SwCerrar:=true;
@@ -1908,6 +1939,7 @@ end;
 
 function TFDISGilbarco.EnviaPresetFlu(xpos:integer;xsube:boolean):boolean;
 var ximporte:real;
+    xPosMagna,xPosDiesel:integer;
 begin
   result:=true;
   try
@@ -1926,13 +1958,27 @@ begin
       end;
     end
     else begin
-      if xsube then
-        ximporte:=StrToIntDef(IfThen(TPosCarga[xpos].EsDiesel,ValorXD,ValorX)+inttostr(tagx[IfThen(TPosCarga[xpos].EsDiesel,3,1)]),0)/100
-      else
-        ximporte:=StrToIntDef(IfThen(TPosCarga[xpos].EsDiesel,ValorXD,ValorX)+'0',0)/100;
+      if TPosCarga[xpos].EsMixto then begin
+        // Comando 959.xy - posicion con magna(1) y diesel(3) en la misma posicion
+        // X = Con_Posicion de la manguera de magna; Y = Con_Posicion de la manguera de diesel
+        xPosMagna:=PosicionDeCombustible(xpos,1);
+        xPosDiesel:=PosicionDeCombustible(xpos,3);
+        if xsube then
+          ximporte:=StrToIntDef(ValorZ+IntToStr(tagx[1])+IntToStr(tagx[3]),0)/100
+        else
+          ximporte:=StrToIntDef(ValorZ+'00',0)/100;
+        DMCONS.AgregaLog('Preset Mixto Pos '+inttoclavenum(xpos,2)+' $'+FormatoMoneda(ximporte)+
+                         ' (Magna ConPos='+IntToStr(xPosMagna)+', Diesel ConPos='+IntToStr(xPosDiesel)+')');
+      end
+      else begin
+        // Logica existente para posiciones de un solo combustible (957.3x o 957.4x)
+        if xsube then
+          ximporte:=StrToIntDef(IfThen(TPosCarga[xpos].EsDiesel,ValorXD,ValorX)+inttostr(tagx[IfThen(TPosCarga[xpos].EsDiesel,3,1)]),0)/100
+        else
+          ximporte:=StrToIntDef(IfThen(TPosCarga[xpos].EsDiesel,ValorXD,ValorX)+'0',0)/100;
+        DMCONS.AgregaLog('Preset Posicion '+inttoclavenum(xpos,2)+' $'+FormatoMoneda(ximporte));
+      end;
     end;
-
-    DMCONS.AgregaLog('Preset Posicion '+inttoclavenum(xpos,2)+' $'+FormatoMoneda(ximporte));
     if TPosCarga[xPos].DigitosGilbarco=6 then begin
 //      if DMCONS.TipoClb='3' then begin
         if EnviaPresetBomba6(xpos,1,1,ximporte,0) then
@@ -2055,9 +2101,16 @@ begin
                         if (StFluPos=11) then  // Baja todos
                           MandaFlujoPos(23,0);
                       end;
-                 else begin     // Flu x Preset
-                    if (Estatus=1)and(Stflu=1)and(swflu) then begin // Manda Flu
-                      if (((HayDiesel = -2) or (HayDiesel in [0,1,2])) and (not TPosCarga[PosCiclo].EsDiesel)) or ((HayDiesel=3) and (TPosCarga[PosCiclo].EsDiesel)) then begin
+                 else begin     // Flu x Preset (TipoClb='1' o sin asignar)
+                    if (Estatus=1)and(Stflu=1)and(swflu) then begin // Manda Flu SUBE
+                      // Pasada magna-only (HD in [0,1,2]): not EsDiesel AND not EsMixto → 957.3x
+                      // Pasada EsMixto    (HD=5)          : EsMixto=True              → 959.xy
+                      // Pasada diesel puro(HD=3)          : EsDiesel=True             → 957.4x
+                      if ((((HayDiesel=-2) or (HayDiesel in [0,1,2])) and
+                           (not TPosCarga[PosCiclo].EsDiesel) and
+                           (not TPosCarga[PosCiclo].EsMixto)) or
+                          ((HayDiesel=5) and TPosCarga[PosCiclo].EsMixto) or
+                          ((HayDiesel=3) and TPosCarga[PosCiclo].EsDiesel)) then begin
                         if EnviaPresetFlu(PosCiclo,true) then begin
                           StFlu:=2;
                           if HayDiesel=3 then
@@ -2066,8 +2119,13 @@ begin
                         end;
                       end;
                     end;
-                    if (Estatus=1)and(Stflu=11)and(swflu) then begin // Manda Flu
-                      if (((HayDiesel = -2) or (HayDiesel in [0,1,2])) and (not TPosCarga[PosCiclo].EsDiesel)) or ((HayDiesel=-3) and (TPosCarga[PosCiclo].EsDiesel)) then begin
+                    if (Estatus=1)and(Stflu=11)and(swflu) then begin // Manda Flu BAJA
+                      // Misma separacion para baja: magna-only, EsMixto (-5), diesel (-3)
+                      if ((((HayDiesel=-2) or (HayDiesel in [0,1,2])) and
+                           (not TPosCarga[PosCiclo].EsDiesel) and
+                           (not TPosCarga[PosCiclo].EsMixto)) or
+                          ((HayDiesel=-5) and TPosCarga[PosCiclo].EsMixto) or
+                          ((HayDiesel=-3) and TPosCarga[PosCiclo].EsDiesel)) then begin
                         if EnviaPresetFlu(PosCiclo,false) then begin
                           StFlu:=12;
                           if HayDiesel=-3 then
@@ -2082,13 +2140,51 @@ begin
                         if DetenerDespacho(PosFlu) then ;
                         StFlu:=0;
                         Case HayDiesel of
+                          // Pasada magna terminada → EsMixto si hay, sino diesel
                           2:begin
-                              HayDiesel:=3;
-                              StFlu:=1;
+                              if HayMixto=1 then begin
+                                HayDiesel:=5;   // pasada EsMixto (959.xy)
+                                StFlu:=1;
+                              end
+                              else begin
+                                HayDiesel:=3;   // pasada diesel puro (957.4x)
+                                StFlu:=1;
+                              end;
                             end;
+                          // Pasada EsMixto terminada → diesel si hay, sino fin
+                          5:begin
+                              xp:=0;
+                              for i:=1 to MaxPosCarga do
+                                if TPosCarga[i].EsDiesel then xp:=1;
+                              if xp=1 then begin
+                                HayDiesel:=3;   // pasada diesel puro (957.4x)
+                                StFlu:=1;
+                              end
+                              else
+                                HayDiesel:=1;   // sin diesel puro, secuencia completa
+                            end;
+                          // Pasada baja magna terminada → EsMixto baja si hay, sino diesel baja
                          -2:begin
-                              HayDiesel:=-3;
-                              StFlu:=11;
+                              if HayMixto=1 then begin
+                                HayDiesel:=-5;  // pasada baja EsMixto (959.00)
+                                StFlu:=11;
+                              end
+                              else begin
+                                HayDiesel:=-3;  // pasada baja diesel puro
+                                StFlu:=11;
+                              end;
+                            end;
+                          // Pasada baja EsMixto terminada → diesel baja si hay, sino fin
+                         -5:begin
+                              xp:=0;
+                              for i:=1 to MaxPosCarga do
+                                if TPosCarga[i].EsDiesel then xp:=1;
+                              if xp=1 then begin
+                                HayDiesel:=-3;  // pasada baja diesel puro
+                                StFlu:=11;
+                              end
+                              else
+                                HayDiesel:=1;   // sin diesel puro, secuencia completa
                             end;
                           4:HayDiesel:=1;
                          -4:HayDiesel:=1;

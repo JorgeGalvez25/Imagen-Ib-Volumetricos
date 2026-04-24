@@ -1,6 +1,6 @@
 object FDISGILBARCO: TFDISGILBARCO
-  Left = 234
-  Top = 148
+  Left = 569
+  Top = 202
   Width = 750
   Height = 556
   Caption = 'Consola de Dispensarios'
@@ -20,8 +20,8 @@ object FDISGILBARCO: TFDISGILBARCO
   TextHeight = 13
   object Panel1: TPanel
     Left = 0
-    Top = 481
-    Width = 742
+    Top = 476
+    Width = 734
     Height = 41
     Align = alBottom
     BevelOuter = bvNone
@@ -75,8 +75,8 @@ object FDISGILBARCO: TFDISGILBARCO
   object PageControl1: TPageControl
     Left = 0
     Top = 0
-    Width = 742
-    Height = 481
+    Width = 734
+    Height = 476
     ActivePage = TabSheet2
     Align = alClient
     TabOrder = 1
@@ -87,7 +87,7 @@ object FDISGILBARCO: TFDISGILBARCO
         Left = 0
         Top = 0
         Width = 160
-        Height = 453
+        Height = 448
         Align = alLeft
         TabOrder = 0
         object ListBox1: TListBox
@@ -254,10 +254,10 @@ object FDISGILBARCO: TFDISGILBARCO
         TabOrder = 12
       end
       object Panel2: TPanel
-        Left = 582
+        Left = 574
         Top = 0
         Width = 152
-        Height = 453
+        Height = 448
         Align = alRight
         BevelOuter = bvNone
         TabOrder = 13
@@ -265,7 +265,7 @@ object FDISGILBARCO: TFDISGILBARCO
           Left = 8
           Top = 0
           Width = 144
-          Height = 453
+          Height = 448
           Align = alRight
           Columns = <
             item
@@ -433,11 +433,19 @@ object FDISGILBARCO: TFDISGILBARCO
         TabOrder = 9
         OnClick = Button2Click
       end
+      object CheckBox1: TCheckBox
+        Left = 184
+        Top = 120
+        Width = 153
+        Height = 17
+        Caption = 'Guardar log c/10 min'
+        TabOrder = 10
+      end
     end
   end
   object Timer1: TTimer
     Enabled = False
-    Interval = 100
+    Interval = 80
     OnTimer = Timer1Timer
     Left = 204
     Top = 64
@@ -1084,8 +1092,10 @@ object FDISGILBARCO: TFDISGILBARCO
     Baud = 5700
     Parity = pEven
     Tracing = tlOn
+    TraceSize = 50000
     TraceName = 'APRO.TRC'
     TraceAllHex = True
+    LogSize = 50000
     LogName = 'APRO.LOG'
     OnTriggerAvail = PuertoSerialTriggerAvail
     OnTriggerData = PuertoSerialTriggerData
