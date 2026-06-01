@@ -7,7 +7,7 @@ uses Variants,
   OoMisc, AdPort, StdCtrls, Buttons, ComCtrls, ExtCtrls, Menus,
   Mask, ImgList, Db, DBTables, Grids, ULibPrint, DBGrids, RXShell, Registry,
   IBCtrls, SIBEABase, SIBFIBEA, FIBDatabase, pFIBDatabase, UIMGUTIL,
-  dxGDIPlusClasses,ShellApi;
+  dxGDIPlusClasses,ShellApi, Math;
 
 Const MaxEsperaRsp=5;
       NivelPrecioContado='1';
@@ -292,7 +292,7 @@ begin
       Q_BombIb.Active:=true;
 
       if Q_BombIb.IsEmpty then
-        raise Exception.Create('Estación no existe, o no tiene posiciones de carga configurados');
+        raise Exception.Create('Estaciï¿½n no existe, o no tiene posiciones de carga configurados');
 
       // Carga Combustibles
       for i:=1 to MaxComb do with TabComb[i] do begin
@@ -315,7 +315,7 @@ begin
         end;
         Q_CombIb.Next;
       end;
-      CargaPreciosFH(Now,true); // guarda precio actual como físico
+      CargaPreciosFH(Now,true); // guarda precio actual como fï¿½sico
       Q_CombIb.Active:=false;
       Q_CombIb.Active:=true;
       DespliegaPrecios;
@@ -667,13 +667,13 @@ begin
                 end;
                 T_MoviIbTag.AsInteger:=0;
                 T_MoviIbManguera.AsInteger:=TMang[PosActual];
-                T_MoviIbTipoPago.asinteger:=TPosCarga[i].TipoPago;
+                AgregaLog('TipoPagoPos'+IntToStr(PosActual)+': '+IntToStr(TipoPago));
+                T_MoviIbTipoPago.asinteger:=TipoPago;
                 T_MoviIbBoucher.Asstring:=Boucher;
                 T_MoviIbCuponImpreso.AsString:='No';
                 T_MoviIbReferenciaBitacora.AsInteger:=0;
                 T_MoviIbGasId.AsInteger:=Random(1000000);
                 TPosCarga[i].TipoPagoAnt:=TPosCarga[i].TipoPago;
-                TPosCarga[i].TipoPago:=0;
                 Boucher:='';
 
                 if swprec then begin
@@ -854,7 +854,7 @@ begin
                      descestat:='---';
                      if estatusant<>0 then begin
                        for xcomb:=1 to nocomb do
-                         DMCONS.RegistraBitacora3(1,'Desconexión de Manguera','Pos Carga '+inttostr(xpos)+' / Combustible '+DMCONS.TabComb[TComb[xcomb]].Nombre,'U');
+                         DMCONS.RegistraBitacora3(1,'Desconexiï¿½n de Manguera','Pos Carga '+inttostr(xpos)+' / Combustible '+DMCONS.TabComb[TComb[xcomb]].Nombre,'U');
                      end;
                    end;
                  1:begin
@@ -876,7 +876,6 @@ begin
                          SwArosMag:=false;
                          PosAutorizada:=0;
                          FinVenta:=0;
-                         TipoPago:=0;
                          SwOcc:=false;
                          ContOcc:=0;
                          PresetImpo:=0;
@@ -889,7 +888,7 @@ begin
                        end;
                        if estatusant=0 then begin
                          for xcomb:=1 to nocomb do
-                           DMCONS.RegistraBitacora3(1,'Reconexión de Manguera','Pos Carga '+inttostr(xpos)+' / Combustible '+DMCONS.TabComb[TComb[xcomb]].Nombre,'U');
+                           DMCONS.RegistraBitacora3(1,'Reconexiï¿½n de Manguera','Pos Carga '+inttostr(xpos)+' / Combustible '+DMCONS.TabComb[TComb[xcomb]].Nombre,'U');
                        end;
                      end;
                    end;
@@ -1306,7 +1305,7 @@ begin
               xmodo:=xmodo+ModoOpera[1];
               if not SwDesHabilitado then begin
                 case estatus of
-                  0:xestado:=xestado+'0'; // Sin Comunicación
+                  0:xestado:=xestado+'0'; // Sin Comunicaciï¿½n
                   1:xestado:=xestado+'1'; // Inactivo (Idle)
                   5:xestado:=xestado+'2'; // Cargando (In Use)
                   7:if not swcargando then
@@ -1465,7 +1464,7 @@ begin
                   SwAplicaCmnd:=false;
                   try
                     SnImporte:=StrToFLoat(ExtraeElemStrSep(TabCmnd[xcmnd].Comando,3,' '));
-                    rsp:=ValidaCifra(SnImporte,4,2);
+                    rsp:=ValidaCifra(SnImporte,IfThen(DMCONS.Bennett8Digitos='Si',5,4),2);
                     if (SnImporte<0.01) then
                       rsp:='Importe en cero no permitido';
                   except
@@ -1477,6 +1476,7 @@ begin
                     xp:=PosicionDeCombustible(xpos,xcomb);
                     if xp>0 then begin
                       TPosCarga[SnPosCarga].tipopago:=StrToIntDef(ExtraeElemStrSep(TabCmnd[xcmnd].Comando,5,' '),0);
+                      AgregaLog('TipoPagoPreset'+IntToStr(SnPosCarga)+': '+IntToStr(TPosCarga[SnPosCarga].tipopago));
                       TPosCarga[SnPosCarga].finventa:=StrToIntDef(ExtraeElemStrSep(TabCmnd[xcmnd].Comando,6,' '),0);
                       TPosCarga[SnPosCarga].boucher:=ExtraeElemStrSep(TabCmnd[xcmnd].Comando,7,' ');
                       TPosCarga[SnPosCarga].swarosmag:=false;
@@ -1488,12 +1488,12 @@ begin
                         swarosmag:=DMCONS.ControlArosMagneticos(SnPosCarga,aros_mang,aros_cte,aros_vehi);
                         aros_cont:=0;
                         if (not swarosmag) then
-                          rsp:='Aro magnético se encuentra desconectado';
+                          rsp:='Aro magnï¿½tico se encuentra desconectado';
                       end;
                       if rsp='OK' then
                         EnviaPreset(rsp,xcomb);
                     end
-                    else rsp:='Combustible no existe en esta posición';
+                    else rsp:='Combustible no existe en esta posiciï¿½n';
                   end;
                 end;
                 if (not SwAplicaCmnd)and(rsp<>'OK') then
@@ -1567,7 +1567,7 @@ begin
                           swarosmag:=DMCONS.ControlArosMagneticos(SnPosCarga,aros_mang,aros_cte,aros_vehi);
                           aros_cont:=0;
                           if (not swarosmag) then
-                            rsp:='Aro magnético se encuentra desconectado';
+                            rsp:='Aro magnï¿½tico se encuentra desconectado';
                         end;
                         if rsp='OK' then begin
                           ss:='F'+IntToClaveNum(xpos,2)+FiltraStrNum(FormatFloat('0000',SnLitros));
@@ -1579,7 +1579,7 @@ begin
                           EnviaPreset(rsp,xcomb);
                         end;
                       end
-                      else rsp:='Combustible no existe en esta posición';
+                      else rsp:='Combustible no existe en esta posiciï¿½n';
                     end;
                   end;
                   if (not SwAplicaCmnd)and(rsp<>'OK') then
@@ -1613,7 +1613,7 @@ begin
                     rsp:='Posicion no esta despachando';
                 end
                 else begin // EOT
-                  rsp:='Posicion aún no esta en fin de venta';
+                  rsp:='Posicion aï¿½n no esta en fin de venta';
                 end;
               end
               else rsp:='Posicion de Carga no Existe';
@@ -1661,7 +1661,7 @@ begin
               if DMCONS.swemular then
                 if xpos in [1..MaxPosCarga] then
                   if EmularEstatus[2*xpos]='5' then
-                    EmularEstatus[2*xpos]:='6'  // Si el flujo ya inició, para el despache momentaneamente y se puede reanudar.
+                    EmularEstatus[2*xpos]:='6'  // Si el flujo ya iniciï¿½, para el despache momentaneamente y se puede reanudar.
                   else
                     EmularEstatus[2*xpos]:='1'; // Si el flujo no ha iniciado, la ventra se cancela totalmente.
             end
@@ -1914,11 +1914,11 @@ begin
   rsp:='OK';
   xpos:=SnPosCarga;
   if not (TPosCarga[xpos].estatus in [1..3]) then begin
-    rsp:='Posición no Disponible';
+    rsp:='Posiciï¿½n no Disponible';
     exit;
   end;
   if TPosCarga[xpos].SwDesHabilitado then begin
-    rsp:='Posición Deshabilitada';
+    rsp:='Posiciï¿½n Deshabilitada';
     exit;
   end;
   ss:='K'+IntToClaveNum(xpos,2)+'2'; // Modo PrePago
@@ -2205,7 +2205,7 @@ begin
         Beep;
       StaticText17.Visible:=not StaticText17.Visible;
       if ContadorAlarma=10 then
-        DMCONS.RegistraBitacora3(1,'Desconexion de Dispositivo','Error Comunicación Dispensarios','U');
+        DMCONS.RegistraBitacora3(1,'Desconexion de Dispositivo','Error Comunicaciï¿½n Dispensarios','U');
     end
     else StaticText17.Visible:=false;
     try
