@@ -718,7 +718,7 @@ type
     ValidaCambioPrecio,
     ServidorGateway         :string;
     FlujoPorVehiculo:Boolean;
-    TimerDisp:Integer;
+    TimerDisp,ConteoOcc:Integer;
     // FIN VARIABLES
     PuertoGatewayDisp,
     PuertoGatewayTanq,    
@@ -1415,6 +1415,7 @@ begin
   Inocuidad31FechaVence:='';
   SegundosFINV:=3;
   TimerDisp:=0;
+  ConteoOcc:=16;
   lista:=TStringList.Create;
   // CARGA VARIBLES
   try
@@ -1596,6 +1597,8 @@ begin
         OrdenMangueras:=ExtraeElemStrSep(lin,2,'=');
       if Mayusculas(ss)='TIMERDISP' then
         TimerDisp:=StrToIntDef(ExtraeElemStrSep(lin,2,'='),0);
+      if Mayusculas(ss)='CONTEOOCC' then
+        ConteoOcc:=StrToIntDef(ExtraeElemStrSep(lin,2,'='),16);
     end;
   finally
     lista.Free;
