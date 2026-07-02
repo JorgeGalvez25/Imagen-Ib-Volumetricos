@@ -163,6 +163,7 @@ type
        TMang        :array[1..MCxP] of integer;
        TotalLitros  :array[1..MCxP] of real;
        TotalLtsAnt  :array[1..MCxP] of real;
+       TotalLitrosEmu  :array[1..MCxP] of real;
        SwDesp,SwA,SwPrec   :boolean;
        HoraFinv,
        Hora         :TDateTime;
@@ -204,6 +205,7 @@ type
        PresetImpoN:integer;
        PresetImpo:real;
        PresetEmuVol:real;
+       EmuVentaNo:integer; // Contador de ventas para escenarios de totalizador en modo emulacion
        SwPresetHora:boolean;
        PresetHora:TDateTime;
      end;
@@ -292,7 +294,7 @@ begin
       Q_BombIb.Active:=true;
 
       if Q_BombIb.IsEmpty then
-        raise Exception.Create('Estaciï¿½n no existe, o no tiene posiciones de carga configurados');
+        raise Exception.Create('Estación no existe, o no tiene posiciones de carga configurados');
 
       // Carga Combustibles
       for i:=1 to MaxComb do with TabComb[i] do begin
@@ -315,7 +317,7 @@ begin
         end;
         Q_CombIb.Next;
       end;
-      CargaPreciosFH(Now,true); // guarda precio actual como fï¿½sico
+      CargaPreciosFH(Now,true); // guarda precio actual como físico
       Q_CombIb.Active:=false;
       Q_CombIb.Active:=true;
       DespliegaPrecios;
@@ -377,6 +379,7 @@ begin
       PresetImpoN:=0;
       PresetComb:=0;
       PresetCont:=0;
+      EmuVentaNo:=0;
       SwPresetHora:=false;
     end;
     if SwEmular then
@@ -680,15 +683,15 @@ begin
                   dmcons.ActualizaTotalesPrecio(i,posactual,volumen);
                   swprec:=false;
                 end;
-
-                T_MoviIb.post;
-
-                (*
-                if (swdif)and(abs(xdiflts)<0.005) then begin
-                  DMCONS.AgregaLog('TOTALES IGUALES');
-                  Button1.Click;
+                
+                try
+                  T_MoviIb.post;
+                except
                 end;
-                *)
+
+                if swemular then
+                  TotalLitros[PosActual] := TotalLitrosEmu[PosActual];
+
                 if (lcLicTemporal)and(date>lcLicVence) then begin
                   MensajeErr('Licencia vencida. Llame a su distribuidor');
                   Application.Terminate;
@@ -854,7 +857,7 @@ begin
                      descestat:='---';
                      if estatusant<>0 then begin
                        for xcomb:=1 to nocomb do
-                         DMCONS.RegistraBitacora3(1,'Desconexiï¿½n de Manguera','Pos Carga '+inttostr(xpos)+' / Combustible '+DMCONS.TabComb[TComb[xcomb]].Nombre,'U');
+                         DMCONS.RegistraBitacora3(1,'Desconexión de Manguera','Pos Carga '+inttostr(xpos)+' / Combustible '+DMCONS.TabComb[TComb[xcomb]].Nombre,'U');
                      end;
                    end;
                  1:begin
@@ -888,7 +891,7 @@ begin
                        end;
                        if estatusant=0 then begin
                          for xcomb:=1 to nocomb do
-                           DMCONS.RegistraBitacora3(1,'Reconexiï¿½n de Manguera','Pos Carga '+inttostr(xpos)+' / Combustible '+DMCONS.TabComb[TComb[xcomb]].Nombre,'U');
+                           DMCONS.RegistraBitacora3(1,'Reconexión de Manguera','Pos Carga '+inttostr(xpos)+' / Combustible '+DMCONS.TabComb[TComb[xcomb]].Nombre,'U');
                        end;
                      end;
                    end;
@@ -1305,7 +1308,7 @@ begin
               xmodo:=xmodo+ModoOpera[1];
               if not SwDesHabilitado then begin
                 case estatus of
-                  0:xestado:=xestado+'0'; // Sin Comunicaciï¿½n
+                  0:xestado:=xestado+'0'; // Sin Comunicación
                   1:xestado:=xestado+'1'; // Inactivo (Idle)
                   5:xestado:=xestado+'2'; // Cargando (In Use)
                   7:if not swcargando then
@@ -1488,12 +1491,12 @@ begin
                         swarosmag:=DMCONS.ControlArosMagneticos(SnPosCarga,aros_mang,aros_cte,aros_vehi);
                         aros_cont:=0;
                         if (not swarosmag) then
-                          rsp:='Aro magnï¿½tico se encuentra desconectado';
+                          rsp:='Aro magnético se encuentra desconectado';
                       end;
                       if rsp='OK' then
                         EnviaPreset(rsp,xcomb);
                     end
-                    else rsp:='Combustible no existe en esta posiciï¿½n';
+                    else rsp:='Combustible no existe en esta posición';
                   end;
                 end;
                 if (not SwAplicaCmnd)and(rsp<>'OK') then
@@ -1567,7 +1570,7 @@ begin
                           swarosmag:=DMCONS.ControlArosMagneticos(SnPosCarga,aros_mang,aros_cte,aros_vehi);
                           aros_cont:=0;
                           if (not swarosmag) then
-                            rsp:='Aro magnï¿½tico se encuentra desconectado';
+                            rsp:='Aro magnético se encuentra desconectado';
                         end;
                         if rsp='OK' then begin
                           ss:='F'+IntToClaveNum(xpos,2)+FiltraStrNum(FormatFloat('0000',SnLitros));
@@ -1579,7 +1582,7 @@ begin
                           EnviaPreset(rsp,xcomb);
                         end;
                       end
-                      else rsp:='Combustible no existe en esta posiciï¿½n';
+                      else rsp:='Combustible no existe en esta posición';
                     end;
                   end;
                   if (not SwAplicaCmnd)and(rsp<>'OK') then
@@ -1613,7 +1616,7 @@ begin
                     rsp:='Posicion no esta despachando';
                 end
                 else begin // EOT
-                  rsp:='Posicion aï¿½n no esta en fin de venta';
+                  rsp:='Posicion aún no esta en fin de venta';
                 end;
               end
               else rsp:='Posicion de Carga no Existe';
@@ -1661,7 +1664,7 @@ begin
               if DMCONS.swemular then
                 if xpos in [1..MaxPosCarga] then
                   if EmularEstatus[2*xpos]='5' then
-                    EmularEstatus[2*xpos]:='6'  // Si el flujo ya iniciï¿½, para el despache momentaneamente y se puede reanudar.
+                    EmularEstatus[2*xpos]:='6'  // Si el flujo ya inició, para el despache momentaneamente y se puede reanudar.
                   else
                     EmularEstatus[2*xpos]:='1'; // Si el flujo no ha iniciado, la ventra se cancela totalmente.
             end
@@ -1914,11 +1917,11 @@ begin
   rsp:='OK';
   xpos:=SnPosCarga;
   if not (TPosCarga[xpos].estatus in [1..3]) then begin
-    rsp:='Posiciï¿½n no Disponible';
+    rsp:='Posición no Disponible';
     exit;
   end;
   if TPosCarga[xpos].SwDesHabilitado then begin
-    rsp:='Posiciï¿½n Deshabilitada';
+    rsp:='Posición Deshabilitada';
     exit;
   end;
   ss:='K'+IntToClaveNum(xpos,2)+'2'; // Modo PrePago
@@ -1971,6 +1974,33 @@ var xpos,rr,i:integer;
     lin:string;
     p1,p2,xp,xcomb:integer;
     xVol,xImpo:Double;
+    xTotalAnt,xTotalNuevo,xAvanceTotalizador:Double;
+    xEscenario:string;
+    xEmuVolObjetivo: Double;
+
+  function TotalEmuFormato(xvalor:Double):string;
+  begin
+    Result:=FiltraStrNum(FormatFloat('0000000.000',AjustaFloat(xvalor,3)));
+    while Length(Result)<10 do
+      Result:='0'+Result;
+    if Length(Result)>10 then
+      Result:=Copy(Result,Length(Result)-9,10);
+  end;
+
+  function TotalEmuPos(xpos,xposTotal:integer):string;
+  var ii:integer;
+      xvalor:Double;
+  begin
+    xvalor:=0;
+    if xpos in [1..MaxPosCarga] then
+      with TPosCarga[xpos] do begin
+        for ii:=1 to NoComb do
+          if TPos[ii]=xposTotal then
+            xvalor:=TotalLitros[ii];
+      end;
+    Result:=TotalEmuFormato(xvalor);
+  end;
+
 begin
   if LineaEmular='' then
     exit;
@@ -2009,23 +2039,81 @@ begin
               else begin
                 for xpos:=1 to MaxPosCarga do with TPosCarga[xpos] do begin
                   p2:=2*xpos;
-                  if (xpos=3) and (EmularEstatus[p2]='5')and((Time-Hora)>((3*TmSegundo)*PresetEmuVol)*0.5) then begin
-                    EmularEstatus[p2]:='0';
-                    Hora:=Time;
-                  end;
-                  if (xpos=3) and (EmularEstatus[p2]='0') and (SecondsBetween(Time,Hora)>=30) then
-                    EmularEstatus[p2]:='1';
-                  if (EmularEstatus[p2]='5')and((Time-Hora)>(3*TmSegundo)*PresetEmuVol) then begin
+
+//                  if xpos=5 then EmularEstatus[p2]:='0';
+//
+//                  if (xpos=3) and (EmularEstatus[p2]='5')and((Time-Hora)>((3*TmSegundo)*PresetEmuVol)*0.5) then begin
+//                    EmularEstatus[p2]:='0';
+//                    Hora:=Time;
+//                  end;
+//                  if (xpos=3) and (EmularEstatus[p2]='0') and (SecondsBetween(Time,Hora)>=30) then
+//                    EmularEstatus[p2]:='1';
+
+                  if xpos = 1 then
+                    xEmuVolObjetivo := PresetEmuVol * 0.40
+                  else
+                    xEmuVolObjetivo := PresetEmuVol;
+
+                  if (EmularEstatus[p2]='5')and((Time-Hora)>(3*TmSegundo)*xEmuVolObjetivo) then begin
                     EmularEstatus[p2]:='7';
-                    if xpos=2 then
-                      volumen:=PresetEmuVol-(PresetEmuVol*0.1)
-                    else if xpos=4 then
-                      volumen:=0
-                    else
-                      volumen:=PresetEmuVol;
-                    importe:=volumen*precio;
-                    TotalLitros[PosActual]:=TotalLitros[PosActual]+volumen;
-                    RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
+                    
+                    // Asignar los litros e importe exactos en los que se detuvo
+                    volumen := xEmuVolObjetivo;
+                    importe := volumen * precio;
+
+                    // Escenarios de totalizador por posicion de carga.
+                    // Venta 1 y 2: normales. Cada 3a venta: aplica el escenario.
+                    // Pos 1: totalizador repetido.
+                    // Pos 2: totalizador avanza menos que el volumen de la venta.
+                    // Pos 3: totalizador cae / se reinicia.
+                    // Pos 4: totalizador avanza de mas, simulando posible venta perdida.
+//                    inc(EmuVentaNo);
+//                    volumen:=PresetEmuVol;
+//                    importe:=volumen*precio;
+//
+//                    xTotalAnt:=TotalLitros[PosActual];
+//                    xAvanceTotalizador:=volumen;
+//                    xTotalNuevo:=xTotalAnt+xAvanceTotalizador;
+//                    xEscenario:='Normal';
+//
+//                    if (EmuVentaNo mod 3)=0 then begin
+//                      case xpos of
+//                        1:begin
+//                            xAvanceTotalizador:=0;
+//                            xTotalNuevo:=xTotalAnt;
+//                            xEscenario:='Escenario 1 - totalizador repetido';
+//                          end;
+//                        2:begin
+//                            xAvanceTotalizador:=volumen*0.50;
+//                            xTotalNuevo:=xTotalAnt+xAvanceTotalizador;
+//                            xEscenario:='Escenario 2 - totalizador avanzo menos que la venta';
+//                          end;
+//                        3:begin
+//                            xAvanceTotalizador:=0;
+//                            if xTotalAnt>100 then
+//                              xTotalNuevo:=100
+//                            else
+//                              xTotalNuevo:=0;
+//                            xEscenario:='Escenario 3 - totalizador reiniciado / caido';
+//                          end;
+//                        4:begin
+//                            xAvanceTotalizador:=volumen+(volumen*0.50);
+//                            xTotalNuevo:=xTotalAnt+xAvanceTotalizador;
+//                            xEscenario:='Escenario 4 - totalizador mayor a la sumatoria de litros';
+//                          end;
+//                      end;
+//                    end;
+//
+//                    TotalLitrosEmu[PosActual]:=AjustaFloat(xTotalNuevo,3);
+////                    if xEscenario<>'Normal' then begin
+//                      AgregaLog('EMULACION TOTALIZADOR Pos:'+IntToStr(xpos)+
+//                                ' Venta:'+IntToStr(EmuVentaNo)+
+//                                ' '+xEscenario+
+//                                ' VolVenta:'+FormatFloat('0.000',volumen)+
+//                                ' TotalAnt:'+FormatFloat('0.000',xTotalAnt)+
+//                                ' AvanceTot:'+FormatFloat('0.000',xAvanceTotalizador)+
+//                                ' TotalNuevo:'+FormatFloat('0.000',TotalLitrosEmu[PosActual]));
+//                    end;
                   end;
                 end;
               end;
@@ -2035,8 +2123,7 @@ begin
               xpos:=StrToIntDef(copy(lin,2,2),1);
               with TPosCarga[xpos] do begin
                 if estatus=5 then begin
-                  if xpos<>4 then
-                    xVol:=MilliSecondsBetween(Time,Hora)/3000;
+                  xVol:=MilliSecondsBetween(Time,Hora)/3000;
                   xImpo:=xVol*TPosCarga[xpos].precio;
                   Linea:=copy(Lin,1,3)+'1'
                          +FiltraStrNum(FormatFloat('0000.00',xVol))
@@ -2051,14 +2138,14 @@ begin
                 end;
               end;
             end;
-//        'N':begin
-//              xpos:=StrToIntDef(copy(lin,2,2),1);
-//              with TPosCarga[xpos] do begin
-//                Linea:=copy(Lin,1,3)+'0000000000'+'0000000000'+'0000000000'+'0000000000';
-//                for i:=1 to NoComb do
-//                  Linea[TPos[i]*10-5]:=Char(TComb[i]+48);
-//              end;
-//            end;
+        'N':begin
+              xpos:=StrToIntDef(copy(lin,2,2),1);
+              Linea:=copy(Lin,1,3)+
+                     TotalEmuPos(xpos,1)+
+                     TotalEmuPos(xpos,2)+
+                     TotalEmuPos(xpos,3)+
+                     TotalEmuPos(xpos,4);
+            end;
         else linea:=idACK;
       end;
       if linea<>idACK then
@@ -2073,7 +2160,6 @@ begin
     Timer1.Enabled:=true;
   end;
 end;
-
 
 procedure TFDISBENNETT2.registro(valor:integer;variable:string);
 var
@@ -2205,7 +2291,7 @@ begin
         Beep;
       StaticText17.Visible:=not StaticText17.Visible;
       if ContadorAlarma=10 then
-        DMCONS.RegistraBitacora3(1,'Desconexion de Dispositivo','Error Comunicaciï¿½n Dispensarios','U');
+        DMCONS.RegistraBitacora3(1,'Desconexion de Dispositivo','Error Comunicación Dispensarios','U');
     end
     else StaticText17.Visible:=false;
     try
@@ -2288,7 +2374,6 @@ begin
         TotalLitros[2]:=Q_AuxiReal2.AsFloat;
         TotalLitros[3]:=Q_AuxiReal3.AsFloat;
         TotalLitros[4]:=Q_AuxiReal4.AsFloat;
-//        MensajeInfo('Total'+IntToClaveNum(Q_AuxiEntero1.AsInteger,2)+' '+FloatToStr(TotalLitros[1])+', '+FloatToStr(TotalLitros[2])+', '+FloatToStr(TotalLitros[3])+', '+FloatToStr(TotalLitros[4]));
       end;
       Q_Auxi.Next;
     end;
