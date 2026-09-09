@@ -638,6 +638,7 @@ type
 
     HorasCorteTurnoAutom,
     TipoVolumenEntradaTanques,
+    TipoVolumenInventarioTanques,
     BitacoraTanques,
     SoportaSeleccionProducto,
     ControlAros,
@@ -1408,6 +1409,7 @@ begin
   CodigoSeguridadVeederRoot:='';
   HorasCorteTurnoAutom:='06:00/14:00/22:00';
   TipoVolumenEntradaTanques:='Bruto';
+  TipoVolumenInventarioTanques:='BRUTO';
   SincHoraVeederRoot:='No';
   GuardaLogEntradaTanques:='No';
   BitacoraTanques:='No';
@@ -1427,6 +1429,15 @@ begin
       // VARIABLES TELEMEDICION TANQUES
       if Mayusculas(ss)='TIPOVOLUMENENTRADATANQUES' then
         TipoVolumenEntradaTanques:=ExtraeElemStrSep(lin,2,'=');
+      if Mayusculas(ss)='TIPOVOLUMENINVENTARIOTANQUES' then begin
+        ss:=Mayusculas(Trim(ExtraeElemStrSep(lin,2,'=')));
+        if (ss='BRUTO')or(ss='NETO') then
+          TipoVolumenInventarioTanques:=ss
+        else begin
+          TipoVolumenInventarioTanques:='BRUTO';
+          AgregaLog('Advertencia: TIPOVOLUMENINVENTARIOTANQUES invalido; se usara BRUTO');
+        end;
+      end;
       if Mayusculas(ss)='HORASCORTETURNOAUTOM' then
         HorasCorteTurnoAutom:=ExtraeElemStrSep(lin,2,'=');
       if Mayusculas(ss)='CODIGOSEGURIDADVEEDERROOT' then

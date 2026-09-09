@@ -306,6 +306,9 @@ type
     entOG:TDateTime;
     horaLog:TDateTime;
     function CalculaAgua(VolTotal,Diametro,AlturaAgua:real):real;
+    procedure ActualizaVolumenInventario(ATanque: Integer;
+      AVolumenBruto, AVolumenNeto: Real; ATieneVolumenNeto: Boolean);
+    procedure ActualizaEtiquetasVolumen(ATanque: Integer; ATieneVolumenNeto: Boolean);
   public
     { Public declarations }
     procedure IniciaBaseDeDatos;
@@ -336,6 +339,8 @@ type TipoTanque = record
        VolumenFondaje,
        VolumenAnterior,
        VolumenUtil,       // VolumenDisponible-VolumenFondaje
+       VolumenBruto,      // Volumen sin compensacion de temperatura
+       VolumenNeto,       // Volumen compensado por temperatura
        Volumen,           // Volumen Total (Incluye Agua)
        VolumenDisponible, // Volumen-VolumenAgua
        PorLlenar,
@@ -367,6 +372,7 @@ var
   TipoTanques,
   TanquePv:integer;
   ruta_db:string;
+  AvisoFallbackVolumenNeto: array[1..MaxTanques] of Boolean;
 
 implementation
 
@@ -467,6 +473,72 @@ begin
   end;
 end;
 
+procedure TFTANMENU.ActualizaEtiquetasVolumen(ATanque: Integer;
+  ATieneVolumenNeto: Boolean);
+var
+  i: Integer;
+  Etiqueta: String;
+begin
+  if ATanque=0 then begin
+    for i:=1 to MaxTanques do
+      ActualizaEtiquetasVolumen(i, ATieneVolumenNeto);
+    exit;
+  end;
+  if not (ATanque in [1..MaxTanques]) then
+    exit;
+  if Mayusculas(DMCONS.TipoVolumenInventarioTanques)='NETO' then begin
+    if ATieneVolumenNeto then
+      Etiqueta:='Volumen neto:'
+    else
+      Etiqueta:='Volumen bruto (sin TC):';
+  end
+  else
+    Etiqueta:='Volumen bruto:';
+  case ATanque of
+    1: if FindComponent('VrLabel5x')<>nil then TVrLabel(FindComponent('VrLabel5x')).Caption:=Etiqueta;
+    2: if FindComponent('VrLabel10')<>nil then TVrLabel(FindComponent('VrLabel10')).Caption:=Etiqueta;
+    3: if FindComponent('VrLabel19')<>nil then TVrLabel(FindComponent('VrLabel19')).Caption:=Etiqueta;
+    4: if FindComponent('VrLabel27')<>nil then TVrLabel(FindComponent('VrLabel27')).Caption:=Etiqueta;
+    5: if FindComponent('VrLabel35')<>nil then TVrLabel(FindComponent('VrLabel35')).Caption:=Etiqueta;
+    6: if FindComponent('VrLabel43')<>nil then TVrLabel(FindComponent('VrLabel43')).Caption:=Etiqueta;
+    7: if FindComponent('VrLabel51')<>nil then TVrLabel(FindComponent('VrLabel51')).Caption:=Etiqueta;
+    8: if FindComponent('VrLabel59')<>nil then TVrLabel(FindComponent('VrLabel59')).Caption:=Etiqueta;
+  end;
+end;
+procedure TFTANMENU.ActualizaVolumenInventario(ATanque: Integer;
+  AVolumenBruto, AVolumenNeto: Real; ATieneVolumenNeto: Boolean);
+var
+  VolumenSeleccionado: Real;
+begin
+  if not (ATanque in [1..MaxTanques]) then
+    exit;
+  if (AVolumenBruto<0)or(AVolumenBruto<>AVolumenBruto) then begin
+    DMCONS.AgregaLog('Advertencia: lectura de volumen bruto invalida para tanque '+IntToStr(ATanque));
+    exit;
+  end;
+  if (AVolumenNeto<0)or(AVolumenNeto<>AVolumenNeto) then
+    ATieneVolumenNeto:=False;
+  with TTanques[ATanque] do begin
+    VolumenAnterior:=Volumen;
+    VolumenBruto:=AVolumenBruto;
+    if ATieneVolumenNeto then
+      VolumenNeto:=AVolumenNeto
+    else
+      VolumenNeto:=AVolumenBruto;
+    VolumenSeleccionado:=VolumenBruto;
+    if (Mayusculas(DMCONS.TipoVolumenInventarioTanques)='NETO')and
+       ATieneVolumenNeto then
+      VolumenSeleccionado:=VolumenNeto;
+    Volumen:=VolumenSeleccionado;
+  end;
+  ActualizaEtiquetasVolumen(ATanque, ATieneVolumenNeto);
+  if (Mayusculas(DMCONS.TipoVolumenInventarioTanques)='NETO')and
+     (not ATieneVolumenNeto)and(not AvisoFallbackVolumenNeto[TipoTanques]) then begin
+    AvisoFallbackVolumenNeto[TipoTanques]:=True;
+    DMCONS.AgregaLog('Inventario NETO: tanque '+IntToStr(ATanque)+
+      ' sin volumen TC; se usa volumen bruto');
+  end;
+end;
 procedure TFTANMENU.ProcesaLineaVeederRoot;
 var lin,line,xfechor,ss:string;
     xtan,xcant,xent,xval,xnum,hh,folioNuevo:integer;
@@ -507,8 +579,8 @@ begin
             end;
           end;
           Estatus:=copy(lin,20,4);
-          VolumenAnterior:=Volumen;
-          Volumen:=IeeeToFloat(copy(lin,26,8));
+          ActualizaVolumenInventario(xtan, IeeeToFloat(copy(lin,26,8)),
+            IeeeToFloat(copy(lin,34,8)), True);
           VolumenAgua:=IeeeToFloat(copy(lin,74,8));
           PorLlenar:=IeeeToFloat(copy(lin,42,8));
           Temperatura:=IeeeToFloat(copy(lin,66,8));
@@ -722,8 +794,8 @@ begin
               DMCONS.DBGASCON.Connected:=false;
             end;
           end;
-          VolumenAnterior:=Volumen;
-          Volumen:=StrToFloat(limpiastr(copy(lin,17,12)));
+          ActualizaVolumenInventario(xtan, StrToFloat(limpiastr(copy(lin,17,12))),
+            StrToFloat(limpiastr(copy(lin,17,12))), False);
           VolumenAgua:=StrToFloat(limpiastr(copy(lin,65,12)));
           PorLlenar:=StrToFloat(limpiastr(copy(lin,53,12)));
           Temperatura:=StrToFloat(limpiastr(copy(lin,41,12)));
@@ -884,15 +956,15 @@ begin
               DMCONS.DBGASCON.Connected:=false;
             end;
           end;
-          VolumenAnterior:=Volumen;
-          Volumen:=StrToFloat(limpiastr(copy(lin,26,6)));
+          VolumenBruto:=StrToFloat(limpiastr(copy(lin,26,6)));
           PorLlenar:=StrToFloat(limpiastr(copy(lin,37,6)));
           Temperatura:=StrToFloat(limpiastr(copy(lin,33,4)))/100;
           AlturaAgua:=0; //StrToFloat(limpiastr(copy(lin,43,3)))/100;
           if AutostikEnGalones='Si' then begin
-            Volumen:=Volumen*LitrosXGalon;
+            VolumenBruto:=VolumenBruto*LitrosXGalon;
             PorLlenar:=PorLlenar*LitrosXGalon;
           end;
+          ActualizaVolumenInventario(xtan, VolumenBruto, VolumenBruto, False);
           if Altura>1 then
             VolumenAgua:=CalculaAgua(Volumen+PorLlenar,Altura,AlturaAgua)
           else
@@ -1091,8 +1163,8 @@ begin
             end;
           end;
           Estatus:=copy(lin,20,4);
-          VolumenAnterior:=Volumen;
-          Volumen:=IeeeToFloat(copy(lin,26,8));
+          ActualizaVolumenInventario(xtan, IeeeToFloat(copy(lin,26,8)),
+            IeeeToFloat(copy(lin,34,8)), True);
           VolumenAgua:=IeeeToFloat(copy(lin,74,8));
           PorLlenar:=IeeeToFloat(copy(lin,42,8));
           Temperatura:=IeeeToFloat(copy(lin,66,8));
@@ -1262,9 +1334,9 @@ begin
               DMCONS.DBGASCON.Connected:=false;
             end;
           end;
-          VolumenAnterior:=Volumen;
           line:=copy(lin,21,8);
-          Volumen:=StrToFloatIncon(copy(lin,21,8));
+          ActualizaVolumenInventario(xtan, StrToFloatIncon(copy(lin,21,8)),
+            StrToFloatIncon(copy(lin,21,8)), False);
           VolumenAgua:=StrToFloatIncon(copy(lin,29,8));
           PorLlenar:=StrToFloatIncon(copy(lin,37,8));
           Temperatura:=StrToFloatIncon(copy(lin,53,8));
@@ -1538,6 +1610,8 @@ begin
       Capacidad:=0;
       VolumenFondaje:=0;
       VolumenAnterior:=0;
+      VolumenBruto:=0;
+      VolumenNeto:=0;
       Volumen:=0;
       VolumenAgua:=0;
       Temperatura:=0;
@@ -1602,6 +1676,8 @@ begin
     SwCorte:=false;
     ErrorInic:=true;
     IniciaBaseDeDatos;
+    DMCONS.AgregaLog('Inventario de tanques configurado como: '+DMCONS.TipoVolumenInventarioTanques);
+    ActualizaEtiquetasVolumen(0, True);
     try
       IniciaEstacion;
       (*
@@ -1748,8 +1824,7 @@ var xlin,ss:string;
       if (TanquePv in [1..NumTanques]) then with TTanques[TanquePv] do begin
 
         ss:=ConvierteStrPv(ExtraeElemStrSep(xlin,3,'/')); // Gross Measured Tank Volume
-        VolumenAnterior:=Volumen;
-        volumen:=StrToFloat(ss);
+        ActualizaVolumenInventario(TanquePv, StrToFloat(ss), StrToFloat(ss), False);
 
         ss:=ConvierteStrPv(ExtraeElemStrSep(xlin,4,'/')); // Volume Left in Tank
         porllenar:=StrToFloat(ss);
@@ -2312,8 +2387,9 @@ begin
                           RegistraBitacora3(1,'Reconexi�n de Tanque','Tanque '+inttostr(TanqueActual),'U');
                           EstadoActivo:=true;
                         end;
-                        VolumenAnterior:=Volumen;
-                        Volumen:=AdoTableInvVolBruto.AsFloat;
+                        ActualizaVolumenInventario(TanqueActual,
+                          AdoTableInvVolBruto.AsFloat, AdoTableInvVolNeto.AsFloat,
+                          not AdoTableInvVolNeto.IsNull);
                         VolumenAgua:=AdoTableInvAgua.AsFloat;
                         PorLlenar:=AdoTableInvCapDisponible.AsFloat;
                         Temperatura:=AdoTableInvTemperatura.AsFloat;
