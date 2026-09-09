@@ -59,8 +59,8 @@ object FTANMENU: TFTANMENU
   end
   object Panel1: TPanel
     Left = 0
-    Top = 499
-    Width = 915
+    Top = 507
+    Width = 923
     Height = 41
     Align = alBottom
     TabOrder = 1
@@ -73,7 +73,7 @@ object FTANMENU: TFTANMENU
     object AbGradient2: TAbGradient
       Left = 1
       Top = 1
-      Width = 610
+      Width = 618
       Height = 39
       Align = alClient
       GradSettings.ColorFrom = 12704249
@@ -98,7 +98,7 @@ object FTANMENU: TFTANMENU
       TabOrder = 2
     end
     object Panel21: TPanel
-      Left = 611
+      Left = 619
       Top = 1
       Width = 303
       Height = 39
@@ -184,16 +184,16 @@ object FTANMENU: TFTANMENU
   object Panel2: TPanel
     Left = 0
     Top = 0
-    Width = 915
-    Height = 499
+    Width = 923
+    Height = 507
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
     object PageControl1: TPageControl
       Left = 0
       Top = 0
-      Width = 915
-      Height = 499
+      Width = 923
+      Height = 507
       ActivePage = TabSheet1
       Align = alClient
       TabOrder = 0
@@ -202,8 +202,8 @@ object FTANMENU: TFTANMENU
         object PageControl2: TPageControl
           Left = 185
           Top = 0
-          Width = 722
-          Height = 471
+          Width = 730
+          Height = 479
           ActivePage = TabSheet4
           Align = alClient
           Style = tsButtons
@@ -213,8 +213,8 @@ object FTANMENU: TFTANMENU
             object Panel8: TPanel
               Left = 0
               Top = 0
-              Width = 714
-              Height = 440
+              Width = 722
+              Height = 448
               Align = alClient
               BevelOuter = bvNone
               Color = clWhite
@@ -222,7 +222,7 @@ object FTANMENU: TFTANMENU
               object PanelA2: TPanel
                 Left = 0
                 Top = 212
-                Width = 714
+                Width = 722
                 Height = 233
                 Align = alTop
                 BevelOuter = bvNone
@@ -646,7 +646,7 @@ object FTANMENU: TFTANMENU
               object PanelA1: TPanel
                 Left = 0
                 Top = 0
-                Width = 714
+                Width = 722
                 Height = 212
                 Align = alTop
                 BevelOuter = bvNone
@@ -1090,8 +1090,8 @@ object FTANMENU: TFTANMENU
             object Panel18: TPanel
               Left = 0
               Top = 0
-              Width = 714
-              Height = 440
+              Width = 722
+              Height = 448
               Align = alClient
               BevelOuter = bvNone
               Color = clWhite
@@ -1099,7 +1099,7 @@ object FTANMENU: TFTANMENU
               object PanelA3: TPanel
                 Left = 0
                 Top = 0
-                Width = 714
+                Width = 722
                 Height = 214
                 Align = alTop
                 BevelOuter = bvNone
@@ -1520,7 +1520,7 @@ object FTANMENU: TFTANMENU
               object PanelA4: TPanel
                 Left = 0
                 Top = 214
-                Width = 714
+                Width = 722
                 Height = 219
                 Align = alTop
                 BevelOuter = bvNone
@@ -1946,8 +1946,8 @@ object FTANMENU: TFTANMENU
             object Panel19: TPanel
               Left = 0
               Top = 0
-              Width = 714
-              Height = 440
+              Width = 722
+              Height = 448
               Align = alClient
               BevelOuter = bvNone
               Color = clWhite
@@ -1955,7 +1955,7 @@ object FTANMENU: TFTANMENU
               object PanelA5: TPanel
                 Left = 0
                 Top = 0
-                Width = 714
+                Width = 722
                 Height = 212
                 Align = alTop
                 BevelOuter = bvNone
@@ -2369,7 +2369,7 @@ object FTANMENU: TFTANMENU
               object PanelA6: TPanel
                 Left = 0
                 Top = 212
-                Width = 714
+                Width = 722
                 Height = 227
                 Align = alTop
                 BevelOuter = bvNone
@@ -2788,8 +2788,8 @@ object FTANMENU: TFTANMENU
             object Panel20: TPanel
               Left = 0
               Top = 0
-              Width = 714
-              Height = 440
+              Width = 722
+              Height = 448
               Align = alClient
               BevelOuter = bvNone
               Color = clWhite
@@ -2797,7 +2797,7 @@ object FTANMENU: TFTANMENU
               object PanelA7: TPanel
                 Left = 0
                 Top = 0
-                Width = 714
+                Width = 722
                 Height = 216
                 Align = alTop
                 BevelOuter = bvNone
@@ -3211,7 +3211,7 @@ object FTANMENU: TFTANMENU
               object PanelA8: TPanel
                 Left = 0
                 Top = 216
-                Width = 714
+                Width = 722
                 Height = 218
                 Align = alTop
                 BevelOuter = bvNone
@@ -3629,7 +3629,7 @@ object FTANMENU: TFTANMENU
           Left = 0
           Top = 0
           Width = 185
-          Height = 471
+          Height = 479
           Align = alLeft
           BevelOuter = bvNone
           TabOrder = 1
@@ -3640,10 +3640,10 @@ object FTANMENU: TFTANMENU
             Height = 200
             Threaded = True
             Active = True
-            Hours = 10
+            Hours = 9
             HourFormat = hfmt24h
-            Minutes = 47
-            Seconds = 42
+            Minutes = 20
+            Seconds = 7
             LedSize = 3
             Spacing = 8
             Align = alTop
@@ -3652,7 +3652,7 @@ object FTANMENU: TFTANMENU
             Left = 0
             Top = 200
             Width = 185
-            Height = 271
+            Height = 279
             Align = alClient
             Font.Charset = ANSI_CHARSET
             Font.Color = clWindowText
@@ -3911,6 +3911,16 @@ object FTANMENU: TFTANMENU
           Height = 17
           Caption = 'StaticText6'
           TabOrder = 6
+        end
+        object CheckBox4: TCheckBox
+          Left = 8
+          Top = 187
+          Width = 147
+          Height = 17
+          Caption = 'Guardar log cada 10 min.'
+          Checked = True
+          State = cbChecked
+          TabOrder = 7
         end
       end
     end
