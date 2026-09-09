@@ -689,8 +689,10 @@ begin
                 except
                 end;
 
-                if swemular then
+                if swemular then begin
+                  RegistraTotales_BD4(i, TotalLitros[1], TotalLitros[2], TotalLitros[3], TotalLitros[4]);
                   TotalLitros[PosActual] := TotalLitrosEmu[PosActual];
+                end;
 
                 if (lcLicTemporal)and(date>lcLicVence) then begin
                   MensajeErr('Licencia vencida. Llame a su distribuidor');

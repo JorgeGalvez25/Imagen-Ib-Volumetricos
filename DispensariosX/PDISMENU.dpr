@@ -1,8 +1,8 @@
 program PDISMENU;
 
 uses
-  uROCOMInit,
   ExceptionLog,
+  uROCOMInit,
   Forms,
   Windows,
   UDISMENU in 'UDISMENU.pas' {FDISMENU},
@@ -43,10 +43,6 @@ begin
   Application.Title := 'Consola de Dispensarios';
   Application.CreateForm(TFDISMENU, FDISMENU);
   Application.CreateForm(TDMCONS, DMCONS);
-  Application.CreateForm(TFDISPAM10002, FDISPAM10002);
-  Application.CreateForm(TFDISGILBARCO, FDISGILBARCO);
-  Application.CreateForm(TFDISGILBARCOKiros, FDISGILBARCOKiros);
-  Application.CreateForm(TFDISGATEWAY, FDISGATEWAY);
   Application.Run;
 end.
 

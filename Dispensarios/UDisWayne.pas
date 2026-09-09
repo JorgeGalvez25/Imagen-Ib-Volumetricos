@@ -1144,12 +1144,12 @@ begin
                      PosDispActual:=xpda
                    else if PosDispActual=0 then
                      PosDispActual:=1;
-                   volumen:=StrToFloat(copy(lin,6,8))/1000;
+                   xvolumen:=StrToFloat(copy(lin,6,8))/1000;
                    simp:=copy(lin,14+Tdiga,8);
                    spre:=copy(lin,22+Tdiga,5-Tdiga);
                    while length(spre)<5 do
                      spre:=spre+'0';
-                   importe:=StrToFloat(simp)/1000;
+                   ximporte:=StrToFloat(simp)/1000;
                    precio:=StrToFloat(spre)/1000;
                    if (2*volumen*precio<importe) then // ajuste por error en digitos
                      importe:=importe/10;
@@ -1158,21 +1158,39 @@ begin
                    end
                    else if DMCONS.AjusteWayne='No' then begin
                      if DMCONS.AjusteWayne2='Si' then begin
-                       ximpo:=Trunc(importe);
-                       centavos:=Round(Frac(importe) * 100);
+                       ximpo:=Trunc(ximporte);
+                       centavos:=Round(Frac(ximporte) * 100);
                        if centavos >= 95 then
-                         importe:=ximpo+1
+                         ximporte:=ximpo+1
                        else if centavos <= 5 then
-                         importe:=ximpo;
+                         ximporte:=ximpo;
                      end;
                      if (importe<(volumen*precio*0.9)) then
-                       importe:=trunc(volumen*precio*100)/100
+                       ximporte:=trunc(volumen*precio*100)/100
                      else begin
                        xvol:=ajustafloat(dividefloat(importe,precio),3);
-                       if abs(volumen-xvol)<0.02 then
-                         volumen:=xvol;
+//                       if abs(volumen-xvol)<0.02 then
+                         xvolumen:=xvol;
                      end;
                    end;
+                   if swcargando then begin
+                     if DMCONS.WayneValidaImporteDespacho<>'Si' then begin
+                       importe:=ximporte;
+                       volumen:=xvolumen;
+                       precio:=xprecio;
+                     end
+                     else if (ximporte>=importeant-0.05) then begin
+                       importe:=ximporte;
+                       volumen:=xvolumen;
+                       precio:=xprecio;
+                     end;
+                   end
+                   else begin
+                     importe:=ximporte;
+                     volumen:=xvolumen;
+                     precio:=xprecio;
+                   end;
+                   importeant:=importe;
                    if (Estatus=3)or(Estatus=1) then begin
                      if (swcargando) then begin // FIN DE CARGA
                        swcargando:=false;

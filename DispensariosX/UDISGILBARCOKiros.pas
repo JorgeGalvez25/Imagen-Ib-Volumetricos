@@ -442,6 +442,7 @@ begin
       sRespuesta:= '';
       PuertoSerial.FlushInBuffer;
       PuertoSerial.FlushOutBuffer;
+      DMCONS.AgregaLog('E '+chComando+' - '+IntToHex(iComando,1)+'.'+IntToStr(xNPos));
       xComando:=EmpacaKairos(chComando,xnpos);
       for i:= 1 to length ( xComando ) do begin
          PuertoSerial.PutChar(xComando[i]);
@@ -454,6 +455,7 @@ begin
          repeat
             Application.ProcessMessages;
          until ( ( bListo ) or ( timerexpired(etTimeOut) ) );
+         DMCONS.AgregaLog('sRespuesta1 Length: '+IntToStr(length(sRespuesta)));
          if ( bListo ) then begin
             sRespuesta:=DesEmpacaKairos(sRespuesta);
             if TPosCarga[xpos].DigitosGilbarco=6 then begin
@@ -504,6 +506,7 @@ begin
             sRespuesta:= '';
             PuertoSerial.FlushInBuffer;
             PuertoSerial.FlushOutBuffer;
+            DMCONS.AgregaLog('sDataBlock: '+sDataBlock);
             xDataBlock:=EmpacaKairos(sDataBlock,xnpos);
             long:=length ( xDataBlock );
             for i:= 1 to long do begin

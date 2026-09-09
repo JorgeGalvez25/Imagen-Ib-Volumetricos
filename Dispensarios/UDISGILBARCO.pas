@@ -11,6 +11,7 @@ uses Variants,
 
 const
       MCxP=4;
+      MaxIntentosLRC = 3;
 
       (*
       xTimeout=1000;       // MiliSeg          : Tiempo maximo para esperar respuesta del puerto
@@ -128,6 +129,8 @@ type
     { Private declarations }
      function  DataControlWordValue(chDataControlWord : char; iLongitud : integer) : longint;
      function  TransmiteComando(iComando, xNPos: integer; sDataBlock: string) : boolean;
+     function ValidaLRC(const sDatos: string): boolean;
+     function ValidaFinDataBlock(const sDatos: string): boolean;
   public
     { Public declarations }
      function  AbrePuerto : boolean;
@@ -204,6 +207,11 @@ type
        SwPreset       :boolean;
 
        FallosEstat    :integer;
+
+       // --- Anti bit-flip (validacion de estatus por confirmacion) ---
+       EstatusPendiente :integer;   // valor de estatus visto en la lectura anterior, aun no confirmado
+       EstatusPendConf  :integer;   // veces consecutivas que se ha visto EstatusPendiente
+       HoraAutorizaLocal:TDateTime; // hora del ultimo Autoriza() emitido localmente para esta posicion
      end;
 
 
@@ -275,12 +283,42 @@ begin
    result:= char($E0 + iLRC and $F);
 end;
 
-
+function StringToHexDump(const s: string): string;
+var
+  i: integer;
+begin
+  result := '';
+  for i := 1 to length(s) do
+  begin
+    if i > 1 then
+      result := result + ' ';
+    result := result + IntToHex(ord(s[i]), 2);
+  end;
+end;
 
 procedure TFDISGILBARCO.PuertoSerialTriggerAvail(CP: TObject; Count: Word);
 var i : integer;
 begin
-   for i:=1 to Count do sRespuesta:= sRespuesta + PuertoSerial.GetChar;
+   try
+      for i:=1 to Count do sRespuesta:= sRespuesta + PuertoSerial.GetChar;
+   except
+      on E:Exception do begin
+         // El ruido electrico puede desincronizar el Count reportado del buffer
+         // real del componente async; sin este try/except la excepcion sube sin
+         // capturarse y congela el ciclo de sondeo completo detras del dialogo modal.
+         DMCONS.AgregaLog('EXCEPCION PuertoSerialTriggerAvail: '+E.Message+' (posible desincronizacion de buffer por ruido)');
+         sRespuesta:= '';
+         bListo:= false;
+         bEndOfText:= false;
+         bLineFeed:= false;
+         try
+            PuertoSerial.FlushInBuffer;
+            PuertoSerial.FlushOutBuffer;
+         except
+         end;
+         Exit;
+      end;
+   end;
    i:= length(sRespuesta);
    if ( ( i>=iBytesEsperados ) or ( bEndOfText )  or ( bLineFeed ) ) then
       bListo:= true
@@ -331,7 +369,10 @@ begin
          end;
       end
       else begin
-         iMaxIntentos:= 2;
+          if (iComando in [$40,$50]) then
+            iMaxIntentos := MaxIntentosLRC
+          else
+            iMaxIntentos := 1;
          if TPosCarga[xpos].DigitosGilbarco=6 then begin
            if ( iComando=$40 ) then
               iBytesEsperados:= 33
@@ -359,6 +400,7 @@ begin
       bEndOfText:= false;
       bLineFeed:= false;
       sRespuesta:= '';
+      DMCONS.AgregaLog('E HEX Comando:'+chComando+' NPos:'+IntToStr(xNPos)+' '+StringToHexDump(chComando));
       PuertoSerial.FlushInBuffer;
       PuertoSerial.FlushOutBuffer;
       PuertoSerial.PutChar(chComando);
@@ -373,6 +415,7 @@ begin
          repeat
             Application.ProcessMessages;
          until ( ( bListo ) or ( timerexpired(etTimeOut) ) );
+         DMCONS.AgregaLog('sRespuesta1 HEX: ' + StringToHexDump(sRespuesta));
          if ( bListo ) then begin
             ls:=length(sRespuesta);
             if TPosCarga[xpos].DigitosGilbarco=6 then begin
@@ -382,10 +425,14 @@ begin
                  bOk:= ( ( LoNibbleChar(sRespuesta[1])=xNPos ) and ( HiNibbleChar(sRespuesta[1])=$D ) );
               end
               else if ( iComando=$40 ) then begin
-                bOk:= ( length(sRespuesta)>31 );
+                bOk := (length(sRespuesta) > 31) and ValidaFinDataBlock(sRespuesta) and ValidaLRC(sRespuesta);
+                if not bOk then
+                  DMCONS.AgregaLog('LRC/ETX invalido en respuesta $40 (6 dig): posible bit-flip en puerto serial');
               end
               else if ( iComando=$50 ) then begin
-                bOk:= ( ( ( length(sRespuesta) - 4) mod 30)=0 );
+                bOk := (((length(sRespuesta) - 4) mod 30) = 0) and ValidaFinDataBlock(sRespuesta) and ValidaLRC(sRespuesta);
+                if not bOk then
+                  DMCONS.AgregaLog('LRC/ETX invalido en respuesta $50 (6 dig): posible bit-flip en puerto serial');
               end
               else if ( iComando=$60 ) then begin
                  bOk:= ( length(sRespuesta)=6 );
@@ -400,10 +447,14 @@ begin
                  bOk:= ( ( LoNibbleChar(sRespuesta[1])=xNPos ) and ( HiNibbleChar(sRespuesta[1])=$D ) );
               end
               else if ( iComando=$40 ) then begin
-                bOk:= ( length(sRespuesta)>37 );
+                bOk := (length(sRespuesta) > 37) and ValidaFinDataBlock(sRespuesta) and ValidaLRC(sRespuesta);
+                if not bOk then
+                  DMCONS.AgregaLog('LRC/ETX invalido en respuesta $40 (8 dig): posible bit-flip en puerto serial');
               end
               else if ( iComando=$50 ) then begin
-                bOk:= ( ( ( length(sRespuesta) - 4) mod 42)=0 );
+                bOk := (((length(sRespuesta) - 4) mod 42) = 0) and ValidaFinDataBlock(sRespuesta) and ValidaLRC(sRespuesta);
+                if not bOk then
+                  DMCONS.AgregaLog('LRC/ETX invalido en respuesta $50 (8 dig): posible bit-flip en puerto serial');
               end
               else if ( iComando=$60 ) then begin
                 bOk:= ( length(sRespuesta)=8 );
@@ -423,6 +474,7 @@ begin
             sRespuesta:= '';
             PuertoSerial.FlushInBuffer;
             PuertoSerial.FlushOutBuffer;
+            DMCONS.AgregaLog('sDataBlock: ' + sDataBlock);
             for i:= 1 to length ( sDataBlock ) do begin
                PuertoSerial.PutChar(sDataBlock[i]);
                repeat
@@ -431,6 +483,7 @@ begin
             end;
             sleep(dmcons.GtwTiempoCmnd);
             chComando:= char($00 + xNPos);
+            DMCONS.AgregaLog('E HEX Comando:'+chComando+' NPos:'+IntToStr(xNPos)+' '+StringToHexDump(chComando));
             PuertoSerial.PutChar(chComando);
             repeat
                PuertoSerial.ProcessCommunications;
@@ -439,6 +492,7 @@ begin
             repeat
                Application.ProcessMessages;
             until ( ( bListo ) or ( timerexpired(etTimeOut) ) );        // FALLA
+            DMCONS.AgregaLog('sRespuesta1 HEX: ' + StringToHexDump(sRespuesta));
             bOk:= ( LoNibbleChar(sRespuesta[1])=xNPos );
          end;
       end;
@@ -484,6 +538,10 @@ end;
 function TFDISGilbarco.Autoriza(PosCarga: integer) : boolean;
 begin
    result:= ( TransmiteComando($10,PosCarga,'') );
+   // $10 no trae respuesta que confirmar; guardamos la hora para poder
+   // distinguir despues un "Autorizado" real de uno inducido por bit-flip.
+   if ( PosCarga>=1 ) and ( PosCarga<=32 ) then
+      TPosCarga[PosCarga].HoraAutorizaLocal:= Now;
 end;
 
 //--------------------------------------------------------------------------------
@@ -855,6 +913,9 @@ begin
       DivLitros:=DMCONS.GtwDivLitros;
       estatus:=-1;
       estatusant:=-1;
+      EstatusPendiente:=-1;
+      EstatusPendConf:=0;
+      HoraAutorizaLocal:=0;
       NoComb:=0;
       SwPreset:=false;
       importe:=0;
@@ -1797,6 +1858,7 @@ label L01;
 var xvolumen,n1,n2,n3:real;
     xcomb,xpos,xp,xgrade,i:integer;
     xtotallitros:array[1..4] of real;
+    xNuevoEstatus:integer;
 begin
   //
   if swbring then begin
@@ -1844,6 +1906,7 @@ begin
         case NumPaso of
           0:if (estatus=1)and(SwNivelPrecio) then begin     // NIVEL DE PRECIOS
               //DespliegaMemo4('E> T '+inttostr(PosCiclo));
+              DMCONS.AgregaLog('E> Pon Nivel Precio: ' + inttoclavenum(PosCiclo, 2));
               if PonNivelPrecio(PosCiclo,1) then begin
                 //DespliegaMemo4('R> T');
                 swnivelprecio:=false;
@@ -1852,8 +1915,36 @@ begin
           1:begin                           // ESTATUS
               try
                   EstatusAnt:=Estatus;
-                  Estatus:=DameEstatus(PosCiclo);    // Aqui bota cuando no hay posicion activa
+                  xNuevoEstatus:=DameEstatus(PosCiclo);    // Aqui bota cuando no hay posicion activa
                   ContadorAlarma:=0;
+
+                  // --- Anti bit-flip: el comando $00 es un solo byte sin LRC, asi
+                  // que un bit volteado en el nibble alto puede leerse como 9
+                  // (Autorizado) sin que nadie haya autorizado nada. Exigimos dos
+                  // lecturas consecutivas iguales antes de aceptar esa transicion.
+                  if (xNuevoEstatus=9) and (EstatusAnt<>9) then begin
+                    if (EstatusPendiente=xNuevoEstatus) and (EstatusPendConf>=1) then begin
+                      // Segunda lectura consecutiva coincide: se acepta.
+                      Estatus:=xNuevoEstatus;
+                      EstatusPendiente:=-1;
+                      EstatusPendConf:=0;
+                      if (HoraAutorizaLocal=0) or ((Now-HoraAutorizaLocal)>(5*tmSegundo)) then
+                        DMCONS.AgregaLog('ALERTA Pos '+inttostr(PosCiclo)+': paso a Autorizado confirmado sin orden local de Autoriza reciente');
+                    end
+                    else begin
+                      // Primera lectura: no se aplica todavia, se conserva el estatus anterior.
+                      EstatusPendiente:=xNuevoEstatus;
+                      EstatusPendConf:=1;
+                      DMCONS.AgregaLog('Pos '+inttostr(PosCiclo)+': posible falso Autorizado (bit-flip), esperando confirmacion');
+                      Estatus:=EstatusAnt;
+                    end;
+                  end
+                  else begin
+                    EstatusPendiente:=-1;
+                    EstatusPendConf:=0;
+                    Estatus:=xNuevoEstatus;
+                  end;
+
                   if (EstatusAnt in [3,4])and(Estatus=1) then begin
                     swcargando:=false;
                     if EsperaFinVenta=1 then
@@ -1871,6 +1962,7 @@ begin
           2:if (swleeventa)and(estatus>0) then begin       // LEE VENTA TERMINADA
               //DespliegaMemo4('E> A '+inttostr(PosCiclo));
               if TPosCarga[PosCiclo].DigitosGilbarco=6 then begin
+                DMCONS.AgregaLog('E> FIN DE VENTA(6): ' + inttoclavenum(PosCiclo, 2));
                 if DameLecturas6(PosCiclo,PosActual,
                                              Volumen,Precio,Importe) then
                 begin
@@ -1878,10 +1970,12 @@ begin
                   if abs(volumen-xvolumen)>0.5 then
                     volumen:=xvolumen;
                   //DespliegaMemo4('R> A '+FormatFloat('###,##0.00',importe));
+                  DMCONS.AgregaLog('R> ' + FormatFloat('###,##0.00', Volumen) + ' / ' + FormatFloat('###,##0.00', precio) + ' / ' + FormatFloat('###,##0.00', importe));
                   swleeventa:=false;
                 end;
               end
               else begin
+                DMCONS.AgregaLog('E> FIN DE VENTA(8): ' + inttoclavenum(PosCiclo, 2));
                 if DameLecturas8(PosCiclo,PosActual,
                                              Volumen,Precio,Importe) then
                 begin
@@ -1889,6 +1983,7 @@ begin
                   if abs(volumen-xvolumen)>0.5 then
                     volumen:=xvolumen;
                   //DespliegaMemo4('R> A '+FormatFloat('###,##0.00',importe));
+                  DMCONS.AgregaLog('R> ' + FormatFloat('###,##0.00', Volumen) + ' / ' + FormatFloat('###,##0.00', precio) + ' / ' + FormatFloat('###,##0.00', importe));
                   swleeventa:=false;
                 end;
               end;
@@ -1896,6 +1991,7 @@ begin
           3:if (swtotales)and(estatus>0) then begin        // LEE TOTALES
               DespliegaMemo4('E> N '+inttostr(PosCiclo));
               if DigitosGilbarco=6 then begin
+                DMCONS.AgregaLog('E> Lee Totales(6): ' + inttoclavenum(PosCiclo, 2));
                 if DameTotales6(PosCiclo,
                                         xTotalLitros[1],n1,
                                         xTotalLitros[2],n2,
@@ -1912,6 +2008,7 @@ begin
                   DespliegaPosCarga(PosCiclo);
                   DespliegaMemo4('R> Nx '+FormatFloat('#,###,##0.000',xTotalLitros[1])+' '+FormatFloat('#,###,##0.000',xTotalLitros[2])+' '+FormatFloat('#,###,##0.000',xTotalLitros[3]));
                   DespliegaMemo4('R> N  '+FormatFloat('#,###,##0.000',TotalLitros[1])+' '+FormatFloat('#,###,##0.000',TotalLitros[2])+' '+FormatFloat('#,###,##0.000',TotalLitros[3]));
+                  DMCONS.AgregaLog('R> ' + FormatFloat('###,###,##0.00', TotalLitros[1]) + ' / ' + FormatFloat('###,###,##0.00', TotalLitros[2]) + ' / ' + FormatFloat('###,###,##0.00', TotalLitros[3]));
                   SwTotales:=false;
                   if not DMCONS.DBGASCON.Connected then
                     DMCONS.DBGASCON.Connected:=true;
@@ -1924,6 +2021,7 @@ begin
                 end;
               end
               else begin
+                DMCONS.AgregaLog('E> Lee Totales(8): ' + inttoclavenum(PosCiclo, 2));
                 if DameTotales8(PosCiclo,
                                         xTotalLitros[1],n1,
                                         xTotalLitros[2],n2,
@@ -1940,6 +2038,7 @@ begin
                   DespliegaPosCarga(PosCiclo);
                   DespliegaMemo4('R> Nx '+FormatFloat('#,###,##0.000',xTotalLitros[1])+' '+FormatFloat('#,###,##0.000',xTotalLitros[2])+' '+FormatFloat('#,###,##0.000',xTotalLitros[3]));
                   DespliegaMemo4('R> N  '+FormatFloat('#,###,##0.000',TotalLitros[1])+' '+FormatFloat('#,###,##0.000',TotalLitros[2])+' '+FormatFloat('#,###,##0.000',TotalLitros[3]));
+                  DMCONS.AgregaLog('R> ' + FormatFloat('###,###,##0.00', TotalLitros[1]) + ' / ' + FormatFloat('###,###,##0.00', TotalLitros[2]) + ' / ' + FormatFloat('###,###,##0.00', TotalLitros[3]));
                   SwTotales:=false;
                   if not DMCONS.DBGASCON.Connected then
                     DMCONS.DBGASCON.Connected:=true;
@@ -1953,20 +2052,25 @@ begin
               end;
             end;
           4:if (estatus=5)and(ModoOpera='Normal') then begin // AUTORIZA TANQUE LLENO
+              DMCONS.AgregaLog('E> Autoriza: ' + inttoclavenum(PosCiclo, 2));
               if Autoriza(PosCiclo) then begin
               end;
             end;
           5:if estatus=2 then begin                 // LEE VENTA PROCESO
               if TPosCarga[PosCiclo].DigitosGilbarco=6 then begin
+                DMCONS.AgregaLog('E> Lee Venta Proc(6): ' + inttoclavenum(PosCiclo, 2));
                 if DameVentaProceso6(PosCiclo,Importe) then begin
                   volumen:=0;
                   precio:=0;
+                  DMCONS.AgregaLog('R> ' + FormatFloat('###,##0.00', importe));
                 end;
               end
               else begin
+                DMCONS.AgregaLog('E> Lee Venta Proc(8): ' + inttoclavenum(PosCiclo, 2));
                 if DameVentaProceso8(PosCiclo,Importe) then begin
                   volumen:=0;
                   precio:=0;
+                  DMCONS.AgregaLog('R> ' + FormatFloat('###,##0.00', importe));
                 end;
               end;
             end;
@@ -1976,11 +2080,13 @@ begin
                 if Estatus=1 then begin
                   if TCambioPrecN1[xp] then begin
                     if TPosCarga[PosCiclo].DigitosGilbarco=6 then begin
+                      DMCONS.AgregaLog('E> Cambia Precio(6): ' + inttoclavenum(PosCiclo, 2) + ' - ' + inttoclavenum(xp, 2));
                       if CambiaPrecio6(PosCiclo,xp,1,TNuevoPrec[xp]) then begin
                         TCambioPrecN1[xp]:=false;
                       end;
                     end
                     else begin
+                      DMCONS.AgregaLog('E> Cambia Precio(8): ' + inttoclavenum(PosCiclo, 2) + ' - ' + inttoclavenum(xp, 2));
                       if CambiaPrecio8(PosCiclo,xp,1,TNuevoPrec[xp]) then begin
                         TCambioPrecN1[xp]:=false;
                       end;
@@ -1988,11 +2094,13 @@ begin
                   end
                   else if TCambioPrecN2[xp] then begin
                     if TPosCarga[PosCiclo].DigitosGilbarco=6 then begin
+                      DMCONS.AgregaLog('E> Cambia Precio(6): ' + inttoclavenum(PosCiclo, 2) + ' - ' + inttoclavenum(xp, 2));
                       if CambiaPrecio6(PosCiclo,xp,1,TNuevoPrec[xp]) then begin
                         TCambioPrecN2[xp]:=false;
                       end;
                     end
                     else begin
+                      DMCONS.AgregaLog('E> Cambia Precio(8): ' + inttoclavenum(PosCiclo, 2) + ' - ' + inttoclavenum(xp, 2));
                       if CambiaPrecio8(PosCiclo,xp,1,TNuevoPrec[xp]) then begin
                         TCambioPrecN2[xp]:=false;
                       end;
@@ -2043,6 +2151,7 @@ L01:
           if SwNivelPrecio then
             NumPaso:=0;
         end;
+        DMCONS.AgregaLog('NumPaso=' + IntToStr(NumPaso));
       end;
     end
     else posciclo:=1;
@@ -2087,6 +2196,29 @@ L01:
   end;
 end;
 
+
+function TFDISGILBARCO.ValidaFinDataBlock(const sDatos: string): boolean;
+begin
+  result := (length(sDatos) > 0) and (sDatos[length(sDatos)] = #$F0);
+end;
+
+function TFDISGILBARCO.ValidaLRC(const sDatos: string): boolean;
+var
+  iSumaNibbles, iNibbleCalculado, iNibbleRecibido, i: integer;
+begin
+  result := false;
+  if length(sDatos) < 3 then
+    Exit;
+
+  iSumaNibbles := 0;
+  for i := 1 to length(sDatos) - 2 do
+    iSumaNibbles := iSumaNibbles + (ord(sDatos[i]) and $0F);
+
+  iNibbleCalculado := ((iSumaNibbles xor $0F) + 1) and $0F;
+  iNibbleRecibido := ord(sDatos[length(sDatos) - 1]) and $0F;
+
+  result := (iNibbleCalculado = iNibbleRecibido);
+end;
 
 end.
 

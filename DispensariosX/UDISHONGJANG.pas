@@ -1199,7 +1199,7 @@ begin
       end;
       with DMCONS do if ((estatusant>1)and(estatus=1))or(swadic) then begin
         SwAdic:=false;
-        (*
+
         if Sw_W then begin
           if stadic=1 then begin
             if DMCONS.ValorHongYang>=0 then
@@ -1209,7 +1209,7 @@ begin
           end
           else
               MeteACola('W'+IntToClaveNum(MangCmnd,2)+IntToClaveNum(0,2))
-        end;*)
+        end;
       end;
       case estatus of
         1:begin  // Inactivo

@@ -196,6 +196,7 @@ type
        FluStd:Boolean;
        FluMin:Boolean;
        HoraPresetFlu:TDateTime;
+       ComandoPendinteFlu:String;
 
        swarosmag:boolean;
        aros_cont,
@@ -207,6 +208,7 @@ type
        swflujovehiculo:boolean;
        flujovehiculo  :integer;
        esDiesel:Boolean;
+       tieneDiesel:Boolean;
 
      end;
 
@@ -310,7 +312,7 @@ begin
       Q_BombIb.Active:=false;
       Q_BombIb.Active:=true;
       if Q_BombIb.IsEmpty then
-        raise Exception.Create('Estación no existe, o no tiene posiciones de carga configurados');
+        raise Exception.Create('Estaciï¿½n no existe, o no tiene posiciones de carga configurados');
 
       // Carga Combustibles
       for i:=1 to MaxComb do with TabComb[i] do begin
@@ -338,7 +340,7 @@ begin
         end;
         Q_CombIb.Next;
       end;
-      CargaPreciosFH(Now,true); // guarda precio actual como físico
+      CargaPreciosFH(Now,true); // guarda precio actual como fï¿½sico
       DBGrid3.Refresh;
       DespliegaPrecios;
     finally
@@ -428,14 +430,16 @@ begin
           existe:=false;
           ModoOpera:=Q_BombIbModoOperacion.AsString;
           esDiesel:=False;
+          tieneDiesel:=False;
           for i:=1 to NoComb do
             if TComb[i]=xcomb then
               existe:=true;
           if not existe then begin
             inc(NoComb);
             TComb[NoComb]:=xcomb;
-            if (xcomb=3) then
-              esDiesel:=True;
+            esDiesel:=(xcomb=3) and (NoComb=1);
+            if (not tieneDiesel) and (xcomb=3) then
+              tieneDiesel:=True;
             if Q_BombIbCon_Posicion.AsInteger>0 then
               TPosx[NoComb]:=Q_BombIbCon_Posicion.AsInteger
             else if NoComb<=2 then
@@ -897,7 +901,7 @@ begin
                        swautorizada:=false;
                        if estatusant<>0 then begin
                          for xcomb:=1 to nocomb do
-                           DMCONS.RegistraBitacora3(1,'Desconexión de Manguera','Pos Carga '+inttostr(xpos)+' / Combustible '+DMCONS.TabComb[TComb[xcomb]].Nombre,'U');
+                           DMCONS.RegistraBitacora3(1,'Desconexiï¿½n de Manguera','Pos Carga '+inttostr(xpos)+' / Combustible '+DMCONS.TabComb[TComb[xcomb]].Nombre,'U');
                        end;
                      end;
                    1:begin              // IDLE
@@ -914,7 +918,7 @@ begin
                          swprec:=false;
                        if estatusant=0 then begin
                          for xcomb:=1 to nocomb do
-                           DMCONS.RegistraBitacora3(1,'Reconexión de Manguera','Pos Carga '+inttostr(xpos)+' / Combustible '+DMCONS.TabComb[TComb[xcomb]].Nombre,'U');
+                           DMCONS.RegistraBitacora3(1,'Reconexiï¿½n de Manguera','Pos Carga '+inttostr(xpos)+' / Combustible '+DMCONS.TabComb[TComb[xcomb]].Nombre,'U');
                        end;
                        swautorizada:=false;
                        descestat:='Inactivo';
@@ -934,13 +938,13 @@ begin
                            xp:=txp[xpos];
                            ss2:=inttostr(TAdicf[xpos,xp]);
                            ValorPamF:='80'+inttostr(xpos)+inttostr(xp)+ss2[1];
-                           ss:='P'+IntToClaveNum(xpos,2)+'0'+'1'+'000'+ValorPAMF+'0';
-                           ComandoConsola(ss);
+                           ss2:='P'+IntToClaveNum(xpos,2)+'0'+'1'+'000'+ValorPAMF+'0';
+                           ComandoConsola(ss2);
                            EsperaMiliseg(1000);
 
-                           ss:='E'+IntToClaveNum(xpos,2);
+                           ss2:='E'+IntToClaveNum(xpos,2);
                            EsperaMiliseg(500);
-                           ComandoConsola(ss);
+                           ComandoConsola(ss2);
                            swflujovehiculo:=false;
                          end;
                          FinVenta:=0;
@@ -952,49 +956,73 @@ begin
                        if (FluAct) and (SwFlu) then begin
                          with DMCONS do begin
                            if (TAdic31[xpos]>0) or (FluMin) then begin
+                             xprodauto:='000000';
+                             with TPosCarga[xpos] do begin
+                               for xc:=1 to NoComb do if xc in [1..4] then begin
+                                 xp:=TPosx[xc];
+                                 if xp in [1..6] then
+                                   xprodauto[xp]:='1';
+                               end;
+                             end;
                              if TipoClb='7' then
                                ValorPam1:='957'+IfThen(esDiesel,'4','3')+FloatToStr(TAdic31[xpos])
                              else
                                ValorPam1:='8'+IntToClaveNum(xpos,2)+'1'+FloatToStr(TAdic31[xpos]);
                              if VersionPam1000='3' then
-                               ss:='@020'+IntToClaveNum(xpos,2)+'010'+ValorPam1+'111000'
+                               ss2:='@020'+IntToClaveNum(xpos,2)+'010'+ValorPam1+xprodauto
                              else
-                               ss:='P'+IntToClaveNum(xpos,2)+'01000'+ValorPAM1+'0';
-                             ComandoConsola(ss);
+                               ss2:='P'+IntToClaveNum(xpos,2)+'01000'+ValorPAM1+'0';
+                             ComandoConsola(ss2);
                              EsperaMiliseg(500);
-                             ss:='E'+IntToClaveNum(xpos,2);
-                             ComandoConsola(ss);
+                             ss2:='E'+IntToClaveNum(xpos,2);
+                             ComandoConsola(ss2);
                              EsperaMiliseg(500);
                              FluMin:=False;
                            end;
                            if (TAdic32[xpos]>0) or (FluMin) then begin
+                            xprodauto:='000000';
+                             with TPosCarga[xpos] do begin
+                               for xc:=1 to NoComb do if xc in [1..4] then begin
+                                 xp:=TPosx[xc];
+                                 if xp in [1..6] then
+                                   xprodauto[xp]:='1';
+                               end;
+                             end;
                              if TipoClb='7' then
                                ValorPam2:='957'+IfThen(esDiesel,'4','3')+FloatToStr(TAdic32[xpos])
                              else
                                ValorPam2:='8'+IntToClaveNum(xpos,2)+'2'+FloatToStr(TAdic32[xpos]);
                              if VersionPam1000='3' then
-                               ss:='@020'+IntToClaveNum(xpos,2)+'010'+ValorPam2+'111000'
+                               ss2:='@020'+IntToClaveNum(xpos,2)+'010'+ValorPam2+xprodauto
                              else
-                               ss:='P'+IntToClaveNum(xpos,2)+'01000'+ValorPAM2+'0';
-                             ComandoConsola(ss);
+                               ss2:='P'+IntToClaveNum(xpos,2)+'01000'+ValorPAM2+'0';
+                             ComandoConsola(ss2);
                              EsperaMiliseg(500);
-                             ss:='E'+IntToClaveNum(xpos,2);
-                             ComandoConsola(ss);
+                             ss2:='E'+IntToClaveNum(xpos,2);
+                             ComandoConsola(ss2);
                              EsperaMiliseg(500);
                            end;
                            if (TAdic33[xpos]>0) or (FluMin) then begin
+                            xprodauto:='000000';
+                             with TPosCarga[xpos] do begin
+                               for xc:=1 to NoComb do if xc in [1..4] then begin
+                                 xp:=TPosx[xc];
+                                 if xp in [1..6] then
+                                   xprodauto[xp]:='1';
+                               end;
+                             end;
                              if TipoClb='7' then
                                ValorPam3:='957'+IfThen(esDiesel,'4','3')+FloatToStr(TAdic33[xpos])
                              else
                                ValorPam3:='8'+IntToClaveNum(xpos,2)+'3'+FloatToStr(TAdic33[xpos]);
                              if VersionPam1000='3' then
-                               ss:='@020'+IntToClaveNum(xpos,2)+'010'+ValorPam3+'111000'
+                               ss2:='@020'+IntToClaveNum(xpos,2)+'010'+ValorPam3+xprodauto
                              else
-                               ss:='P'+IntToClaveNum(xpos,2)+'01000'+ValorPAM3+'0';
-                             ComandoConsola(ss);
+                               ss2:='P'+IntToClaveNum(xpos,2)+'01000'+ValorPAM3+'0';
+                             ComandoConsola(ss2);
                              EsperaMiliseg(500);
-                             ss:='E'+IntToClaveNum(xpos,2);
-                             ComandoConsola(ss);
+                             ss2:='E'+IntToClaveNum(xpos,2);
+                             ComandoConsola(ss2);
                              EsperaMiliseg(500);
                            end;
                            FluAct:=False;
@@ -1004,13 +1032,13 @@ begin
                        else if (FluStd) and (SwFlu) then begin
                          with DMCONS do begin
                            if VersionPam1000='3' then
-                             ss:='@020'+IntToClaveNum(xpos,2)+'010937150111000'
+                             ss2:='@020'+IntToClaveNum(xpos,2)+'010937150111000'
                            else
-                             ss:='P'+IntToClaveNum(xpos,2)+'0'+'1'+'000937150';
-                           ComandoConsola(ss);
+                             ss2:='P'+IntToClaveNum(xpos,2)+'0'+'1'+'000937150';
+                           ComandoConsola(ss2);
                            EsperaMiliseg(500);
-                           ss:='E'+IntToClaveNum(xpos,2);
-                           ComandoConsola(ss);
+                           ss2:='E'+IntToClaveNum(xpos,2);
+                           ComandoConsola(ss2);
                            EsperaMiliseg(500);
                            FluStd:=False;
                            SwFlu:=False;
@@ -1019,17 +1047,24 @@ begin
                        else if (FluMin) and (SwFlu) then begin
                          with DMCONS do begin
                            if VersionPam1000='3' then
-                             ss:='@020'+IntToClaveNum(xpos,2)+'010924760111000'
+                             ss2:='@020'+IntToClaveNum(xpos,2)+'010924760111000'
                            else
-                             ss:='P'+IntToClaveNum(xpos,2)+'0'+'1'+'000924760';
-                           ComandoConsola(ss);
+                             ss2:='P'+IntToClaveNum(xpos,2)+'0'+'1'+'000924760';
+                           ComandoConsola(ss2);
                            EsperaMiliseg(500);
-                           ss:='E'+IntToClaveNum(xpos,2);
-                           ComandoConsola(ss);
+                           ss2:='E'+IntToClaveNum(xpos,2);
+                           ComandoConsola(ss2);
                            EsperaMiliseg(500);
                            FluMin:=False;
                            SwFlu:=False;
                          end;
+                       end;
+                       if (ComandoPendinteFlu<>'') and (HoraPresetFlu=0) then begin
+                         DMCONS.AgregaLog('Pos: '+IntToStr(xpos)+' ss: '+ss);
+                         HoraPresetFlu:=Now;
+                         ComandoConsola(ComandoPendinteFlu);
+                         ComandoPendinteFlu:='';
+                         EsperaMiliseg(500);
                        end;
                      end;
                    2:begin              // BUSY
@@ -1038,8 +1073,8 @@ begin
                        SwCargando:=true;
                        if SwArosMag then begin
                          if (not DMCONS.ConexionArosActiva(xpos)) then with DMCONS do begin
-                           ss:='E'+IntToClaveNum(xpos,2); // STOP
-                           ComandoConsola(ss);
+                           ss2:='E'+IntToClaveNum(xpos,2); // STOP
+                           ComandoConsola(ss2);
                            EsperaMiliSeg(100);
                            if DMCONS.ReautorizaPam='Si' then begin
                              TPosCarga[xpos].CmndOcc:='';
@@ -1069,8 +1104,8 @@ begin
                            Despliegamemo4('Reconecta aros: mang'+inttostr(xmang)+' cte '+inttostr(xcte)+' vehic '+inttostr(xvehi));
                            Despliegamemo4('Anterior aros: mang'+inttostr(aros_mang)+' cte '+inttostr(aros_cte)+' vehic '+inttostr(aros_vehi));
                            if (xmang=aros_mang)and(xcte=aros_cte)and(xvehi=aros_vehi)and(aros_cont<DMCONS.ReconexionesAros) then begin
-                             ss:='G'+IntToClaveNum(xpos,2); // START
-                             ComandoConsola(ss);
+                             ss2:='G'+IntToClaveNum(xpos,2); // START
+                             ComandoConsola(ss2);
                              EsperaMiliSeg(100);
                              SwArosMag_Stop:=false;
                              inc(aros_cont);
@@ -1098,8 +1133,8 @@ begin
                        if SwArosMag then begin
                          if (not DMCONS.ConexionArosActiva(xpos)) then with DMCONS do begin
                            Despliegamemo4('STOP MANGUERA >> '+Formatdatetime('HH:mm:ss.zzz',now));
-                           ss:='E'+IntToClaveNum(xpos,2); // STOP
-                           ComandoConsola(ss);
+                           ss2:='E'+IntToClaveNum(xpos,2); // STOP
+                           ComandoConsola(ss2);
                            EsperaMiliSeg(100);
                            if DMCONS.ReautorizaPam='Si' then begin
                              TPosCarga[xpos].CmndOcc:='';
@@ -1110,15 +1145,12 @@ begin
                          end;
                        end;
                        if SecondsBetween(Now,HoraPresetFlu) in [2..10] then begin
-                         ss:='E'+IntToClaveNum(xpos,2); // STOP
-                         ComandoConsola(ss);
+                         ss2:='E'+IntToClaveNum(xpos,2); // STOP
+                         ComandoConsola(ss2);
                          HoraPresetFlu:=0;
                          EsperaMiliSeg(100);
-                         if SwEspMin then begin
-                           SwCerrar:=True;
-                           Button1Click(nil);
-                           Close;
-                         end;
+                         if SwEspMin then
+                           DMCONS.EjecutaComando('CERRAR');
                        end;
                      end;
                  end;
@@ -1197,8 +1229,8 @@ begin
                    case Estatus of
                      6:if SwInicio then begin
                          apeg:=15;
-                         ss:='L'+IntToClaveNum(xpos,2); // OPEN PUMP
-                         ComandoConsola(ss);
+                         ss2:='L'+IntToClaveNum(xpos,2); // OPEN PUMP
+                         ComandoConsola(ss2);
                          EsperaMiliSeg(100);
                          SwInicio:=false;
                        end;
@@ -1207,8 +1239,8 @@ begin
                          if (ModoOpera='Normal')and(not swarosmag) then begin
                            apeg:=17;
                            if (DMCONS.ModoAutorizaBennett=0)or(DMCONS.VersionPam1000='1') then begin
-                             ss:='S'+IntToClaveNum(xpos,2); // AUTHORIZATION FOR FILLUP
-                             ComandoConsola(ss);
+                             ss2:='S'+IntToClaveNum(xpos,2); // AUTHORIZATION FOR FILLUP
+                             ComandoConsola(ss2);
                              esperamiliseg(100);
                              TipoPago:=0;
                              SwAutorizando:=true;
@@ -1218,7 +1250,7 @@ begin
                              SnLitros:=0;
                              SnPosCarga:=xpos;
                              TipoPago:=0;
-                             EnviaPreset3(ss,0)
+                             EnviaPreset3(ss2,0)
                            end;
                            SwInicio:=false;
                          end;
@@ -1236,9 +1268,9 @@ begin
                          apeg:=20;
                          if (not SwArosMag) then begin
                            apeg:=21;
-                           ss:='G'+IntToClaveNum(xpos,2); // RESTART
-                           DespliegaMemo4('Reanuda carga: '+ss);
-                           ComandoConsola(ss);
+                           ss2:='G'+IntToClaveNum(xpos,2); // RESTART
+                           DespliegaMemo4('Reanuda carga: '+ss2);
+                           ComandoConsola(ss2);
                            EsperaMiliSeg(100);
                            if CheckBox2.Checked then begin
                              DMCONS.ListaLog.SaveToFile('\ImagenCo\Log'+FiltraStrNum(FechaHoraToStr(Now))+'.Txt');
@@ -1303,7 +1335,7 @@ begin
                    for i:=1 to MCxP do
                      if xGrade=IntToStr(TComb[i]) then
                        PosActual:=TPosx[i];
-                   if (PosActual=0)or(checkbox2.Checked) then begin   // Perdió el mapeo
+                   if (PosActual=0)or(checkbox2.Checked) then begin   // Perdiï¿½ el mapeo
                      for i:=1 to nocomb do
                        SwMapea[i]:=true;
                    end
@@ -1347,10 +1379,10 @@ begin
                        if (TPosCarga[xpos].finventa=0) then begin
                          if Estatus=3 then begin // EOT
                            TPosCarga[xpos].finventa:=0;
-                           ss:='R'+IntToClaveNum(xpos,2); // VENTA COMPLETA
+                           ss2:='R'+IntToClaveNum(xpos,2); // VENTA COMPLETA
                            if DMCONS.swemular then
                              EmularEstatus[xpos]:='1';
-                           ComandoConsola(ss);
+                           ComandoConsola(ss2);
                            EsperaMiliSeg(100);
                          end;
                        end;
@@ -1532,7 +1564,7 @@ begin
             xmodo:=xmodo+ModoOpera[1];
             if not SwDesHabilitado then begin
               case estatus of
-                0:xestado:=xestado+'0'; // Sin Comunicación
+                0:xestado:=xestado+'0'; // Sin Comunicaciï¿½n
                 1:xestado:=xestado+'1'; // Inactivo (Idle)
                 2:xestado:=xestado+'2'; // Cargando (In Use)
                 3:if not swcargando then
@@ -1835,7 +1867,7 @@ begin
                               else
                                 EnviaPreset(rsp,xcomb);
                             end
-                            else rsp:='Combustible no existe en esta posición';
+                            else rsp:='Combustible no existe en esta posiciï¿½n';
                           end
                           else begin
                             rsp:='Posicion de Carga no Disponible';
@@ -1960,7 +1992,7 @@ begin
                               else
                                 EnviaPreset(rsp,xcomb);
                             end
-                            else rsp:='Combustible no existe en esta posición';
+                            else rsp:='Combustible no existe en esta posiciï¿½n';
                           end
                           else begin
                             rsp:='Posicion de Carga no Disponible';
@@ -2037,7 +2069,7 @@ begin
                   end;
                 end
                 else begin // EOT
-                  rsp:='Posicion aún no esta en fin de venta';
+                  rsp:='Posicion aï¿½n no esta en fin de venta';
                 end;
               end
               else rsp:='Posicion de Carga no Existe';
@@ -2212,14 +2244,16 @@ begin
                       Q_CombIb.Next;
                     end;
                     if TipoClb='2' then begin
-                      ValorPam1:='957'+inttostr(tagx[1])+inttostr(tagx[3]);   // Gasolina y Diesel (3 mangueras)
-                      ValorPam2:='9574'+inttostr(tagx[3]);                    // Solo Diesel
+                      ValorPam1:='0957'+inttostr(tagx[1])+inttostr(tagx[3]);   // Gasolina y Diesel (3 mangueras)
+                      ValorPam2:='09574'+inttostr(tagx[3]);                    // Solo Diesel
                     end
                     else if TipoClb='5' then
-                      ValorPam1:='93715'
+                      ValorPam1:='093715'
+                    else if TipoClb='8' then
+                      ValorPam1:='91750'+inttostr(tagx[1])
                     else begin
-                      ValorPam1:='9573'+inttostr(tagx[1]); // on ====
-                      ValorPam2:='9574'+inttostr(tagx[3]);
+                      ValorPam1:='09573'+inttostr(tagx[1]); // on ====
+                      ValorPam2:='09574'+inttostr(tagx[3]);
                     end;
                   finally
                     Q_CombIb.Active:=false;
@@ -2255,11 +2289,11 @@ begin
                     end;
 
                     if VersionPam1000='3' then
-                      ss:='@020'+IntToClaveNum(xposstop,2)+'010'+ValorPAM1+xprodauto
+                      ss:='@020'+IntToClaveNum(xposstop,2)+'01'+ValorPAM1+xprodauto
                     else
-                      ss:='P'+IntToClaveNum(xposstop,2)+'0'+'1'+'000'+ValorPAM1+'0';
-                    TPosCarga[xposstop].HoraPresetFlu:=Now;
+                      ss:='P'+IntToClaveNum(xposstop,2)+'0'+'1'+'00'+ValorPAM1+'0';
                     ComandoConsola(ss);
+                    TPosCarga[xposstop].HoraPresetFlu:=Now;
                     EsperaMiliseg(500);
                     if PosTarjeta2>0 then begin
                       xprodauto:='000000';
@@ -2269,14 +2303,14 @@ begin
                           if xp in [1..6] then
                             xprodauto[xp]:='1';
                         end;
-                      end;          
+                      end;
 
                       if VersionPam1000='3' then
-                        ss:='@020'+IntToClaveNum(xPosStop2,2)+'010'+ValorPAM1+xprodauto
+                        ss:='@020'+IntToClaveNum(xPosStop2,2)+'01'+ValorPAM1+xprodauto
                       else
-                        ss:='P'+IntToClaveNum(xPosStop2,2)+'0'+'1'+'000'+ValorPAM1+'0';
-                      TPosCarga[xPosStop2].HoraPresetFlu:=Now;
+                        ss:='P'+IntToClaveNum(xPosStop2,2)+'0'+'1'+'00'+ValorPAM1+'0';
                       ComandoConsola(ss);
+                      TPosCarga[xPosStop2].HoraPresetFlu:=Now;
                       EsperaMiliseg(500);
                     end;
                   end
@@ -2303,11 +2337,30 @@ begin
                         ss:='@020'+IntToClaveNum(xposstop2,2)+'010'+ValorPAM2+xprodauto
                       else
                         ss:='P'+IntToClaveNum(xposstop2,2)+'0'+'1'+'000'+ValorPAM2+'0';
-                      TPosCarga[xposstop2].HoraPresetFlu:=Now;
                       ComandoConsola(ss);
+                      TPosCarga[xposstop2].HoraPresetFlu:=Now;
                       EsperaMiliseg(500);
                     end
                     else xposstop2:=0;
+                  end;
+
+                  if TipoClb='8' then begin
+                    for xpos:=1 to MaxPosCarga do begin
+                      if TPosCarga[xpos].tieneDiesel then begin
+                        xprodauto:='000000';
+                        with TPosCarga[xpos] do begin
+                          for xc:=1 to NoComb do if xc in [1..4] then begin
+                            xp:=TPosx[xc];
+                            if xp in [1..6] then
+                              xprodauto[xp]:='1';
+                          end;
+                        end;
+                        if VersionPam1000='3' then
+                          TPosCarga[xpos].ComandoPendinteFlu:='@020'+IntToClaveNum(xpos,2)+'019'+IntToClaveNum(xpos,2)+IntToStr(PosicionDeCombustible(xpos,3))+'0'+inttostr(tagx[3])+xprodauto
+                        else
+                          TPosCarga[xpos].ComandoPendinteFlu:='P'+IntToClaveNum(xpos,2)+'0'+'1'+'009'+IntToClaveNum(xpos,2)+IntToStr(PosicionDeCombustible(xpos,3))+'0'+inttostr(tagx[3])+'0';
+                      end;
+                    end;
                   end;
                 end;
 
@@ -2316,7 +2369,7 @@ begin
 //                  ActualizaAdic(1);
               end
               else begin // if licencia2ok
-                rsp:='Opción no Habilitada';
+                rsp:='Opciï¿½n no Habilitada';
               end;
             end
             // CMND: ACTIVA FLUJO MINIMO
@@ -2354,12 +2407,14 @@ begin
                 end
                 else begin
                   if tipoclb='2' then
-                    ValorPam1:='95700'
+                    ValorPam1:='095700'
                   else if TipoClb='5' then
-                    ValorPam1:='92476'
+                    ValorPam1:='092476'
+                  else if TipoClb='8' then
+                    ValorPam1:='917500'
                   else
-                    ValorPam1:='95730';
-                  ValorPam2:='95740';
+                    ValorPam1:='095730';
+                  ValorPam2:='095740';
                   xposstop:=0;
                   xpos:=0;
                   repeat
@@ -2391,9 +2446,10 @@ begin
                     end;
 
                     if VersionPam1000='3' then
-                      ss:='@020'+IntToClaveNum(xposstop,2)+'010'+ValorPAM1+xprodauto
+                      ss:='@020'+IntToClaveNum(xposstop,2)+'01'+ValorPAM1+xprodauto
                     else
-                      ss:='P'+IntToClaveNum(xposstop,2)+'0'+'1'+'000'+ValorPAM1+'0';
+                      ss:='P'+IntToClaveNum(xposstop,2)+'0'+'1'+'00'+ValorPAM1+'0';
+
                     TPosCarga[xposstop].HoraPresetFlu:=Now;
                     ComandoConsola(ss);
                     EsperaMiliseg(500);
@@ -2408,9 +2464,10 @@ begin
                       end;
 
                       if VersionPam1000='3' then
-                        ss:='@020'+IntToClaveNum(xPosStop2,2)+'010'+ValorPAM1+xprodauto
+                        ss:='@020'+IntToClaveNum(xPosStop2,2)+'01'+ValorPAM1+xprodauto
                       else
-                        ss:='P'+IntToClaveNum(xPosStop2,2)+'0'+'1'+'000'+ValorPAM1+'0';
+                        ss:='P'+IntToClaveNum(xPosStop2,2)+'0'+'1'+'00'+ValorPAM1+'0';
+
                       TPosCarga[xposstop2].HoraPresetFlu:=Now;
                       ComandoConsola(ss);
                       EsperaMiliseg(500);
@@ -2444,7 +2501,7 @@ begin
                 end;
               end
               else begin // if licencia2ok
-                rsp:='Opción no Habilitada';
+                rsp:='Opciï¿½n no Habilitada';
               end;
             end
             // CMND: ACTIVA FLUJO ESPECIAL GILBARCO
@@ -2469,7 +2526,7 @@ begin
                 end;
               end
               else begin // if licencia2ok
-                rsp:='Opción no Habilitada';
+                rsp:='Opciï¿½n no Habilitada';
               end;
             end
             else if ss='ESTADI' then begin
@@ -2660,10 +2717,13 @@ end;
 
 procedure TFDISPAM10002.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  Ap1.Open:=false;
-  DMCONS.AgregaLog('Termino Aplicacion');
-  Button1.click;
-  Application.Terminate;
+  try
+    Ap1.Open:=false;
+    DMCONS.AgregaLog('Termino Aplicacion');
+    DMCONS.ListaLog.SaveToFile('\ImagenCo\Log'+FiltraStrNum(FechaHoraToStr(Now))+'.Txt');
+    Application.Terminate;
+  except
+  end;
 end;
 
 procedure TFDISPAM10002.Timer1Timer(Sender: TObject);
@@ -2707,7 +2767,7 @@ begin
           Beep;
         StaticText17.Visible:=not StaticText17.Visible;
         if ContadorAlarma=10 then
-          DMCONS.RegistraBitacora3(1,'Desconexion de Dispositivo','Error Comunicación Dispensarios','U');
+          DMCONS.RegistraBitacora3(1,'Desconexion de Dispositivo','Error Comunicaciï¿½n Dispensarios','U');
       end
       else StaticText17.Visible:=false;
       try
@@ -2728,7 +2788,7 @@ begin
             Q_AplicaPrecioF.ParamByName('pError').AsString:='No';
             Q_AplicaPrecioF.ExecSQL;
           end;
-          CargaPreciosFH(Now,true); // guarda precio actual como físico
+          CargaPreciosFH(Now,true); // guarda precio actual como fï¿½sico
           DespliegaPrecios;
           DBGrid3.Refresh;
         end;
@@ -2833,11 +2893,11 @@ begin
   rsp:='OK';
   xpos:=SnPosCarga;
   if TPosCarga[xpos].SwDesHabilitado then begin
-    rsp:='Posición Deshabilitada';
+    rsp:='Posiciï¿½n Deshabilitada';
     exit;
   end;
   if not (TPosCarga[xpos].estatus in [1,5,9]) then begin
-    rsp:='Posición no Disponible';
+    rsp:='Posiciï¿½n no Disponible';
     exit;
   end;
   if TPosCarga[xpos].estatus=9 then begin
@@ -2878,7 +2938,7 @@ begin
     TPosCarga[xpos].HoraOcc:=now;
   end;
   if SwError then begin
-    rsp:='Error al Activar Posición de Carga';
+    rsp:='Error al Activar Posiciï¿½n de Carga';
     exit;
   end;
   TPosCarga[xpos].SwPreset:=true;
@@ -2908,11 +2968,11 @@ begin
   rsp:='OK';
   xpos:=SnPosCarga;
   if TPosCarga[xpos].SwDesHabilitado then begin
-    rsp:='Posición Deshabilitada';
+    rsp:='Posiciï¿½n Deshabilitada';
     exit;
   end;
   if not (TPosCarga[xpos].estatus in [1,5,9]) then begin
-    rsp:='Posición no Disponible';
+    rsp:='Posiciï¿½n no Disponible';
     exit;
   end;
   if TPosCarga[xpos].estatus=9 then begin

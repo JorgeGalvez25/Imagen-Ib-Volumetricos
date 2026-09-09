@@ -20,12 +20,12 @@ object FDISGILBARCOKiros: TFDISGILBARCOKiros
   TextHeight = 13
   object Panel1: TPanel
     Left = 0
-    Top = 488
-    Width = 742
+    Top = 483
+    Width = 734
     Height = 41
     Align = alBottom
     BevelOuter = bvNone
-    TabOrder = 0
+    TabOrder = 1
     object Label1: TLabel
       Left = 40
       Top = 8
@@ -45,7 +45,7 @@ object FDISGILBARCOKiros: TFDISGILBARCOKiros
       Width = 75
       Height = 25
       Caption = 'Minimizar'
-      TabOrder = 0
+      TabOrder = 1
       OnClick = BitBtn3Click
       Glyph.Data = {
         F6000000424DF600000000000000760000002800000010000000100000000100
@@ -69,17 +69,17 @@ object FDISGILBARCOKiros: TFDISGILBARCOKiros
       Font.Name = 'MS Sans Serif'
       Font.Style = [fsBold]
       ParentFont = False
-      TabOrder = 1
+      TabOrder = 0
     end
   end
   object PageControl1: TPageControl
     Left = 0
     Top = 0
-    Width = 742
-    Height = 488
+    Width = 734
+    Height = 483
     ActivePage = TabSheet2
     Align = alClient
-    TabOrder = 1
+    TabOrder = 0
     object TabSheet2: TTabSheet
       Caption = 'Consola '
       ImageIndex = 1
@@ -87,7 +87,7 @@ object FDISGILBARCOKiros: TFDISGILBARCOKiros
         Left = 0
         Top = 0
         Width = 160
-        Height = 460
+        Height = 455
         Align = alLeft
         TabOrder = 0
         object ListBox1: TListBox
@@ -113,7 +113,7 @@ object FDISGILBARCOKiros: TFDISGILBARCOKiros
         Font.Style = []
         ItemHeight = 13
         ParentFont = False
-        TabOrder = 1
+        TabOrder = 4
       end
       object ListBoxPC2: TListBox
         Left = 375
@@ -127,7 +127,7 @@ object FDISGILBARCOKiros: TFDISGILBARCOKiros
         Font.Style = []
         ItemHeight = 13
         ParentFont = False
-        TabOrder = 2
+        TabOrder = 5
       end
       object ListBoxPC3: TListBox
         Left = 184
@@ -141,7 +141,7 @@ object FDISGILBARCOKiros: TFDISGILBARCOKiros
         Font.Style = []
         ItemHeight = 13
         ParentFont = False
-        TabOrder = 3
+        TabOrder = 10
       end
       object ListBoxPC4: TListBox
         Left = 375
@@ -155,35 +155,35 @@ object FDISGILBARCOKiros: TFDISGILBARCOKiros
         Font.Style = []
         ItemHeight = 13
         ParentFont = False
-        TabOrder = 4
+        TabOrder = 11
       end
       object PanelPC1: TPanel
         Left = 184
         Top = 151
         Width = 160
         Height = 20
-        TabOrder = 5
+        TabOrder = 6
       end
       object PanelPC2: TPanel
         Left = 375
         Top = 151
         Width = 160
         Height = 20
-        TabOrder = 6
+        TabOrder = 7
       end
       object PanelPC3: TPanel
         Left = 184
         Top = 328
         Width = 160
         Height = 20
-        TabOrder = 7
+        TabOrder = 12
       end
       object PanelPC4: TPanel
         Left = 375
         Top = 328
         Width = 160
         Height = 20
-        TabOrder = 8
+        TabOrder = 13
       end
       object StaticText1: TStaticText
         Left = 184
@@ -200,7 +200,7 @@ object FDISGILBARCOKiros: TFDISGILBARCOKiros
         Font.Style = [fsBold]
         ParentColor = False
         ParentFont = False
-        TabOrder = 9
+        TabOrder = 2
       end
       object StaticText2: TStaticText
         Left = 375
@@ -217,7 +217,7 @@ object FDISGILBARCOKiros: TFDISGILBARCOKiros
         Font.Style = [fsBold]
         ParentColor = False
         ParentFont = False
-        TabOrder = 10
+        TabOrder = 3
       end
       object StaticText3: TStaticText
         Left = 184
@@ -234,7 +234,7 @@ object FDISGILBARCOKiros: TFDISGILBARCOKiros
         Font.Style = [fsBold]
         ParentColor = False
         ParentFont = False
-        TabOrder = 11
+        TabOrder = 8
       end
       object StaticText4: TStaticText
         Left = 375
@@ -251,21 +251,21 @@ object FDISGILBARCOKiros: TFDISGILBARCOKiros
         Font.Style = [fsBold]
         ParentColor = False
         ParentFont = False
-        TabOrder = 12
+        TabOrder = 9
       end
       object Panel2: TPanel
-        Left = 582
+        Left = 574
         Top = 0
         Width = 152
-        Height = 460
+        Height = 455
         Align = alRight
         BevelOuter = bvNone
-        TabOrder = 13
+        TabOrder = 1
         object ListView1: TListView
           Left = 8
           Top = 0
           Width = 144
-          Height = 460
+          Height = 455
           Align = alRight
           Columns = <
             item

@@ -70,6 +70,7 @@ type
     TL_BombMODOOPERACION: TStringField;
     PageControl1: TPageControl;
     Button2: TButton;
+    CheckBox1: TCheckBox;
     procedure FormShow(Sender: TObject);
     procedure Ap1TriggerAvail(CP: TObject; Count: Word);
     procedure Timer1Timer(Sender: TObject);
@@ -238,6 +239,7 @@ var
   // FLUJO
   SwFlujoStd:boolean;
   //TabAju  :array[1..4] of integer;
+  HoraLog     :TDateTime;
 
 implementation
 
@@ -432,7 +434,7 @@ begin
             TPos[NoComb]:=NoComb
           else
             TPos[NoComb]:=1;
-            
+
           ii:=TPos[NoComb];
           case ii of
             1:TAjuPos[ii]:=10;
@@ -506,7 +508,7 @@ begin
       Timer1.Enabled:=true;
       Timer2.Enabled:=true;
       DMCONS.T_ConfIb.Active:=true;
-      ActualizaAdic(2); 
+      ActualizaAdic(2);
       if DMCONS.SwEmular then begin
         LineaEmular:='';
         EmularEstatus:=LlenaStr('','N',MaxPosCarga*2,'1');
@@ -794,7 +796,7 @@ begin
         TPosCarga[xpos].stflujo:=0;
       end;
     end;
-    // Fin ver4.4                               
+    // Fin ver4.4
   end;
 end;
 
@@ -1638,7 +1640,7 @@ begin
                               // Fin ver4.4
                             end;
                           end;
-                          
+
                         EnviaPreset(rsp,xcomb,sprec,(TPosCarga[SnPosCarga].ContOCC<DMCONS.BennettReintentosPreset));
 
                       end;
@@ -1713,7 +1715,7 @@ begin
                           rsp:='Aro magnético se encuentra desconectado';
                       end;
                       if rsp='OK' then begin
-                      
+
                           if TPosCarga[SnPosCarga].swflujovehiculo then begin
                             if (Licencia3Ok) then begin
                               xpos:=SnPosCarga;
@@ -2147,6 +2149,13 @@ begin
          else LineaTimer:=idNak;
         end;
         ProcesaLinea;
+      end;
+    end;
+    if CheckBox1.Checked then begin
+      if (Now-HoraLog)>10*tmMinuto then begin
+        HoraLog:=Now;
+        Button1.Click;
+        Button2.Click;
       end;
     end;
   except

@@ -20,12 +20,12 @@ object FDISBENNETT2: TFDISBENNETT2
   TextHeight = 13
   object Panel1: TPanel
     Left = 0
-    Top = 481
-    Width = 742
+    Top = 476
+    Width = 734
     Height = 41
     Align = alBottom
     BevelOuter = bvNone
-    TabOrder = 0
+    TabOrder = 1
     object Label4x: TLabel
       Left = 520
       Top = 14
@@ -46,7 +46,7 @@ object FDISBENNETT2: TFDISBENNETT2
       Width = 75
       Height = 25
       Caption = 'Minimizar'
-      TabOrder = 0
+      TabOrder = 1
       OnClick = BitBtn3Click
       Glyph.Data = {
         F6000000424DF600000000000000760000002800000010000000100000000100
@@ -70,17 +70,17 @@ object FDISBENNETT2: TFDISBENNETT2
       Font.Name = 'MS Sans Serif'
       Font.Style = [fsBold]
       ParentFont = False
-      TabOrder = 1
+      TabOrder = 0
     end
   end
   object PageControl1: TPageControl
     Left = 0
     Top = 0
-    Width = 742
-    Height = 481
+    Width = 734
+    Height = 476
     ActivePage = TabSheet2
     Align = alClient
-    TabOrder = 1
+    TabOrder = 0
     object TabSheet2: TTabSheet
       Caption = 'Consola '
       ImageIndex = 1
@@ -88,7 +88,7 @@ object FDISBENNETT2: TFDISBENNETT2
         Left = 0
         Top = 0
         Width = 160
-        Height = 453
+        Height = 448
         Align = alLeft
         TabOrder = 0
         object ListBox1: TListBox
@@ -115,7 +115,7 @@ object FDISBENNETT2: TFDISBENNETT2
         Font.Style = []
         ItemHeight = 13
         ParentFont = False
-        TabOrder = 1
+        TabOrder = 4
         OnDblClick = ListBoxPC1DblClick
       end
       object ListBoxPC2: TListBox
@@ -131,7 +131,7 @@ object FDISBENNETT2: TFDISBENNETT2
         Font.Style = []
         ItemHeight = 13
         ParentFont = False
-        TabOrder = 2
+        TabOrder = 5
         OnDblClick = ListBoxPC1DblClick
       end
       object ListBoxPC3: TListBox
@@ -147,7 +147,7 @@ object FDISBENNETT2: TFDISBENNETT2
         Font.Style = []
         ItemHeight = 13
         ParentFont = False
-        TabOrder = 3
+        TabOrder = 10
         OnDblClick = ListBoxPC1DblClick
       end
       object ListBoxPC4: TListBox
@@ -163,7 +163,7 @@ object FDISBENNETT2: TFDISBENNETT2
         Font.Style = []
         ItemHeight = 13
         ParentFont = False
-        TabOrder = 4
+        TabOrder = 11
         OnDblClick = ListBoxPC1DblClick
       end
       object PanelPC1: TPanel
@@ -171,28 +171,28 @@ object FDISBENNETT2: TFDISBENNETT2
         Top = 151
         Width = 160
         Height = 20
-        TabOrder = 5
+        TabOrder = 6
       end
       object PanelPC2: TPanel
         Left = 375
         Top = 151
         Width = 160
         Height = 20
-        TabOrder = 6
+        TabOrder = 7
       end
       object PanelPC3: TPanel
         Left = 184
         Top = 328
         Width = 160
         Height = 20
-        TabOrder = 7
+        TabOrder = 12
       end
       object PanelPC4: TPanel
         Left = 375
         Top = 328
         Width = 160
         Height = 20
-        TabOrder = 8
+        TabOrder = 13
       end
       object StaticText1: TStaticText
         Left = 184
@@ -209,7 +209,7 @@ object FDISBENNETT2: TFDISBENNETT2
         Font.Style = [fsBold]
         ParentColor = False
         ParentFont = False
-        TabOrder = 9
+        TabOrder = 2
       end
       object StaticText2: TStaticText
         Left = 375
@@ -226,7 +226,7 @@ object FDISBENNETT2: TFDISBENNETT2
         Font.Style = [fsBold]
         ParentColor = False
         ParentFont = False
-        TabOrder = 10
+        TabOrder = 3
       end
       object StaticText3: TStaticText
         Left = 184
@@ -243,7 +243,7 @@ object FDISBENNETT2: TFDISBENNETT2
         Font.Style = [fsBold]
         ParentColor = False
         ParentFont = False
-        TabOrder = 11
+        TabOrder = 8
       end
       object StaticText4: TStaticText
         Left = 375
@@ -260,16 +260,16 @@ object FDISBENNETT2: TFDISBENNETT2
         Font.Style = [fsBold]
         ParentColor = False
         ParentFont = False
-        TabOrder = 12
+        TabOrder = 9
       end
       object Panel2: TPanel
-        Left = 584
+        Left = 576
         Top = 0
         Width = 150
-        Height = 453
+        Height = 448
         Align = alRight
         BevelOuter = bvNone
-        TabOrder = 13
+        TabOrder = 1
       end
       object DBGrid3: TDBGrid
         Left = 247
@@ -334,6 +334,16 @@ object FDISBENNETT2: TFDISBENNETT2
         Caption = 'Guardar Log Comandos'
         TabOrder = 2
         OnClick = Button2Click
+      end
+      object CheckBox1: TCheckBox
+        Left = 463
+        Top = 159
+        Width = 169
+        Height = 17
+        Caption = 'Guardar Log cada 10 min'
+        Checked = True
+        State = cbChecked
+        TabOrder = 3
       end
     end
   end

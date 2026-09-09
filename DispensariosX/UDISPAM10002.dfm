@@ -20,7 +20,7 @@ object FDISPAM10002: TFDISPAM10002
   TextHeight = 13
   object Panel1: TPanel
     Left = 0
-    Top = 481
+    Top = 484
     Width = 719
     Height = 41
     Align = alBottom
@@ -77,7 +77,7 @@ object FDISPAM10002: TFDISPAM10002
     Left = 0
     Top = 0
     Width = 719
-    Height = 481
+    Height = 484
     ActivePage = TabSheet2
     Align = alClient
     TabOrder = 0
@@ -88,7 +88,7 @@ object FDISPAM10002: TFDISPAM10002
         Left = 0
         Top = 0
         Width = 160
-        Height = 453
+        Height = 456
         Align = alLeft
         TabOrder = 0
         object ListBox1: TListBox
@@ -266,7 +266,7 @@ object FDISPAM10002: TFDISPAM10002
         Left = 559
         Top = 0
         Width = 152
-        Height = 453
+        Height = 456
         Align = alRight
         BevelOuter = bvNone
         TabOrder = 1

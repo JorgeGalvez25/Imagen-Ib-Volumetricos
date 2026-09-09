@@ -876,6 +876,13 @@ begin
                          for xcomb:=1 to nocomb do
                            DMCONS.RegistraBitacora3(1,'Desconexion de Manguera','Pos Carga '+inttostr(xpos)+' / Combustible '+DMCONS.TabComb[TComb[xcomb]].Nombre,'U');
                        end;
+                       if (SecondsBetween(Now,HoraFinv)>DMCONS.SegundosFINV) and (TotsFinv) then begin
+                         SwTotales[1]:=true;
+                         SwTotales[2]:=true;
+                         SwTotales[3]:=true;
+                         SwTotales[4]:=true;
+                         TotsFinv:=False;
+                       end;
                      end;
                  1,7:begin              // IDLE
                        if (SecondsBetween(Now,HoraFinv)>DMCONS.SegundosFINV) and (TotsFinv) then begin
@@ -1007,6 +1014,7 @@ begin
                        SwInicio:=false;
                      end;
                    4,5:if (not SwDesHabilitado)and(not swautorizada)and((now-HoraOcc)>(tmsegundo*5)) then begin
+                       DMCONS.AgregaLog('Pos '+IntToStr(xpos)+' ModoOpera=' + ModoOpera);
                        apeg:=16;
                        if (SecondsBetween(UltimoCmnd,Now)>3) and (ModoOpera='Normal')and(not swarosmag) then begin
                          apeg:=17;
@@ -1398,7 +1406,7 @@ begin
             end;
             if PosicionCargaActual<=MaxPosCarga then begin
               with TPosCarga[PosicionCargaActual] do begin
-                if (estatus in [1,7]) and (swtotales[PosicionDispenActual]) then begin
+                if (estatus in [0,1,7]) and (swtotales[PosicionDispenActual]) then begin
                   ComandoConsolaBuff('@100'+IntToClaveNum(PosicionCargaActual,2));
                   EsperaMiliSeg(100);
                   exit;

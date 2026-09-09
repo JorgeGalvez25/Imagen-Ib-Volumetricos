@@ -20,7 +20,7 @@ object FDISHONGJANG: TFDISHONGJANG
   TextHeight = 13
   object Panel1: TPanel
     Left = 0
-    Top = 506
+    Top = 509
     Width = 806
     Height = 41
     Align = alBottom
@@ -85,7 +85,7 @@ object FDISHONGJANG: TFDISHONGJANG
     Left = 0
     Top = 0
     Width = 806
-    Height = 506
+    Height = 509
     ActivePage = TabSheet2
     Align = alClient
     TabOrder = 1
@@ -96,7 +96,7 @@ object FDISHONGJANG: TFDISHONGJANG
         Left = 0
         Top = 0
         Width = 217
-        Height = 478
+        Height = 481
         Align = alLeft
         TabOrder = 0
         object ListBox1: TListBox
@@ -250,7 +250,7 @@ object FDISHONGJANG: TFDISHONGJANG
         Left = 640
         Top = 0
         Width = 158
-        Height = 478
+        Height = 481
         Align = alRight
         BevelOuter = bvNone
         TabOrder = 15
@@ -258,7 +258,7 @@ object FDISHONGJANG: TFDISHONGJANG
           Left = 23
           Top = 0
           Width = 135
-          Height = 478
+          Height = 481
           Align = alRight
           Columns = <
             item
