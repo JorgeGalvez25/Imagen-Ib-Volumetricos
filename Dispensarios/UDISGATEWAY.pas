@@ -276,7 +276,7 @@ begin
       Q_BombIb.Active:=false;
       Q_BombIb.Active:=true;
       if Q_BombIb.IsEmpty then
-        raise Exception.Create('Estaciï¿½n no existe, o no tiene posiciones de carga configurados');
+        raise Exception.Create('Estación no existe, o no tiene posiciones de carga configurados');
 
       // Carga Combustibles
       for i:=1 to MaxComb do with TabComb[i] do begin
@@ -2108,7 +2108,7 @@ begin
       Close;
     try
       if ContadorAlarma=3 then
-        Memo2.Lines.Add('Pï¿½rdida de comunicaciï¿½n el: '+FechaHoraPaq(Now));
+        Memo2.Lines.Add('Pérdida de comunicación el: '+FechaHoraPaq(Now));
       if ContadorAlarma>=10 then begin
         if not StaticText17.Visible then
           Beep;

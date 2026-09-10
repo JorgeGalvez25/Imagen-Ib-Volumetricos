@@ -1706,7 +1706,7 @@ end;
 
 function FechaHoraToStr(FechaHora:TDateTime):String;
 begin
-  result:=FechaPaq(FechaHora)+' '+FormatDatetime('hh:mm am/pm',FechaHora);
+  result:=FechaPaq(FechaHora)+' '+HoraToStr24(FechaHora);
 end;
 
 function FechaHoraExtToStr(FechaHora:TDateTime):String;
@@ -1716,7 +1716,7 @@ end;
 
 function FecHorActualToStr:String;
 begin
-  result:=FechaPaq(date)+'   '+FormatDatetime('hh:mm am/pm',time);
+  result:=FechaPaq(date)+'   '+HoraToStr24(time);
 end;
 
 function SetFechaHora(xstr:string):String;

@@ -306,9 +306,6 @@ type
     entOG:TDateTime;
     horaLog:TDateTime;
     function CalculaAgua(VolTotal,Diametro,AlturaAgua:real):real;
-    procedure ActualizaVolumenInventario(ATanque: Integer;
-      AVolumenBruto, AVolumenNeto: Real; ATieneVolumenNeto: Boolean);
-    procedure ActualizaEtiquetasVolumen(ATanque: Integer; ATieneVolumenNeto: Boolean);
   public
     { Public declarations }
     procedure IniciaBaseDeDatos;
@@ -339,8 +336,6 @@ type TipoTanque = record
        VolumenFondaje,
        VolumenAnterior,
        VolumenUtil,       // VolumenDisponible-VolumenFondaje
-       VolumenBruto,      // Volumen sin compensacion de temperatura
-       VolumenNeto,       // Volumen compensado por temperatura
        Volumen,           // Volumen Total (Incluye Agua)
        VolumenDisponible, // Volumen-VolumenAgua
        PorLlenar,
@@ -372,7 +367,6 @@ var
   TipoTanques,
   TanquePv:integer;
   ruta_db:string;
-  AvisoFallbackVolumenNeto: array[1..MaxTanques] of Boolean;
 
 implementation
 
@@ -473,72 +467,6 @@ begin
   end;
 end;
 
-procedure TFTANMENU.ActualizaEtiquetasVolumen(ATanque: Integer;
-  ATieneVolumenNeto: Boolean);
-var
-  i: Integer;
-  Etiqueta: String;
-begin
-  if ATanque=0 then begin
-    for i:=1 to MaxTanques do
-      ActualizaEtiquetasVolumen(i, ATieneVolumenNeto);
-    exit;
-  end;
-  if not (ATanque in [1..MaxTanques]) then
-    exit;
-  if Mayusculas(DMCONS.TipoVolumenInventarioTanques)='NETO' then begin
-    if ATieneVolumenNeto then
-      Etiqueta:='Volumen neto:'
-    else
-      Etiqueta:='Volumen bruto (sin TC):';
-  end
-  else
-    Etiqueta:='Volumen bruto:';
-  case ATanque of
-    1: if FindComponent('VrLabel5x')<>nil then TVrLabel(FindComponent('VrLabel5x')).Caption:=Etiqueta;
-    2: if FindComponent('VrLabel10')<>nil then TVrLabel(FindComponent('VrLabel10')).Caption:=Etiqueta;
-    3: if FindComponent('VrLabel19')<>nil then TVrLabel(FindComponent('VrLabel19')).Caption:=Etiqueta;
-    4: if FindComponent('VrLabel27')<>nil then TVrLabel(FindComponent('VrLabel27')).Caption:=Etiqueta;
-    5: if FindComponent('VrLabel35')<>nil then TVrLabel(FindComponent('VrLabel35')).Caption:=Etiqueta;
-    6: if FindComponent('VrLabel43')<>nil then TVrLabel(FindComponent('VrLabel43')).Caption:=Etiqueta;
-    7: if FindComponent('VrLabel51')<>nil then TVrLabel(FindComponent('VrLabel51')).Caption:=Etiqueta;
-    8: if FindComponent('VrLabel59')<>nil then TVrLabel(FindComponent('VrLabel59')).Caption:=Etiqueta;
-  end;
-end;
-procedure TFTANMENU.ActualizaVolumenInventario(ATanque: Integer;
-  AVolumenBruto, AVolumenNeto: Real; ATieneVolumenNeto: Boolean);
-var
-  VolumenSeleccionado: Real;
-begin
-  if not (ATanque in [1..MaxTanques]) then
-    exit;
-  if (AVolumenBruto<0)or(AVolumenBruto<>AVolumenBruto) then begin
-    DMCONS.AgregaLog('Advertencia: lectura de volumen bruto invalida para tanque '+IntToStr(ATanque));
-    exit;
-  end;
-  if (AVolumenNeto<0)or(AVolumenNeto<>AVolumenNeto) then
-    ATieneVolumenNeto:=False;
-  with TTanques[ATanque] do begin
-    VolumenAnterior:=Volumen;
-    VolumenBruto:=AVolumenBruto;
-    if ATieneVolumenNeto then
-      VolumenNeto:=AVolumenNeto
-    else
-      VolumenNeto:=AVolumenBruto;
-    VolumenSeleccionado:=VolumenBruto;
-    if (Mayusculas(DMCONS.TipoVolumenInventarioTanques)='NETO')and
-       ATieneVolumenNeto then
-      VolumenSeleccionado:=VolumenNeto;
-    Volumen:=VolumenSeleccionado;
-  end;
-  ActualizaEtiquetasVolumen(ATanque, ATieneVolumenNeto);
-  if (Mayusculas(DMCONS.TipoVolumenInventarioTanques)='NETO')and
-     (not ATieneVolumenNeto)and(not AvisoFallbackVolumenNeto[TipoTanques]) then begin
-    AvisoFallbackVolumenNeto[TipoTanques]:=True;
-    DMCONS.AgregaLog('Inventario NETO: tanque '+IntToStr(ATanque)+
-      ' sin volumen TC; se usa volumen bruto');
-  end;
-end;
 procedure TFTANMENU.ProcesaLineaVeederRoot;
 var lin,line,xfechor,ss:string;
     xtan,xcant,xent,xval,xnum,hh,folioNuevo:integer;
@@ -557,7 +485,7 @@ begin
         if (xtan in [1..NumTanques]) then with TTanques[xtan] do begin
           FechaHoraActivo:=now;
           if not EstadoActivo then begin
-            RegistraBitacora3(1,'Reconexiï¿½n de Tanque','Tanque '+inttostr(xtan),'U');
+            RegistraBitacora3(1,'Reconexión de Tanque','Tanque '+inttostr(xtan),'U');
             EstadoActivo:=true;
           end;
           if TTanques[xtan].Estado='I' then begin
@@ -579,8 +507,11 @@ begin
             end;
           end;
           Estatus:=copy(lin,20,4);
-          ActualizaVolumenInventario(xtan, IeeeToFloat(copy(lin,26,8)),
-            IeeeToFloat(copy(lin,34,8)), True);
+          VolumenAnterior:=Volumen;
+          if Mayusculas(DMCONS.TipoVolumenTanques)='NETO' then
+            Volumen:=IeeeToFloat(copy(lin,34,8))   // TC Volume
+          else
+            Volumen:=IeeeToFloat(copy(lin,26,8));  // Volume
           VolumenAgua:=IeeeToFloat(copy(lin,74,8));
           PorLlenar:=IeeeToFloat(copy(lin,42,8));
           Temperatura:=IeeeToFloat(copy(lin,66,8));
@@ -773,7 +704,7 @@ begin
         if (xtan in [1..NumTanques]) then with TTanques[xtan] do begin
           FechaHoraActivo:=now;
           if not EstadoActivo then begin
-            RegistraBitacora3(1,'Reconexiï¿½n de Tanque','Tanque '+inttostr(xtan),'U');
+            RegistraBitacora3(1,'Reconexión de Tanque','Tanque '+inttostr(xtan),'U');
             EstadoActivo:=true;
           end;
           if TTanques[xtan].Estado='I' then begin
@@ -794,8 +725,8 @@ begin
               DMCONS.DBGASCON.Connected:=false;
             end;
           end;
-          ActualizaVolumenInventario(xtan, StrToFloat(limpiastr(copy(lin,17,12))),
-            StrToFloat(limpiastr(copy(lin,17,12))), False);
+          VolumenAnterior:=Volumen;
+          Volumen:=StrToFloat(limpiastr(copy(lin,17,12)));
           VolumenAgua:=StrToFloat(limpiastr(copy(lin,65,12)));
           PorLlenar:=StrToFloat(limpiastr(copy(lin,53,12)));
           Temperatura:=StrToFloat(limpiastr(copy(lin,41,12)));
@@ -935,7 +866,7 @@ begin
         if (xtan in [1..NumTanques]) then with TTanques[xtan] do begin
           FechaHoraActivo:=now;
           if not EstadoActivo then begin
-            RegistraBitacora3(1,'Reconexiï¿½n de Tanque','Tanque '+inttostr(xtan),'U');
+            RegistraBitacora3(1,'Reconexión de Tanque','Tanque '+inttostr(xtan),'U');
             EstadoActivo:=true;
           end;
           if TTanques[xtan].Estado='I' then begin
@@ -956,15 +887,15 @@ begin
               DMCONS.DBGASCON.Connected:=false;
             end;
           end;
-          VolumenBruto:=StrToFloat(limpiastr(copy(lin,26,6)));
+          VolumenAnterior:=Volumen;
+          Volumen:=StrToFloat(limpiastr(copy(lin,26,6)));
           PorLlenar:=StrToFloat(limpiastr(copy(lin,37,6)));
           Temperatura:=StrToFloat(limpiastr(copy(lin,33,4)))/100;
           AlturaAgua:=0; //StrToFloat(limpiastr(copy(lin,43,3)))/100;
           if AutostikEnGalones='Si' then begin
-            VolumenBruto:=VolumenBruto*LitrosXGalon;
+            Volumen:=Volumen*LitrosXGalon;
             PorLlenar:=PorLlenar*LitrosXGalon;
           end;
-          ActualizaVolumenInventario(xtan, VolumenBruto, VolumenBruto, False);
           if Altura>1 then
             VolumenAgua:=CalculaAgua(Volumen+PorLlenar,Altura,AlturaAgua)
           else
@@ -1141,7 +1072,7 @@ begin
         if (xtan in [1..NumTanques]) then with TTanques[xtan] do begin
           FechaHoraActivo:=now;
           if not EstadoActivo then begin
-            RegistraBitacora3(1,'Reconexiï¿½n de Tanque','Tanque '+inttostr(xtan),'U');
+            RegistraBitacora3(1,'Reconexión de Tanque','Tanque '+inttostr(xtan),'U');
             EstadoActivo:=true;
           end;
           if TTanques[xtan].Estado='I' then begin
@@ -1163,8 +1094,8 @@ begin
             end;
           end;
           Estatus:=copy(lin,20,4);
-          ActualizaVolumenInventario(xtan, IeeeToFloat(copy(lin,26,8)),
-            IeeeToFloat(copy(lin,34,8)), True);
+          VolumenAnterior:=Volumen;
+          Volumen:=IeeeToFloat(copy(lin,26,8));
           VolumenAgua:=IeeeToFloat(copy(lin,74,8));
           PorLlenar:=IeeeToFloat(copy(lin,42,8));
           Temperatura:=IeeeToFloat(copy(lin,66,8));
@@ -1313,7 +1244,7 @@ begin
         if (xtan in [1..NumTanques]) then with TTanques[xtan] do begin
           FechaHoraActivo:=now;
           if not EstadoActivo then begin
-            RegistraBitacora3(1,'Reconexiï¿½n de Tanque','Tanque '+inttostr(xtan),'U');
+            RegistraBitacora3(1,'Reconexión de Tanque','Tanque '+inttostr(xtan),'U');
             EstadoActivo:=true;
           end;
           if TTanques[xtan].Estado='I' then begin
@@ -1334,9 +1265,9 @@ begin
               DMCONS.DBGASCON.Connected:=false;
             end;
           end;
+          VolumenAnterior:=Volumen;
           line:=copy(lin,21,8);
-          ActualizaVolumenInventario(xtan, StrToFloatIncon(copy(lin,21,8)),
-            StrToFloatIncon(copy(lin,21,8)), False);
+          Volumen:=StrToFloatIncon(copy(lin,21,8));
           VolumenAgua:=StrToFloatIncon(copy(lin,29,8));
           PorLlenar:=StrToFloatIncon(copy(lin,37,8));
           Temperatura:=StrToFloatIncon(copy(lin,53,8));
@@ -1488,7 +1419,7 @@ begin
         TAbTank(FindComponent('AbTank'+IntToStr(xtan))).TankSettings.Color:=clBlack;
       TvrThermoMeter(FindComponent('vrThermoMeter'+IntToStr(xtan))).Scale.Min:=0;
       TvrThermoMeter(FindComponent('vrThermoMeter'+IntToStr(xtan))).Scale.Max:=50;
-      TvrThermoMeter(FindComponent('vrThermoMeter'+IntToStr(xtan))).Caption:=FormatoNumero(Temperatura,6,2)+' ï¿½C';
+      TvrThermoMeter(FindComponent('vrThermoMeter'+IntToStr(xtan))).Caption:=FormatoNumero(Temperatura,6,2)+' '+#176+'C';
       TvrThermoMeter(FindComponent('vrThermoMeter'+IntToStr(xtan))).Value.Value:=Temperatura;
       TvrThermoMeter(FindComponent('vrThermoMeter'+IntToStr(xtan))).Refresh;
       TvrLabel(FindComponent('VrLabelNom'+IntToStr(xtan))).Caption:=NombreComb;
@@ -1592,7 +1523,7 @@ begin
       finally
         DMCONS.DBGASCON.Connected:=false;
       end;
-      StaticText2.Caption:='Prï¿½ximo Corte: '+FechaHoraToStr(FechaSiguienteCorte);
+      StaticText2.Caption:='Próximo Corte: '+FechaHoraToStr(FechaSiguienteCorte);
     finally
       Screen.Cursor:=crDefault;
     end;
@@ -1610,8 +1541,6 @@ begin
       Capacidad:=0;
       VolumenFondaje:=0;
       VolumenAnterior:=0;
-      VolumenBruto:=0;
-      VolumenNeto:=0;
       Volumen:=0;
       VolumenAgua:=0;
       Temperatura:=0;
@@ -1676,8 +1605,6 @@ begin
     SwCorte:=false;
     ErrorInic:=true;
     IniciaBaseDeDatos;
-    DMCONS.AgregaLog('Inventario de tanques configurado como: '+DMCONS.TipoVolumenInventarioTanques);
-    ActualizaEtiquetasVolumen(0, True);
     try
       IniciaEstacion;
       (*
@@ -1824,7 +1751,8 @@ var xlin,ss:string;
       if (TanquePv in [1..NumTanques]) then with TTanques[TanquePv] do begin
 
         ss:=ConvierteStrPv(ExtraeElemStrSep(xlin,3,'/')); // Gross Measured Tank Volume
-        ActualizaVolumenInventario(TanquePv, StrToFloat(ss), StrToFloat(ss), False);
+        VolumenAnterior:=Volumen;
+        volumen:=StrToFloat(ss);
 
         ss:=ConvierteStrPv(ExtraeElemStrSep(xlin,4,'/')); // Volume Left in Tank
         porllenar:=StrToFloat(ss);
@@ -2043,7 +1971,7 @@ begin
                         end
                         else begin
                           inc(conterrorescom);
-                          StaticText4.Caption:='Errores de Comunicaciï¿½n: '+inttostr(conterrorescom);
+                          StaticText4.Caption:='Errores de Comunicación: '+inttostr(conterrorescom);
                         end;
                       end;
                 else LineaBuff:=LineaBuff+C;
@@ -2113,7 +2041,7 @@ begin
                         end
                         else begin
                           inc(conterrorescom);
-                          StaticText4.Caption:='Errores de Comunicaciï¿½n: '+inttostr(conterrorescom);
+                          StaticText4.Caption:='Errores de Comunicación: '+inttostr(conterrorescom);
                         end;
                       end;
                 else LineaBuff:=LineaBuff+C;
@@ -2163,7 +2091,7 @@ begin
                         end
                         else begin
                           inc(conterrorescom);
-                          StaticText4.Caption:='Errores de Comunicaciï¿½n: '+inttostr(conterrorescom);
+                          StaticText4.Caption:='Errores de Comunicación: '+inttostr(conterrorescom);
                         end;
                       end;
                 else LineaBuff:=LineaBuff+C;
@@ -2327,10 +2255,10 @@ begin
       if (ContadorAlarma>=10)or(ContadorAlarma2>=10)or(ContadorAlarma3>=10)or(SwAux) then begin
         if ContadorAlarma3>=10 then BEGIN
           DMCONS.DBGASCON.Connected:=true;
-          DMCONS.RegistraBitacora3(1,'Desconexion de Dispositivo','Error de Comunicaciï¿½n','U');
+          DMCONS.RegistraBitacora3(1,'Desconexion de Dispositivo','Error de Comunicación','U');
           ReiniciaTanques;
         end;
-        StaticText3.Caption:='Error de Comunicaciï¿½n';
+        StaticText3.Caption:='Error de Comunicación';
         if not StaticText3.Visible then
           Beep;
         StaticText3.Visible:=not StaticText3.Visible;
@@ -2384,12 +2312,11 @@ begin
                       if AdoTableInv.Locate('Tanque',TanqueActual,[]) then with TTanques[TanqueActual] do begin
                         FechaHoraActivo:=now;
                         if not EstadoActivo then begin
-                          RegistraBitacora3(1,'Reconexiï¿½n de Tanque','Tanque '+inttostr(TanqueActual),'U');
+                          RegistraBitacora3(1,'Reconexión de Tanque','Tanque '+inttostr(TanqueActual),'U');
                           EstadoActivo:=true;
                         end;
-                        ActualizaVolumenInventario(TanqueActual,
-                          AdoTableInvVolBruto.AsFloat, AdoTableInvVolNeto.AsFloat,
-                          not AdoTableInvVolNeto.IsNull);
+                        VolumenAnterior:=Volumen;
+                        Volumen:=AdoTableInvVolBruto.AsFloat;
                         VolumenAgua:=AdoTableInvAgua.AsFloat;
                         PorLlenar:=AdoTableInvCapDisponible.AsFloat;
                         Temperatura:=AdoTableInvTemperatura.AsFloat;
@@ -2406,7 +2333,7 @@ begin
                 with TTanques[TanqueActual] do begin
                   if (EstadoActivo)and(FechaHoraActivo<Now-3*tmminuto) then begin
                     EstadoActivo:=false;
-                    RegistraBitacora3(1,'Desconexiï¿½n de Tanque','Tanque '+inttostr(TanqueActual),'U');
+                    RegistraBitacora3(1,'Desconexión de Tanque','Tanque '+inttostr(TanqueActual),'U');
                   end;
                 end;
               end;
@@ -2672,7 +2599,7 @@ begin
             else begin
               //inc(ContadorAlarma2);
               inc(conterrorescom);
-              StaticText4.Caption:='Errores de Comunicaciï¿½n: '+inttostr(conterrorescom);
+              StaticText4.Caption:='Errores de Comunicación: '+inttostr(conterrorescom);
             end;
           end;
         2:begin // EecoSystem
@@ -2774,7 +2701,7 @@ begin
             end
             else begin
               inc(conterrorescom);
-              StaticText4.Caption:='Errores de Comunicaciï¿½n: '+inttostr(conterrorescom);
+              StaticText4.Caption:='Errores de Comunicación: '+inttostr(conterrorescom);
             end;
           end;
         5:begin // PetroVend
@@ -2785,15 +2712,15 @@ begin
                 lineapetrovend[3]:='2.Informe inventario de tanque';
                 lineapetrovend[4]:='3.Informes';
                 lineapetrovend[5]:='4.Coma';
-                lineapetrovend[6]:='ndos de sistema5.Comandos de programaciï¿½n e informes';
-                lineapetrovend[7]:='6.Instalaciï¿½n del sistema';
-                lineapetrovend[8]:='7.Datos de los mï¿½dulos';
+                lineapetrovend[6]:='ndos de sistema5.Comandos de programación e informes';
+                lineapetrovend[7]:='6.Instalación del sistema';
+                lineapetrovend[8]:='7.Datos de los módulos';
                 lineapetrovend[9]:='8.Inf. r pido venta (por impresora)';
                 lineapetrovend[10]:='9.Inf. r pido despacho (por impresora)';
                 lineapetrovend[11]:='INSTRUCCIONES:--';
-                lineapetrovend[12]:='------------En cada menï¿½, puede entrar lo siguiente:';
-                lineapetrovend[13]:='Opciï¿½n #        Selecciona la opciï¿½n';
-                lineapetrovend[14]:='[C] o [CANCELAR]Volver al menï¿½ anterior';
+                lineapetrovend[12]:='------------En cada menú, puede entrar lo siguiente:';
+                lineapetrovend[13]:='Opción #        Selecciona la opción';
+                lineapetrovend[14]:='[C] o [CANCELAR]Volver al menú anterior';
                 lineapetrovend[15]:='[H] o [AYUDA]   Visualiz. texto de ayuda';
                 lineapetrovend[16]:='[P] or [0]      Imprime la pantalla=8 G0TG0G4No.';
                 lineapetrovend[17]:='C/CANCELAR, ./AYUDA, 0/imPrimir:G0G0G4  4/=8G0T*=';
@@ -2869,13 +2796,13 @@ begin
                 lineapetrovend[3]:='2.Borrar memoria intermedia            ';
                 lineapetrovend[4]:=' 3.Prueba fuga cronometrada            ';
                 lineapetrovend[5]:='4.Almac. invent. tanque   (de    a    ) ';
-                lineapetrovend[6]:='5.Puerta passthrough (ï¿½sï¿½lo termin.!) ';
-                lineapetrovend[7]:=' 6.Abort. impresiï¿½n informe programada.  ';
+                lineapetrovend[6]:='5.Puerta passthrough (¡sólo termin.!) ';
+                lineapetrovend[7]:=' 6.Abort. impresión informe programada.  ';
                 lineapetrovend[8]:='7.Conmut.luz roja:   APAGADO            ';
-                lineapetrovend[9]:=' 8.Conmut.seï¿½al son.: APAGADO           ';
-                lineapetrovend[10]:='9.Informes de ordenadores (ï¿½sï¿½lo term!) ';
-                lineapetrovend[11]:='10.Copia del sistema (ï¿½sï¿½lo terminales!)';
-                lineapetrovend[12]:='11.Restaurar sistema (ï¿½sï¿½lo terminales!)';
+                lineapetrovend[9]:=' 8.Conmut.señal son.: APAGADO           ';
+                lineapetrovend[10]:='9.Informes de ordenadores (¡sólo term!) ';
+                lineapetrovend[11]:='10.Copia del sistema (¡sólo terminales!)';
+                lineapetrovend[12]:='11.Restaurar sistema (¡sólo terminales!)';
                 lineapetrovend[13]:='12.Cambia estado de relevador=8 G0TG0G4No., ';
                 lineapetrovend[14]:='C/CANCELAR, ./AYUDA, 0/imPrimir:G0G0G4  4=8 G0T=8 G0TG0G4ACCESO ';
                 lineapetrovend[15]:='inel      ABR 6, 2011   10:29 AM';
@@ -3136,7 +3063,7 @@ begin
           finally
             DMCONS.DBGASCON.Connected:=false;
           end;
-          StaticText2.Caption:='Prï¿½ximo Corte: '+FechaHoraToStr(FechaSiguienteCorte);
+          StaticText2.Caption:='Próximo Corte: '+FechaHoraToStr(FechaSiguienteCorte);
           SwCorte:=true;
         end;
       end;
@@ -3225,7 +3152,7 @@ begin
                     end
                     else if (xFecha<=FinTurnoActual)and((FinTurnoActual-xFecha)<FinTurnoActualMargenAnt) then begin
                       CualCorte:='Actual';
-                      // Si se adelantï¿½ la apertura del siguiente turno:
+                      // Si se adelantó la apertura del siguiente turno:
                       if (FechaToStr(FechaTurnoActual)+inttostr(TurnoActual)<FechaToStr(Q_TurnFecha.AsDateTime)+inttostr(Q_TurnTurno.AsInteger)) then begin
                         CualCorte:='Anterior';
                         //DespliegaMemo1('    4) '+CualCorte);
@@ -3236,7 +3163,7 @@ begin
                     else if (xFecha>FinTurnoActual)and((xFecha-FinTurnoActual)<FinTurnoActualMargenPos) then begin
                       CualCorte:='Actual';
                       //DespliegaMemo1('    5) '+CualCorte);
-                      // Si se adelantï¿½ la apertura del siguiente turno:
+                      // Si se adelantó la apertura del siguiente turno:
                       if (FechaToStr(FechaTurnoActual)+inttostr(TurnoActual)<FechaToStr(Q_TurnFecha.AsDateTime)+inttostr(Q_TurnTurno.AsInteger)) then begin
                         CualCorte:='Anterior';
                         FechaTurnoActual:=Q_TurnFecha.AsDateTime;
@@ -3485,7 +3412,7 @@ end.
 
 (* Control de Versiones
 
-29/ago/2013   Se cambiï¿½ el calculo del CRC INCON de DLL a un EXE. (Se tenï¿½a problemas con la DLL)
+29/ago/2013   Se cambió el calculo del CRC INCON de DLL a un EXE. (Se tenía problemas con la DLL)
 
 
 *)
