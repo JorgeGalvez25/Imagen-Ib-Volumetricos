@@ -1336,6 +1336,10 @@ begin
 
     // checa lecturas de dispensarios
     if NumPaso=2 then begin
+      // Si quedo pendiente la respuesta (ACK) de un comando enviado al procesar el estatus (S,L,G,E...),
+      // no se envia el comando A hasta recibirla; de lo contrario se encima con el comando anterior
+      if SwEsperaRsp then
+        exit;
       try
         if PosicionCargaActual<MaxPosCargaActiva then begin
           repeat
