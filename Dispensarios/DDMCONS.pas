@@ -634,6 +634,7 @@ type
     // DECLARACION VARIABLES
     ModoTurnos,
     CortesPorDia        :integer;
+    FechaSistema,
     FechaInicioSat      :TDateTime;
 
     HorasCorteTurnoAutom,
@@ -674,6 +675,10 @@ type
 
     GtwTimeOut,             // Timeout miliseg
     GtwTiempoCmnd :integer; // Tiempo entre comandos miliseg
+
+    // WAYNE 2W
+    WtwDivImporte,          // Divisor importe para lecturas y ventas                 **
+    WtwDivLitros  :integer; // Divisor litros para ventas                             **
 
     // WAYNE
     WayneFusion,
@@ -798,6 +803,7 @@ type
     function UltimoEstadoTanque(xtan:integer):string;
     function HashMd5(const Valor: string): string;
     procedure RegistraBitacoraCP(xprod:integer);
+    procedure RegistraBitacoraCFH(xfechor1,xfechor2:TDateTime);
     procedure ConectaAplicacion;
     procedure RefrescaConexion;
     procedure RegistraBitacora(xUsuario:integer;xOperacion:string;xObserva:TStrings);
@@ -1379,6 +1385,9 @@ begin
   GtwTimeOut:=1000;
   GtwTiempoCmnd:=100;
 
+  WtwDivImporte:=100;
+  WtwDivLitros:=100;
+
 
 
   WayneFusion:='No';
@@ -1488,6 +1497,12 @@ begin
         GtwTimeout:=StrToIntDef(ExtraeElemStrSep(lin,2,'='),1000);
       if Mayusculas(ss)='GTWTIEMPOCMND' then
         GtwTiempoCmnd:=StrToIntDef(ExtraeElemStrSep(lin,2,'='),100);
+
+      // VARIABLES WAYNE 2W
+      if Mayusculas(ss)='WTWDIVIMPORTE' then
+        WtwDivImporte:=StrToIntDef(ExtraeElemStrSep(lin,2,'='),100);
+      if Mayusculas(ss)='WTWDIVLITROS' then
+        WtwDivLitros:=StrToIntDef(ExtraeElemStrSep(lin,2,'='),100);
 
       // VARIABLES WAYNE
       if Mayusculas(ss)='DECIMALESPRESETWAYNE' then
@@ -2434,6 +2449,70 @@ begin
   Q_Auxi.ParamByName('HASH').AsString:=LowerCase(HashMd5(IntToStr(folioBit)+'|'+FormatDateTime('mm/dd/yyyy hh:mm:ss',fecha)+'|CMBP|Producto: '+TabComb[xprod].Nombre+'|'
                                               +FormatoMoneda(TabComb[xprod].PrecioAnt)+'|'+FormatoMoneda(TabComb[xprod].PrecioNuevo)));
   Q_Auxi.ExecSQL;
+end;
+
+procedure TDMCONS.RegistraBitacoraCFH(xfechor1,xfechor2:TDateTime);
+var
+  folioBit:Integer;
+  fecha:TDateTime;
+  sfech1,sfech2:string;
+
+begin
+  sfech1:=Extraeelemstrsep(FormatDateTime('dd/mm/yyyy hh:mm:ss',xfechor1),1,' ');
+  sfech2:=Extraeelemstrsep(FormatDateTime('dd/mm/yyyy hh:mm:ss',xfechor2),1,' ');
+  if sfech1<>sfech2 then begin // Cambio de fecha
+    Q_Auxi.Close;
+    Q_Auxi.SQL.Clear;
+    Q_AuxiEntero1.FieldKind:=fkInternalCalc;
+    Q_Auxi.SQL.Add('SELECT COALESCE(MAX(FOLIO),0)+1 AS ENTERO1 FROM DPVGBTCC');
+    Q_Auxi.Prepare;
+    Q_Auxi.Open;
+    folioBit:=Q_AuxiEntero1.AsInteger;
+
+    Q_Auxi.Close;
+    Q_Auxi.SQL.Clear;
+    Q_Auxi.SQL.Add('INSERT INTO DPVGBTCC (FECHAHORA, TIPOEVENTO, INFOEVENTO, VALORANTERIOR, VALORNUEVO, HASH) '+
+                   'VALUES (:FECHAHORA, :TIPOEVENTO, :INFOEVENTO, :VALORANTERIOR, :VALORNUEVO, :HASH)');
+    fecha:=Now;
+    Q_Auxi.ParamByName('FECHAHORA').AsString:=FormatDateTime('mm/dd/yyyy hh:mm:ss',fecha);
+    Q_Auxi.ParamByName('TIPOEVENTO').AsString:='CMBF';
+    Q_Auxi.ParamByName('INFOEVENTO').AsString:='Fecha del sistema operativo ha sido actualizada.';
+    Q_Auxi.ParamByName('VALORANTERIOR').AsString:=sfech1;
+    Q_Auxi.ParamByName('VALORNUEVO').AsString:=sfech2;
+    Q_Auxi.ParamByName('HASH').AsString:=LowerCase(HashMd5(IntToStr(folioBit)+'|'+FormatDateTime('mm/dd/yyyy hh:mm:ss',fecha)
+                                                +'|CMBF|Fecha del sistema operativo ha sido actualizada.'+'|'
+                                                +sfech1+'|'+sfech2));
+    Q_Auxi.ExecSQL;
+  end;
+  sfech1:=Extraeelemstrsep(FormatDateTime('dd/mm/yyyy hh:mm:ss',xfechor1),2,' ');
+  sfech2:=Extraeelemstrsep(FormatDateTime('dd/mm/yyyy hh:mm:ss',xfechor2),2,' ');
+  sfech1:=copy(sfech1,1,5);
+  sfech2:=copy(sfech2,1,5);
+  if sfech1<>sfech2 then begin // Cambio de hora
+    Q_Auxi.Close;
+    Q_Auxi.SQL.Clear;
+    Q_AuxiEntero1.FieldKind:=fkInternalCalc;
+    Q_Auxi.SQL.Add('SELECT COALESCE(MAX(FOLIO),0)+1 AS ENTERO1 FROM DPVGBTCC');
+    Q_Auxi.Prepare;
+    Q_Auxi.Open;
+    folioBit:=Q_AuxiEntero1.AsInteger;
+
+    Q_Auxi.Close;
+    Q_Auxi.SQL.Clear;
+    Q_Auxi.SQL.Add('INSERT INTO DPVGBTCC (FECHAHORA, TIPOEVENTO, INFOEVENTO, VALORANTERIOR, VALORNUEVO, HASH) '+
+                   'VALUES (:FECHAHORA, :TIPOEVENTO, :INFOEVENTO, :VALORANTERIOR, :VALORNUEVO, :HASH)');
+    fecha:=Now;
+    Q_Auxi.ParamByName('FECHAHORA').AsString:=FormatDateTime('mm/dd/yyyy hh:mm:ss',fecha);
+    Q_Auxi.ParamByName('TIPOEVENTO').AsString:='CMBH';
+    Q_Auxi.ParamByName('INFOEVENTO').AsString:='Hora del sistema operativo ha sido actualizada.';
+    Q_Auxi.ParamByName('VALORANTERIOR').AsString:=sfech1;
+    Q_Auxi.ParamByName('VALORNUEVO').AsString:=sfech2;
+    Q_Auxi.ParamByName('HASH').AsString:=LowerCase(HashMd5(IntToStr(folioBit)+'|'+FormatDateTime('mm/dd/yyyy hh:mm:ss',fecha)
+                                                +'|CMBH|Hora del sistema operativo ha sido actualizada.'+'|'
+                                                +sfech1+'|'+sfech2));
+    Q_Auxi.ExecSQL;
+
+  end;
 end;
 
 end.

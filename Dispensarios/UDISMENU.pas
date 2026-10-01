@@ -22,7 +22,8 @@ var
 implementation
 
 uses DDMCONS, ULIBDATABASE, ULIBGRAL, ULIBLICENCIAS, ULIBPRINT, UDisWayne,
-  UDISBENNETT2, UDISPAM10002, UDISTEAM, UDISHONGJANG, UDISGILBARCO, UDISGATEWAY;
+  UDISBENNETT2, UDISPAM10002, UDISTEAM, UDISHONGJANG, UDISGILBARCO, UDISGATEWAY,
+  UDISWAYNE2W;
 
 {$R *.dfm}
 
@@ -124,6 +125,10 @@ begin
         8:begin
             Application.CreateForm(TFDISGATEWAY,FDISGATEWAY);
             FDISGATEWAY.Show;
+          end;
+        9:begin
+            Application.CreateForm(TFDISWAYNE2W,FDISWAYNE2W);
+            FDISWAYNE2W.Show;
           end;
       end;
     except
