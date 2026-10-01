@@ -102,8 +102,12 @@ type
     ls,ContLeeVenta,
     NumPaso         :integer;
     SwPasoBien      :boolean;
+    HoraArranque,
+    HoraUltGuardaLogError :TDateTime;
     { Private declarations }
      function  TransmiteComando1(DataBlock:string):boolean;
+     procedure GuardarLog;
+     procedure GuardarLogError(xmsj:string);
   public
     { Public declarations }
      function  AbrePuerto : boolean;
@@ -283,9 +287,38 @@ begin
 end;
 
 
+// Guarda el log en disco, agregando datos de arranque (equivalente a GuardarLog del servicio)
+procedure TFDISWAYNE2W.GuardarLog;
+begin
+  try
+    DMCONS.AgregaLog('Ejecutable: '+Application.ExeName);
+    DMCONS.AgregaLog('Fecha y hora de arranque: '+FechaHoraExtToStr(HoraArranque));
+    DMCONS.ListaLog.SaveToFile('\ImagenCo\Log'+FiltraStrNum(FechaHoraToStr(Now))+'.Txt');
+  except
+    on e:Exception do
+      DMCONS.AgregaLogCmnd('Error GuardarLog: '+e.Message);
+  end;
+end;
+
+// Registra un error en ambos logs y guarda el log en disco.
+// Para no saturar el disco el log se guarda maximo una vez por minuto.
+procedure TFDISWAYNE2W.GuardarLogError(xmsj:string);
+begin
+  try
+    DMCONS.AgregaLog(xmsj);
+    DMCONS.AgregaLogCmnd(xmsj);
+    if abs(Now-HoraUltGuardaLogError)>TMMinuto then begin
+      HoraUltGuardaLogError:=Now;
+      GuardarLog;
+    end;
+  except
+  end;
+end;
+
 procedure TFDISWAYNE2W.PuertoSerialTriggerAvail(CP: TObject; Count: Word);
 var i : integer;
 begin
+  try
    for i:=1 to Count do begin
      sRespuesta:= sRespuesta + PuertoSerial.GetChar;
    end;
@@ -294,15 +327,24 @@ begin
       bListo:= true
    else
       newtimer(etTimeOut,MSecs2Ticks(dmcons.GtwTimeout));
+  except
+    on e:Exception do
+      GuardarLogError('Error PuertoSerialTriggerAvail: '+e.Message);
+  end;
 end;
 
 procedure TFDISWAYNE2W.PuertoSerialTriggerData(CP: TObject;
   TriggerHandle: Word);
 begin
+  try
    if ( TriggerHandle=wTriggerEOT ) then
       bEndOfText:= true
    else
       bLineFeed:= true;
+  except
+    on e:Exception do
+      GuardarLogError('Error PuertoSerialTriggerData: '+e.Message);
+  end;
 end;
 
 
@@ -312,6 +354,7 @@ var ss:string;
     iNoIntento    :integer;
     bOk           :boolean;
 begin
+  try
    iMaxIntentos:=2;
    iBytesEsperados:=13;
    iNoIntento:= 0;
@@ -337,18 +380,32 @@ begin
          repeat
             Application.ProcessMessages;
          until ( ( bListo ) or ( timerexpired(etTimeOut) ) );
+         DMCONS.AgregaLog('sRespuesta Length: '+IntToStr(length(sRespuesta)));
          if ( bListo ) then begin
            if length(sRespuesta)=13 then begin
              bOk:=true;
              DMCONS.AgregaLog('R  '+StrToHexSep(sRespuesta));
-           end;
-         end;
+           end
+           else
+             DMCONS.AgregaLog('Respuesta con longitud invalida: '+StrToHexSep(sRespuesta));
+         end
+         else if sRespuesta<>'' then
+           DMCONS.AgregaLog('Timeout con respuesta incompleta: '+StrToHexSep(sRespuesta))
+         else
+           DMCONS.AgregaLog('Timeout sin respuesta ('+IntToStr(dmcons.GtwTimeout)+' ms)');
          if ( not bOk ) then begin
+            DMCONS.AgregaLog('Intento '+IntToStr(iNoIntento)+' de '+IntToStr(iMaxIntentos)+' fallido');
             if  ( iNoIntento<iMaxIntentos ) then sleep(dmcons.GtwTiempoCmnd);
          end;
       end;
    until ( ( bOk ) or ( iNoIntento>=iMaxIntentos ) );
    result:= bOk;
+  except
+    on e:Exception do begin
+      GuardarLogError('Error TransmiteComando1: '+e.Message);
+      raise;
+    end;
+  end;
 end;
 
 //------------------------------------------------------------------------------
@@ -373,10 +430,17 @@ begin
       PuertoSerial.Tracing:= tlOn;
 
       PuertoSerial.Open:= true;
+      AgregaLog('Puerto abierto COM'+IntToStr(ptPuerto)+' '+IntToStr(ptBaudios)+','+ptParidad+','+
+                IntToStr(ptBitsDatos)+','+IntToStr(ptBitsParada)+
+                ' GtwTimeout:'+IntToStr(GtwTimeout)+' GtwTiempoCmnd:'+IntToStr(GtwTiempoCmnd)+
+                ' WtwDivImporte:'+IntToStr(WtwDivImporte)+' WtwDivLitros:'+IntToStr(WtwDivLitros));
       result:= true;
     end;
   except
-     result:= false;
+    on e:Exception do begin
+      result:= false;
+      GuardarLogError('Error AbrePuerto: '+e.Message);
+    end;
   end;
 end;
 //--------------------------------------------------------------------------------
@@ -399,19 +463,32 @@ function TFDISWAYNE2W.EnviaPresetPesosBomba(xPosCarga,xTipoPreset: integer; xVal
 var DataBlock,
     stComando :string;
 begin
+  try
    result:=false;
    if xTipoPreset=1 then begin  // Pesos
+     DMCONS.AgregaLog('Preset Pesos Posicion '+inttoclavenum(xPosCarga,2)+' $'+FormatFloat('###,##0.00',xValor));
      stComando:= char(ControlByte(xPosCarga,7))+#33+ConvierteBCD(xValor*DMCONS.WtwDivImporte,6);
      DataBlock:=EmpacaWayne(stComando);
      if ( ( TransmiteComando1(DataBlock) ) and ( length(sRespuesta)=13 ) ) then
        result:=true;
    end
    else if xTipoPreset=2 then begin  // Litros
+     DMCONS.AgregaLog('Preset Litros Posicion '+inttoclavenum(xPosCarga,2)+' '+FormatFloat('###,##0.00',xValor)+' lts');
      stComando:= char(ControlByte(xPosCarga,7))+#35+ConvierteBCD(xValor*DMCONS.WtwDivLitros,6);
      DataBlock:=EmpacaWayne(stComando);
      if ( ( TransmiteComando1(DataBlock) ) and ( length(sRespuesta)=13 ) ) then
        result:=true;
-   end;
+   end
+   else
+     DMCONS.AgregaLog('Tipo de preset invalido: '+IntToStr(xTipoPreset)+' Posicion '+inttoclavenum(xPosCarga,2));
+   if not result then
+     DMCONS.AgregaLog('Fallo envio de preset Posicion '+inttoclavenum(xPosCarga,2));
+  except
+    on e:Exception do begin
+      GuardarLogError('Error EnviaPresetPesosBomba: '+e.Message);
+      raise;
+    end;
+  end;
 end;
 
 //--------------------------------------------------------------------------------
@@ -420,11 +497,21 @@ function TFDISWAYNE2W.DetenerDespacho(xPosCarga : integer) : boolean;
 var DataBlock,
     stComando :string;
 begin
+  try
    result:=false;
+   DMCONS.AgregaLog('Detener despacho Posicion '+inttoclavenum(xPosCarga,2));
    stComando:= char(ControlByte(xPosCarga,0))+char(10*16+7)+#0+#0+#0;
    DataBlock:=EmpacaWayne(stComando);
    if ( ( TransmiteComando1(DataBlock) ) and ( length(sRespuesta)=13 ) ) then
-     result:=true;
+     result:=true
+   else
+     DMCONS.AgregaLog('Fallo detener despacho Posicion '+inttoclavenum(xPosCarga,2));
+  except
+    on e:Exception do begin
+      GuardarLogError('Error DetenerDespacho: '+e.Message);
+      raise;
+    end;
+  end;
 end;
 
 
@@ -433,11 +520,21 @@ function TFDISWAYNE2W.ReanudaDespacho(xPosCarga: integer) : boolean;
 var DataBlock,
     stComando :string;
 begin
+  try
    result:=false;
+   DMCONS.AgregaLog('Reanudar despacho Posicion '+inttoclavenum(xPosCarga,2));
    stComando:= char(ControlByte(xPosCarga,0))+char(9*16+7)+#0+#0+#0;
    DataBlock:=EmpacaWayne(stComando);
    if ( ( TransmiteComando1(DataBlock) ) and ( length(sRespuesta)=13 ) ) then
-     result:=true;
+     result:=true
+   else
+     DMCONS.AgregaLog('Fallo reanudar despacho Posicion '+inttoclavenum(xPosCarga,2));
+  except
+    on e:Exception do begin
+      GuardarLogError('Error ReanudaDespacho: '+e.Message);
+      raise;
+    end;
+  end;
 end;
 
 //------------------------------------------------------------------------------
@@ -446,11 +543,21 @@ function TFDISWAYNE2W.Autoriza(xPosCarga: integer) : boolean;
 var DataBlock,
     stComando :string;
 begin
+  try
    result:=false;
+   DMCONS.AgregaLog('Autoriza Posicion '+inttoclavenum(xPosCarga,2)+' (todas las mangueras)');
    stComando:= char(ControlByte(xPosCarga,0))+char(8*16+15)+char(0)+#0+#0;         // 08 8F 00 00 00
    DataBlock:=EmpacaWayne(stComando);
    if ( ( TransmiteComando1(DataBlock) ) and ( length(sRespuesta)=13 ) ) then
-     result:=true;
+     result:=true
+   else
+     DMCONS.AgregaLog('Fallo autorizacion Posicion '+inttoclavenum(xPosCarga,2));
+  except
+    on e:Exception do begin
+      GuardarLogError('Error Autoriza: '+e.Message);
+      raise;
+    end;
+  end;
 end;
 
 
@@ -461,17 +568,29 @@ var DataBlock,
     stComando :string;
     xposfis:integer;
 begin
+  try
    result:=false;
    if xpm in [0..4] then begin
      if xpm=0 then
        xposfis:=15
      else
        xposfis:=TPosCarga[xposcarga].TPosx[xpm];
+     DMCONS.AgregaLog('Autoriza Posicion '+inttoclavenum(xPosCarga,2)+' Manguera: '+IntToStr(xpm)+' PosFis: '+IntToStr(xposfis));
      stComando:= char(ControlByte(xPosCarga,0))+char(128+8+xposfis-1)+char(0)+#0+#0;         // 08 8F 00 00 00
      DataBlock:=EmpacaWayne(stComando);
      if ( ( TransmiteComando1(DataBlock) ) and ( length(sRespuesta)=13 ) ) then
-       result:=true;
-   end;
+       result:=true
+     else
+       DMCONS.AgregaLog('Fallo autorizacion Posicion '+inttoclavenum(xPosCarga,2)+' Manguera: '+IntToStr(xpm));
+   end
+   else
+     DMCONS.AgregaLog('AutorizaPm manguera invalida: '+IntToStr(xpm)+' Posicion '+inttoclavenum(xPosCarga,2));
+  except
+    on e:Exception do begin
+      GuardarLogError('Error AutorizaPm: '+e.Message);
+      raise;
+    end;
+  end;
 end;
 
 //------------------------------------------------------------------------------
@@ -483,6 +602,7 @@ var DataBlock,ss,
     chmang:char;
     xposfis:integer;
 begin
+  try
    result:=false;
    rTotalLitros:=0;
    if xpos in [1..4] then begin
@@ -493,25 +613,45 @@ begin
      DataBlock:=EmpacaWayne(stComando);
      if ( ( TransmiteComando1(DataBlock) ) and ( length(sRespuesta)=13 ) ) then begin
        ss:=StrToHexSep(DesempacaWayne(sRespuesta));
+       if ss='' then
+         DMCONS.AgregaLog('Trama de total (parte 1) corrupta Pos '+inttoclavenum(xPosCarga,2));
        val1:=ExtraeBCD(ss,4,5);
        // leo parte2
        stComando:= char(ControlByte(xPosCarga,7))+#2+chmang+#0+#0;
        DataBlock:=EmpacaWayne(stComando);
        if ( ( TransmiteComando1(DataBlock) ) and ( length(sRespuesta)=13 ) ) then begin
          ss:=StrToHexSep(DesempacaWayne(sRespuesta));
+         if ss='' then
+           DMCONS.AgregaLog('Trama de total (parte 2) corrupta Pos '+inttoclavenum(xPosCarga,2));
          val2:=ExtraeBCD(ss,4,5);
          // leo parte2
          stComando:= char(ControlByte(xPosCarga,7))+#22+chmang+#0+#0;
          DataBlock:=EmpacaWayne(stComando);
          if ( ( TransmiteComando1(DataBlock) ) and ( length(sRespuesta)=13 ) ) then begin
            ss:=StrToHexSep(DesempacaWayne(sRespuesta));
+           if ss='' then
+             DMCONS.AgregaLog('Trama de total (parte 3) corrupta Pos '+inttoclavenum(xPosCarga,2));
            val3:=ExtraeBCD(ss,4,5);
            rTotalLitros:=(val1+val2*10000+val3*10000*10000)/100;
+           DMCONS.AgregaLog('Total Pos '+inttoclavenum(xPosCarga,2)+' Manguera: '+IntToStr(xpos)+' PosFis: '+IntToStr(xposfis)+
+                            ' Partes: '+FormatFloat('0',val1)+' / '+FormatFloat('0',val2)+' / '+FormatFloat('0',val3)+
+                            ' Total: '+FormatFloat('###,###,##0.00',rTotalLitros));
            result:=true;
-         end;
-       end;
-     end;
-   end;
+         end
+         else DMCONS.AgregaLog('Sin respuesta total (parte 3) Pos '+inttoclavenum(xPosCarga,2)+' Manguera: '+IntToStr(xpos));
+       end
+       else DMCONS.AgregaLog('Sin respuesta total (parte 2) Pos '+inttoclavenum(xPosCarga,2)+' Manguera: '+IntToStr(xpos));
+     end
+     else DMCONS.AgregaLog('Sin respuesta total (parte 1) Pos '+inttoclavenum(xPosCarga,2)+' Manguera: '+IntToStr(xpos));
+   end
+   else
+     DMCONS.AgregaLog('DameTotal manguera invalida: '+IntToStr(xpos)+' Pos '+inttoclavenum(xPosCarga,2));
+  except
+    on e:Exception do begin
+      GuardarLogError('Error DameTotal Pos '+inttoclavenum(xPosCarga,2)+': '+e.Message);
+      raise;
+    end;
+  end;
 end;
 
 //------------------------------------------------------------------------------
@@ -522,23 +662,30 @@ var DataBlock,ss,ss1,
     xposact,xposfis:integer;
     val1,val2:integer;
 begin
+  try
    result:=false;
    rLitros:=0;rPesos:=0;rPrecio:=0;xposfis:=0;
    xposact:=TPosCarga[xposcarga].PosActual;
    if xposact in [1..4] then
      xposfis:=TPosCarga[xposcarga].TPosx[xposact];
+   DMCONS.AgregaLog('Lecturas Pos '+inttoclavenum(xPosCarga,2)+' PosActual: '+IntToStr(xposact)+' PosFis: '+IntToStr(xposfis));
    // leo importe
    stComando:= char(ControlByte(xPosCarga,7))+#42+#0+#0+#0;
    DataBlock:=EmpacaWayne(stComando);
    if ( ( TransmiteComando1(DataBlock) ) and ( length(sRespuesta)=13 ) ) then begin
      ss:=StrToHexSep(DesempacaWayne(sRespuesta));
+     if ss='' then
+       DMCONS.AgregaLog('Trama de importe corrupta Pos '+inttoclavenum(xPosCarga,2));
      rPesos:=dividefloat(ExtraeBCD(ss,3,5),TPoscarga[xPosCarga].DivImporte);
+     DMCONS.AgregaLog('Importe leido: '+FormatFloat('###,##0.00',rPesos)+' (Div: '+IntToStr(TPoscarga[xPosCarga].DivImporte)+')');
      if xposfis in [1..7] then begin
        // leo precio
        stComando:= char(ControlByte(xPosCarga,7))+#0+char(xposfis-1)+#0+#0;         //   0F 00 00 F2 03
        DataBlock:=EmpacaWayne(stComando);
        if ( ( TransmiteComando1(DataBlock) ) and ( length(sRespuesta)=13 ) ) then begin
          ss:=StrToHexSep(DesempacaWayne(sRespuesta));
+         if ss='' then
+           DMCONS.AgregaLog('Trama de precio corrupta Pos '+inttoclavenum(xPosCarga,2));
          ss1:=ExtraeElemStrSep(ss,5,' ');
          Val1:=HexToInt(ss1);
          ss1:=ExtraeElemStrSep(ss,4,' ');
@@ -549,9 +696,13 @@ begin
            rLitros:=ajustafloat(dividefloat(rPesos,rPrecio),3)
          else
            rLitros:=ajustafloat(dividefloat(rPesos,rPrecio),2);
+         DMCONS.AgregaLog('Precio leido: '+FormatFloat('###,##0.00',rPrecio)+' Litros calculados: '+FormatFloat('###,##0.000',rLitros));
          result:=true;
        end
-       else rPesos:=0;
+       else begin
+         DMCONS.AgregaLog('Sin respuesta lectura de precio Pos '+inttoclavenum(xPosCarga,2)+', importe se deja en ceros');
+         rPesos:=0;
+       end;
      end
      else begin
        // leo volumen
@@ -559,13 +710,27 @@ begin
        DataBlock:=EmpacaWayne(stComando);
        if ( ( TransmiteComando1(DataBlock) ) and ( length(sRespuesta)=13 ) ) then begin
          ss:=StrToHexSep(DesempacaWayne(sRespuesta));
+         if ss='' then
+           DMCONS.AgregaLog('Trama de volumen corrupta Pos '+inttoclavenum(xPosCarga,2));
          rlitros:=dividefloat(ExtraeBCD(ss,3,5),TPoscarga[xPosCarga].DivLitros);
          rPrecio:=ajustafloat(dividefloat(rPesos,rLitros),2);
+         DMCONS.AgregaLog('Volumen leido: '+FormatFloat('###,##0.000',rLitros)+' (Div: '+IntToStr(TPoscarga[xPosCarga].DivLitros)+') Precio calculado: '+FormatFloat('###,##0.00',rPrecio));
          result:=true;
        end
-       else rPesos:=0;
+       else begin
+         DMCONS.AgregaLog('Sin respuesta lectura de volumen Pos '+inttoclavenum(xPosCarga,2)+', importe se deja en ceros');
+         rPesos:=0;
+       end;
      end;
-   end;
+   end
+   else
+     DMCONS.AgregaLog('Sin respuesta lectura de importe Pos '+inttoclavenum(xPosCarga,2));
+  except
+    on e:Exception do begin
+      GuardarLogError('Error DameLecturas Pos '+inttoclavenum(xPosCarga,2)+': '+e.Message);
+      raise;
+    end;
+  end;
 end;
 
 //------------------------------------------------------------------------------
@@ -580,6 +745,8 @@ begin
    result:=false;
    timer1.Enabled:=false;
    try
+   try
+     DMCONS.AgregaLog('Lee precios Pos '+inttoclavenum(xPosCarga,2)+' NoComb: '+IntToStr(TPosCarga[xPosCarga].nocomb));
      for xp:=1 to TPosCarga[xPosCarga].nocomb do begin
        xposfis:=TPosCarga[xPosCarga].TPosx[xp];
        stComando:= char(ControlByte(xPosCarga,7))+#0+char(xposfis-1)+#0+#0;         //   0F 00 00 F2 03
@@ -593,6 +760,9 @@ begin
          Val2:=HexToInt(ss1);
          xprecio:=256*val1+val2;
          TPosCarga[xPosCarga].TPrecio[xp]:=dividefloat(xprecio,100);
+         DMCONS.AgregaLog('Precio leido Pos '+inttoclavenum(xPosCarga,2)+' Manguera: '+IntToStr(xp)+
+                          ' PosFis: '+IntToStr(xposfis)+' Combustible: '+IntToStr(TPosCarga[xPosCarga].TComb[xp])+
+                          ' Precio: '+FormatFloat('###,##0.00',TPosCarga[xPosCarga].TPrecio[xp]));
          Esperamiliseg(50);
          with DMCONS do begin
            xcomb:=TPosCarga[xPosCarga].TComb[xp];
@@ -613,8 +783,16 @@ begin
            DMCONS.Q_CombIb.Active:=true;
            DBGrid3.Refresh;
          end;
-       end;
+       end
+       else
+         DMCONS.AgregaLog('Sin respuesta lectura de precio Pos '+inttoclavenum(xPosCarga,2)+' Manguera: '+IntToStr(xp));
      end;
+   except
+     on e:Exception do begin
+       GuardarLogError('Error LeePrecios Pos '+inttoclavenum(xPosCarga,2)+': '+e.Message);
+       raise;
+     end;
+   end;
    finally
      Timer1.Enabled:=true;
    end;
@@ -631,26 +809,46 @@ begin
    result:=false;
    timer1.Enabled:=false;
    try
+   try
      for xp:=1 to TPosCarga[xPosCarga].nocomb do begin
        xposfis:=TPosCarga[xPosCarga].TPosx[xp];
        xprecio:=Trunc(TPosCarga[xPosCarga].TNuevoPrec[xp]*100+0.01);
        val1:=(xprecio)div(256);
        val2:=(xprecio)mod(256);
+       DMCONS.AgregaLog('Precio 1, PosCarga: '+IntToStr(xPosCarga)+' Manguera: '+IntToStr(xposfis)+
+                        ' Combustible: '+IntToStr(TPosCarga[xPosCarga].TComb[xp])+
+                        ' Nuevo Precio: '+FormatFloat('###,##0.00',TPosCarga[xPosCarga].TNuevoPrec[xp])+
+                        ' Valor Precio: '+IntToStr(xprecio));
        stComando:= char(ControlByte(xPosCarga,7))+#1+char(xposfis-1)+char(val2)+char(val1);
        DataBlock:=EmpacaWayne(stComando);
        if ( ( TransmiteComando1(DataBlock) ) and ( length(sRespuesta)=13 ) ) then begin
          Esperamiliseg(50);
+         DMCONS.AgregaLog('Precio 2, PosCarga: '+IntToStr(xPosCarga)+' Manguera: '+IntToStr(xposfis)+' Valor Precio: '+IntToStr(xprecio));
          stComando:= char(ControlByte(xPosCarga,7))+#1+char(16+xposfis-1)+char(val2)+char(val1);
          DataBlock:=EmpacaWayne(stComando);
          if ( ( TransmiteComando1(DataBlock) ) and ( length(sRespuesta)=13 ) ) then begin
            Esperamiliseg(50);
-           if xp=TPosCarga[xPosCarga].nocomb then
+           if xp=TPosCarga[xPosCarga].nocomb then begin
              result:=true;
+             DMCONS.AgregaLog('Cambio de precios correcto Pos '+inttoclavenum(xPosCarga,2));
+           end;
          end
-         else exit;
+         else begin
+           DMCONS.AgregaLog('Fallo cambio de precio (Precio 2) Pos '+inttoclavenum(xPosCarga,2)+' Manguera: '+IntToStr(xposfis));
+           exit;
+         end;
        end
-       else exit;
+       else begin
+         DMCONS.AgregaLog('Fallo cambio de precio (Precio 1) Pos '+inttoclavenum(xPosCarga,2)+' Manguera: '+IntToStr(xposfis));
+         exit;
+       end;
      end;
+   except
+     on e:Exception do begin
+       GuardarLogError('Error CambiaPrecios Pos '+inttoclavenum(xPosCarga,2)+': '+e.Message);
+       raise;
+     end;
+   end;
    finally
      Timer1.Enabled:=true;
    end;
@@ -665,11 +863,15 @@ var iStatus,i,xposact : integer;
     chComando:char;
     tbit:array[0..7] of boolean;
 begin
+  try
    iStatus:= 0;
+   StrBin:='';
    chComando:= char(ControlByte(xPosCarga,1));     // Comando 1
    DataBlock:=EmpacaWayne(chComando);
    if ( ( TransmiteComando1(DataBlock) ) and ( length(sRespuesta)=13 ) ) then begin
      sRespuesta:=DesempacaWayne(sRespuesta);
+     if sRespuesta='' then
+       DMCONS.AgregaLog('Trama de estatus corrupta Pos '+inttoclavenum(xPosCarga,2));
      StrBin:=ByteToBin(ord(sRespuesta[5]));
      for i:=0 to 7 do
        tbit[i]:=(strbin[8-i]='1');
@@ -726,8 +928,23 @@ begin
        else if (TPosCarga[xPosCarga].SwPreset2) then
          iStatus:=9;
      end;
-   end;
+   end
+   else
+     DMCONS.AgregaLog('Sin respuesta de estatus Pos '+inttoclavenum(xPosCarga,2));
+   if iStatus<>TPosCarga[xPosCarga].estatus then
+     DMCONS.AgregaLog('Cambio estatus Pos '+inttoclavenum(xPosCarga,2)+': '+
+                      IntToStr(TPosCarga[xPosCarga].estatus)+' -> '+IntToStr(iStatus)+
+                      ' Bits: '+StrBin+' PosActual: '+IntToStr(TPosCarga[xPosCarga].PosActual)+
+                      ' MangLev: '+IntToStr(TPosCarga[xPosCarga].PosMangLev)+
+                      ' Preset: '+BoolToStr(TPosCarga[xPosCarga].SwPreset,true)+'/'+BoolToStr(TPosCarga[xPosCarga].SwPreset2,true)+
+                      ' StatusFV: '+BoolToStr(TPosCarga[xPosCarga].SwStatusFV,true));
    result:= iStatus;
+  except
+    on e:Exception do begin
+      GuardarLogError('Error DameEstatus Pos '+inttoclavenum(xPosCarga,2)+': '+e.Message);
+      raise;
+    end;
+  end;
 end;
 
 
@@ -739,6 +956,8 @@ begin
   with DMCONS do begin
     Screen.Cursor:=crHourGlass;
     try
+    try
+      AgregaLog('Inicia base de datos');
       if not AbrePuerto then
         raise exception.Create('No puedo abrir puerto');
       // Carga Pos. Carga
@@ -769,10 +988,18 @@ begin
             ProductoPrecio:=inttostr(i);
             DigitoPrec:=Q_CombIbDigitoAjustePrecio.AsInteger;
             AgruparCon:=Q_CombIbAgrupar_con.AsInteger;
+            AgregaLog('Combustible '+IntToStr(i)+': '+Nombre+' ClavePemex: '+ClavePemex+
+                      ' DigitoPrec: '+IntToStr(DigitoPrec)+' AgruparCon: '+IntToStr(AgruparCon));
           end;
         end;
         Q_CombIb.Next;
       end;
+    except
+      on e:Exception do begin
+        GuardarLogError('Error IniciaBaseDeDatos: '+e.Message);
+        raise;
+      end;
+    end;
     finally
       Screen.Cursor:=crDefault;
     end;
@@ -782,6 +1009,7 @@ end;
 procedure TFDISWAYNE2W.IniciaEstacion;
 var i,j,xisla,xpos,xcomb,xnum:integer;
     existe:boolean;
+    lin:string;
 begin
   with DMCONS do begin
     swcierrabd:=false;
@@ -868,6 +1096,14 @@ begin
       end;
       Q_BombIb.Next;
     end;
+    AgregaLog('Inicia estacion. MaxPosCarga: '+IntToStr(MaxPosCarga));
+    for i:=1 to MaxPosCarga do with TPosCarga[i] do begin
+      lin:='Pos '+inttoclavenum(i,2)+' Isla: '+IntToStr(Isla)+' Modo: '+ModoOpera+
+           ' DivImporte: '+IntToStr(DivImporte)+' DivLitros: '+IntToStr(DivLitros)+' NoComb: '+IntToStr(NoComb);
+      for j:=1 to NoComb do
+        lin:=lin+' [Mang: '+IntToStr(TMang[j])+' Comb: '+IntToStr(TComb[j])+' PosFis: '+IntToStr(TPosx[j])+']';
+      AgregaLog(lin);
+    end;
   end;
   ListBox1.Items.Clear;
   xnum:=(MaxPosCarga)div(4);
@@ -885,7 +1121,9 @@ procedure TFDISWAYNE2W.FormShow(Sender: TObject);
 begin
   if SwInicio then begin
     try
+    try
       SwInicio:=false;
+      DMCONS.AgregaLog('Inicia consola Wayne 2W: '+Application.ExeName);
       IniciaBaseDeDatos;
       ListBox1.ItemIndex:=0;
       StaticText6.Caption:='';
@@ -896,6 +1134,13 @@ begin
       IniciaEstacion;
       ListBox1.SetFocus;
       DMCONS.T_ConfIb.Active:=true;
+      DMCONS.AgregaLog('Consola iniciada correctamente');
+    except
+      on e:Exception do begin
+        GuardarLogError('Error al iniciar consola: '+e.Message);
+        raise;
+      end;
+    end;
     finally
       Timer1.Enabled:=true;
     end;
@@ -1068,6 +1313,10 @@ begin
               end;
 
               T_MoviIb.post;
+              AgregaLog('Venta registrada Pos '+inttoclavenum(i,2)+' Combustible: '+IntToStr(xcomb)+
+                        ' Manguera: '+IntToStr(xmang)+' Volumen: '+FormatFloat('###,##0.000',Volumen)+
+                        ' Precio: '+FormatFloat('###,##0.00',Precio)+' Importe: '+FormatFloat('###,##0.00',Importe)+
+                        ' TipoPago: '+IntToStr(T_MoviIbTipoPago.AsInteger));
               apunt:=8;
               if (lcLicTemporal)and(date>lcLicVence) then begin
                 MensajeErr('Licencia vencida. Llame a su distribuidor');
@@ -1077,17 +1326,24 @@ begin
               T_MoviIb.Active:=false;
             end;
           except
+            on e:Exception do
+              GuardarLogError('Error al registrar venta Pos '+inttoclavenum(i,2)+' (paso '+inttostr(apunt)+'): '+e.Message);
           end;
-        end;
+        end
+        else
+          DMCONS.AgregaLog('Fin de venta sin importe o sin manguera activa Pos '+inttoclavenum(i,2)+
+                           ' Importe: '+FormatFloat('###,##0.00',importe)+' PosActual: '+IntToStr(PosActual));
       end
       else if (SwStatusFV)and(importe<0.001) then
         SwStatusFV:=false;
     end;
   except
-    DMCONS.AgregaLogCmnd('Error: '+inttostr(apunt));
-    with DMCONS do begin
-      if (T_MoviIb.State in [dsInsert,dsEdit]) then
-        T_MoviIb.Cancel;
+    on e:Exception do begin
+      GuardarLogError('Error DespliegaPosCarga Pos '+inttoclavenum(xpos,2)+' (paso '+inttostr(apunt)+'): '+e.Message);
+      with DMCONS do begin
+        if (T_MoviIb.State in [dsInsert,dsEdit]) then
+          T_MoviIb.Cancel;
+      end;
     end;
   end;
 end;
@@ -1099,12 +1355,15 @@ begin
   with DMCONS do begin
     rsp:='OK';
     try
+      AgregaLog('Ejecuta corte Fecha: '+DateToStr(xFechaCorte)+' Turno: '+IntToStr(xTurnoCorte)+
+                ' Isla: '+IntToStr(xIslaCorte)+' Parcial: '+BoolToStr(SwCorteParcial,true));
       SwCorteOk:=true;
       if not SwCorteParcial then begin
         for xpos:=1 to MaxPosCarga do
           if ((TPosCarga[xpos].isla=xIslaCorte)or(xIslaCorte=0))and(TPosCarga[xpos].estatus in [2,3,4]) then begin
             SwCorteOk:=false;
             DescRsp:='Existen dispensarios cargando';
+            AgregaLog('Corte: Pos '+inttoclavenum(xpos,2)+' con estatus '+IntToStr(TPosCarga[xpos].estatus));
           end;
       end;
       if SwCorteOk then begin
@@ -1127,6 +1386,8 @@ begin
                   T_CorteContadorLitros.AsFloat:=AjustaFloat(Totallitros[xpr],3);
                   T_CorteContadorImporte.AsFloat:=0;
                   T_Corte.Post;
+                  AgregaLog('Corte Pos '+inttoclavenum(xpos,2)+' Combustible: '+IntToStr(xcomb)+
+                            ' Contador: '+FormatFloat('###,###,##0.000',Totallitros[xpr]));
                 end;
               end;
             end;
@@ -1139,9 +1400,13 @@ begin
         rsp:='ERROR: '+DescRsp;
       end;
     except
-      if (T_Corte.State in [dsInsert,dsEdit]) then
-        T_Corte.Cancel;
-      rsp:='ERROR: Al insertar registro de Corte';
+      on e:Exception do begin
+        AgregaLog('Error EjecutaCorte: '+e.Message);
+        AgregaLogCmnd('Error EjecutaCorte: '+e.Message);
+        if (T_Corte.State in [dsInsert,dsEdit]) then
+          T_Corte.Cancel;
+        rsp:='ERROR: Al insertar registro de Corte';
+      end;
     end;
   end;
   result:=rsp;
@@ -1178,6 +1443,8 @@ begin
   ContadorAlarma:=0;
   StrCiclo:='';
   HoraGuardaLog:=Now;
+  HoraArranque:=Now;
+  HoraUltGuardaLogError:=0;
 end;
 
 procedure TFDISWAYNE2W.BitBtn3Click(Sender: TObject);
@@ -1189,7 +1456,10 @@ end;
 procedure TFDISWAYNE2W.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   Timer1.Enabled:=false;
-  CierraPuerto;
+  DMCONS.AgregaLog('Cierra consola Wayne 2W');
+  if not CierraPuerto then
+    DMCONS.AgregaLog('Error al cerrar puerto');
+  GuardarLog;
   Application.Terminate;
 end;
 
@@ -1248,9 +1518,12 @@ begin
       end;
       if Accion<>'' then begin
         try
+          DMCONS.AgregaLog('Accion recibida: '+Accion+' (Puerto abierto: '+BoolToStr(Accion='Cliente1',true)+')');
           Open:=(Accion='Cliente1');
           Accion:='';
         except
+          on e:Exception do
+            GuardarLogError('Error al aplicar accion de puerto: '+e.Message);
         end;
       end;
     finally
@@ -1264,7 +1537,7 @@ end;
 
 procedure TFDISWAYNE2W.Button1Click(Sender: TObject);
 begin
-  DMCONS.ListaLog.SaveToFile('\ImagenCo\Log'+FiltraStrNum(FechaHoraToStr(Now))+'.Txt');
+  GuardarLog;
   PuertoSerial.Tracing:= tlDump;
   PuertoSerial.Tracing:= tlOn;
 end;
@@ -1364,6 +1637,7 @@ begin
     // Checa Comandos
     with DMCONS do begin
       if swcierrabd then begin
+        AgregaLog('Reconecta base de datos');
         DBGASCON.Connected:=false;
         Esperamiliseg(200);
         DBGASCON.Connected:=true;
@@ -1439,6 +1713,10 @@ begin
                       xcomb:=StrToIntDef(ss,0);
                       xp:=PosicionDeCombustible(xpos,xcomb);
                       TPosCarga[xpos].Esperafinventa:=StrToIntDef(ExtraeElemStrSep(TabCmnd[xcmnd].Comando,6,' '),0);
+                      AgregaLog(ExtraeElemStrSep(scmnd,1,' ')+' Pos '+inttoclavenum(xpos,2)+' Estatus: '+IntToStr(TPosCarga[xpos].estatus)+
+                                ' Monto: '+TPosCarga[xpos].MontoPreset+' Combustible: '+IntToStr(xcomb)+
+                                ' PosComb: '+IntToStr(xp)+' TipoPago: '+IntToStr(TPosCarga[xpos].tipopago)+
+                                ' EsperaFinVenta: '+IntToStr(TPosCarga[xpos].Esperafinventa));
                       // Preset Pesos
                       EsperaMiliseg(50);
                       if EnviaPresetPesosBomba(xpos,1,ximporte) then begin
@@ -1482,6 +1760,10 @@ begin
                       xcomb:=StrToIntDef(ss,0);
                       xp:=PosicionDeCombustible(xpos,xcomb);
                       TPosCarga[xpos].Esperafinventa:=StrToIntDef(ExtraeElemStrSep(TabCmnd[xcmnd].Comando,6,' '),0);
+                      AgregaLog(ExtraeElemStrSep(scmnd,1,' ')+' Pos '+inttoclavenum(xpos,2)+' Estatus: '+IntToStr(TPosCarga[xpos].estatus)+
+                                ' Monto: '+TPosCarga[xpos].MontoPreset+' Combustible: '+IntToStr(xcomb)+
+                                ' PosComb: '+IntToStr(xp)+' TipoPago: '+IntToStr(TPosCarga[xpos].tipopago)+
+                                ' EsperaFinVenta: '+IntToStr(TPosCarga[xpos].Esperafinventa));
                       // Preset Litros
                       EsperaMiliseg(50);
                       if EnviaPresetPesosBomba(xpos,2,xlitros) then begin
@@ -1659,12 +1941,16 @@ begin
             DMCONS.AgregaLog(LlenaStr(TabCmnd[xcmnd].Comando,'I',40,' ')+' Respuesta: '+TabCmnd[xcmnd].Respuesta);
             DMCONS.AgregaLogCmnd(LlenaStr(TabCmnd[xcmnd].Comando,'I',40,' ')+' Respuesta: '+TabCmnd[xcmnd].Respuesta);
           end;
-          if SwCerrar then
+          if SwCerrar then begin
+            DMCONS.AgregaLog('Cierre de consola solicitado por comando');
             FDISWAYNE2W.Close;
+          end;
         end;
       end;
     end;
   except
+    on e:Exception do
+      GuardarLogError('Error ProcesaComandos: '+e.Message);
   end;
 end;
 
@@ -1686,6 +1972,8 @@ begin
         HoraGuardaLog:=now;
       end;
   except
+    on e:Exception do
+      GuardarLogError('Error Timer1 (fecha sistema/guarda log): '+e.Message);
   end;
   if swbring then begin
     StaticText17.Visible:=false;
@@ -1696,13 +1984,17 @@ begin
     if not StaticText17.Visible then
       Beep;
     StaticText17.Visible:=not StaticText17.Visible;
-    if ContadorAlarma=10 then
+    if ContadorAlarma=10 then begin
+      DMCONS.AgregaLog('Desconexion de Dispositivo - Error Comunicacion Dispensarios');
       DMCONS.RegistraBitacora3(1,'Desconexion de Dispositivo','Error Comunicación Dispensarios','U');
+    end;
   end
   else StaticText17.Visible:=false;
   try
     lee_registro;
   except
+    on e:Exception do
+      GuardarLogError('Error lee_registro: '+e.Message);
   end;
   //
   if (swespera)and((now-horaespera)>3*tmsegundo) then
@@ -1716,12 +2008,14 @@ begin
     SwPasoBien:=false;
     SwEspera:=true;
     HoraEspera:=Now;
+    DMCONS.AgregaLog('PosCiclo: '+IntToStr(PosCiclo)+' - '+'NumPaso: '+IntToStr(NumPaso));
     if PosCiclo in [1..MaxPosCarga] then with TPosCarga[PosCiclo] do begin
       StrCiclo:=StrCiclo+inttostr(PosCiclo);
       while length(StrCiclo)>20 do
         delete(StrCiclo,1,1);
       StaticText5.Caption:='Bomba: '+inttostr(PosCiclo);
       StaticText6.Caption:='Paso: '+inttostr(NumPaso);
+      try
       try
         case NumPaso of
           0:if SwLeePrecios then begin
@@ -1762,10 +2056,12 @@ begin
                   end;
                 end;
               except
-                DMCONS.AgregaLogCmnd('Error Estatus Pos: '+inttostr(PosCiclo));
-                AvanzaPosCiclo;
-                NumPaso:=1;
-                exit;
+                on e:Exception do begin
+                  GuardarLogError('Error Estatus Pos: '+inttostr(PosCiclo)+' - '+e.Message);
+                  AvanzaPosCiclo;
+                  NumPaso:=1;
+                  exit;
+                end;
               end;
             end;
           2:if (swleeventa)and(estatus>0) then begin       // LEE VENTA TERMINADA
@@ -1777,12 +2073,14 @@ begin
                   if abs(volumen-xvolumen)>0.5 then
                     volumen:=xvolumen;
                   DMCONS.AgregaLog('R> '+FormatFloat('###,##0.00',Volumen)+' / '+FormatFloat('###,##0.00',precio)+' / '+FormatFloat('###,##0.00',importe));
-                end;
+                end
+                else
+                  DMCONS.AgregaLog('No se pudo leer fin de venta Pos '+inttoclavenum(PosCiclo,2)+' Intento: '+IntToStr(ContLeeVenta));
               end;
             end;
           3:if (estatus>0)and(not swdeshabil) then begin        // LEE TOTALES
               if LeeTotalPosCiclo(PosCiclo,MangCiclo) then begin
-                DMCONS.AgregaLog('E> Lee Totales: '+inttoclavenum(PosCiclo,2));
+                DMCONS.AgregaLog('E> Lee Totales: '+inttoclavenum(PosCiclo,2)+' MangCiclo:'+IntToStr(MangCiclo)+' NoComb:'+IntToStr(TPosCarga[PosCiclo].NoComb));
                 if DameTotal(PosCiclo,MangCiclo,xTotalLitros)then
                 begin
                   TotalLitros[MangCiclo]:=xTotalLitros;
@@ -1795,7 +2093,9 @@ begin
                     swcierrabd:=true;
                     swcierrabd2:=false;
                   end;
-                end;
+                end
+                else
+                  DMCONS.AgregaLog('Sin respuesta de totalizador Pos '+IntToStr(PosCiclo)+' Manguera '+IntToStr(MangCiclo));
               end;
             end;
           4:if (estatus=5)and(not swdeshabil)  then begin
@@ -1852,6 +2152,12 @@ begin
             end;
 
         end;
+      except
+        on e:Exception do begin
+          GuardarLogError('Error Timer1 PosCiclo: '+IntToStr(PosCiclo)+' NumPaso: '+IntToStr(NumPaso)+' - '+e.Message);
+          raise;
+        end;
+      end;
       finally
         swespera:=false;
       end;
@@ -1913,7 +2219,11 @@ L01:
             Q_AplicaPrecioF.ParamByName('pError').AsString:='No';
             Q_AplicaPrecioF.ExecSQL;
             RegistraBitacoraCP(xcomb);
+            AgregaLog('Aplica cambio de precio Combustible '+IntToStr(xcomb)+' ('+Nombre+') Folio: '+IntToStr(Folio)+
+                      ' Nuevo precio: '+FormatFloat('###,##0.00',precio));
           except
+            on e:Exception do
+              GuardarLogError('Error al aplicar precio Combustible '+IntToStr(xcomb)+': '+e.Message);
           end;
 
           // Programa cambio precio
