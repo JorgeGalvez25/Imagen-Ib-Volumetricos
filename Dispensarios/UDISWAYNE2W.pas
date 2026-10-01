@@ -1484,7 +1484,7 @@ begin
                       TPosCarga[xpos].Esperafinventa:=StrToIntDef(ExtraeElemStrSep(TabCmnd[xcmnd].Comando,6,' '),0);
                       // Preset Litros
                       EsperaMiliseg(50);
-                      if EnviaPresetPesosBomba(xpos,1,xlitros) then begin
+                      if EnviaPresetPesosBomba(xpos,2,xlitros) then begin
                         TPosCarga[xpos].SwPreset:=true;
                         TPosCarga[xpos].SwPreset2:=true;
                         TPosCarga[xpos].PosPreset:=xp;
