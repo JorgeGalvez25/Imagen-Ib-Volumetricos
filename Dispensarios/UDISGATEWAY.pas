@@ -150,6 +150,8 @@ type
     procedure lee_registro;
     function CombustibleEnPosicion(xpos,xposcarga:integer):integer;
     function PosicionDeCombustible(xpos,xcomb:integer):integer;
+    function IndiceCombustible(xpos,xposcarga:integer):integer;
+    function PosicionValida(xpos:integer):boolean;
     procedure EnviaPreset3(var rsp:string;xcomb:integer);
     procedure EnviaPreset(var rsp:string;xcomb:integer);
     procedure SetFolioOG(xpos,xfolioOG:Integer);
@@ -350,7 +352,9 @@ begin
         swmapea[j]:=false;
         TMapa[j]:='';
         TComb[j]:=0;
+        TCombx[j]:=0;
         TPosx[j]:=0;
+        TMang[j]:=0;
       end;
       SwActivo:=false;
       SwDeshabilitado:=false;
@@ -379,10 +383,14 @@ begin
       if (xpos in [1..32]) then begin
         xcomb:=Q_BombIbCOMBUSTIBLE.AsInteger;
         if (xpos>MaxPosCarga) then begin
+          // Se agrega un elemento por cada posicion hasta xpos, aunque haya posiciones
+          // deshabilitadas intermedias, para que ListView1.Items[xpos-1] siempre exista
+          while ListView1.Items.Count<xpos do
+            with ListView1.Items.Add do begin
+              Caption:=IntToClaveNum(ListView1.Items.Count,2);
+              ImageIndex:=0;
+            end;
           MaxPosCarga:=xpos;
-          ListView1.Items.Add;
-          ListView1.Items[MaxPosCarga-1].Caption:=IntToClaveNum(xpos,2);
-          ListView1.Items[MaxPosCarga-1].ImageIndex:=0;
         end;
         with TPosCarga[xpos] do begin
           Isla:=xisla;
@@ -588,7 +596,7 @@ begin
       if xpos in [posi..posf] then begin
         ii:=xpos-posi+1;
         TStaticText(FindComponent('StaticText'+IntToStr(ii))).Caption:=IntToClaveNum(xpos,2);
-        if not SwDesHabilitado then begin
+        if (not SwDesHabilitado)and(NoComb>0) then begin
           case ii of
             1:panelPC1.Caption:=TPosCarga[xpos].descestat;
             2:panelPC2.Caption:=TPosCarga[xpos].descestat;
@@ -637,6 +645,11 @@ begin
     apunt:=2;
     // Refresca Listas
     for i:=1 to MaxPosCarga do with TPosCarga[i] do begin
+      if NoComb=0 then begin // Posicion deshabilitada o no configurada
+        ListView1.Items[i-1].ImageIndex:=0;
+        ListView1.Items[i-1].Caption:=IntToClaveNum(i,2)+'  Deshabilitada';
+        Continue;
+      end;
       if ModoOpera='Normal' then begin
         case estatus of
           1,7:ListView1.Items[i-1].ImageIndex:=1;
@@ -676,8 +689,12 @@ begin
               T_MoviIbPosCarga.AsInteger:=i;
               apunt:=5;
               xcomb:=CombustibleEnPosicion(i,PosActual);
-              xmang:=TMang[PosActual];
-              if TabComb[xcomb].Agruparcon>0 then begin // Combustible agrupado
+              xc:=IndiceCombustible(i,PosActual);
+              if xc>0 then
+                xmang:=TMang[xc]
+              else
+                xmang:=0;
+              if (xcomb in [1..MaxComb]) and (TabComb[xcomb].Agruparcon>0) then begin // Combustible agrupado
                 T_MoviIbKilometraje.asinteger:=xmang;
                 xc:=TabComb[xcomb].Agruparcon;
                 if TabComb[xc].Activo then
@@ -811,7 +828,7 @@ var lin,ss,rsp,ss2,
     importeant,
     ximporte:real;
     xvol,ximp:real;
-    swerr,SwAplicaMapa:boolean;
+    swerr,swtot,SwAplicaMapa:boolean;
     tagx:array[1..3] of integer;
 begin
   try
@@ -844,8 +861,8 @@ begin
              apeg:=1;
              for xpos:=1 to MaxPosCargaActiva do begin
                with TPosCarga[xpos] do begin
-                 if NoComb=0 then
-                   Next;
+                 if NoComb=0 then // Posicion deshabilitada o no configurada
+                   Continue;
                  SwAutorizando:=false;
                  SwCmndB:=true;
                  estatusant:=estatus;
@@ -891,7 +908,7 @@ begin
                          SwTotales[4]:=true;
                          TotsFinv:=False;
                        end;
-                       if (estatusant in [9,2])and(DMCONS.ReautorizaPam='Si') then begin
+                       if (estatusant in [9,2])and(DMCONS.ReautorizaPam='Si')and(not SwDesHabilitado) then begin
                          if (now-TPosCarga[xpos].HoraOcc)<=60*tmsegundo then begin
                            DMCONS.AgregaLog('Reenvia: '+TPosCarga[xpos].CmndOcc);
                            ComandoConsolaBuff(TPosCarga[xpos].CmndOcc);
@@ -1004,6 +1021,8 @@ begin
 
              for xpos:=1 to MaxPosCargaActiva do begin
                with TPosCarga[xpos] do begin
+                 if NoComb=0 then // Posicion deshabilitada o no configurada
+                   Continue;
                  case Estatus of
                    6:if SwInicio then begin
                        apeg:=15;
@@ -1028,7 +1047,7 @@ begin
                          SwInicio:=false;
                        end;
                      end
-                     else if (swautorizada)and(DMCONS.ReautorizaPam='Si') then begin
+                     else if (not SwDesHabilitado)and(swautorizada)and(DMCONS.ReautorizaPam='Si') then begin
                        if (now-TPosCarga[xpos].HoraOcc)<=60*tmsegundo then begin
                          DMCONS.AgregaLog('Reenvia: '+TPosCarga[xpos].CmndOcc);
                          ComandoConsolaBuff(TPosCarga[xpos].CmndOcc);
@@ -1053,7 +1072,7 @@ begin
      'A':begin // RECIBE LECTURA DE BOMBA
            try
              xpos:=StrToIntDef(copy(lin,2,2),0);
-             if (xpos in [1..maxposcarga]) then begin
+             if PosicionValida(xpos) then begin
                ContEsperaPaso2:=0;
                with TPosCarga[xpos] do begin
                  Mensaje:='';
@@ -1090,7 +1109,7 @@ begin
                  else begin // VENTA CONCLUIDA
                    xGrade:=lin[4];
                    PosActual:=0;
-                   for i:=1 to MCxP do
+                   for i:=1 to NoComb do
                      if xGrade=IntToStr(TComb[i]) then
                        PosActual:=TPosx[i];
                    if (PosActual=0)or(checkbox2.Checked) then begin   // Perdio el mapeo
@@ -1122,12 +1141,10 @@ begin
                            swdesp:=true;
                            DespliegaPosCarga(xpos,true);
                            if UpperCase(DMCONS.TotalCalculado)='SI' then begin
-                             case PosActual of
-                               1:TotalLitros[1]:=TotalLitros[1]+volumen;
-                               2:TotalLitros[2]:=TotalLitros[2]+volumen;
-                               3:TotalLitros[3]:=TotalLitros[3]+volumen;
-                               4:TotalLitros[4]:=TotalLitros[4]+volumen;
-                             end;
+                             // PosActual es la posicion fisica; TotalLitros va por indice de combustible
+                             xc:=IndiceCombustible(xpos,PosActual);
+                             if xc in [1..MCxP] then
+                               TotalLitros[xc]:=TotalLitros[xc]+volumen;
                              DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
                            end;
                          end;
@@ -1158,73 +1175,35 @@ begin
      '@':begin // RECIBE TOTAL DE LA POSICION
            try
              xpos:=StrToIntDef(copy(lin,5,2),0);
-             if (xpos in [1..maxposcarga]) then begin
+             if PosicionValida(xpos) then begin
                with TPosCarga[xpos] do begin
-                 xgrade:=lin[8];
-                 for i:=1 to nocomb do begin
-                   if TPosx[i]=1 then begin
-                     SwTotales[i]:=false;
-                     if (swSinGuardar) and (Abs((StrToFloat(copy(lin,9,12))/100)-TotalLitros[i])>0.5) then begin
-                       DMCONS.AgregaLog('Venta posterior guardada Poscarga: '+IntToStr(xpos)+' Importe: '+FloatToStr(importe));
-                       SwDesp := True;
-                       swSinGuardar:=False;
-                     end;
-                     TotalLitros[i]:=StrToFloat(copy(lin,9,12))/100;
-                     DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
-                     DespliegaPosCarga(xpos,true);
-                   end;
-                 end;
-                 if nocomb=1 then begin
-                   for i:=1 to 4 do
-                     SwTotales[i]:=false;
-                 end
-                 else if nocomb>=2 then begin
-                   xgrade:=lin[41];
+                 // La respuesta trae un bloque de 33 caracteres por posicion fisica (TPosx):
+                 // bloque 1 en 8, bloque 2 en 41, bloque 3 en 74, bloque 4 en 107.
+                 // Se busca por TPosx para no depender de que las mangueras sean consecutivas
+                 // (puede haber mangueras deshabilitadas en DPVGBOMB).
+                 swtot:=false;
+                 for xp:=1 to MCxP do begin
+                   xc:=9+(xp-1)*33; // inicio del total del bloque xp
+                   if length(lin)<xc+11 then
+                     Break;
                    for i:=1 to nocomb do begin
-                     if TPosx[i]=2 then begin
+                     if TPosx[i]=xp then begin
                        SwTotales[i]:=false;
-                       if (swSinGuardar) and (Abs((StrToFloat(copy(lin,42,12))/100) - TotalLitros[i])>0.5) then begin
+                       if (swSinGuardar) and (Abs((StrToFloat(copy(lin,xc,12))/100)-TotalLitros[i])>0.5) then begin
                          DMCONS.AgregaLog('Venta posterior guardada Poscarga: '+IntToStr(xpos)+' Importe: '+FloatToStr(importe));
                          SwDesp:=True;
                          swSinGuardar:=False;
                        end;
-                       TotalLitros[i]:=StrToFloat(copy(lin,42,12))/100;
-                       DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
-                       DespliegaPosCarga(xpos,true);
+                       TotalLitros[i]:=StrToFloat(copy(lin,xc,12))/100;
+                       swtot:=true;
                      end;
                    end;
-                   if nocomb>=3 then begin
-                     xgrade:=lin[74];
-                     for i:=1 to nocomb do begin
-                       if TPosx[i]=3 then begin
-                         SwTotales[i]:=false;
-                         if (swSinGuardar) and (Abs((StrToFloat(copy(lin,75,12))/100) - TotalLitros[i])>0.5) then begin
-                           DMCONS.AgregaLog('Venta posterior guardada Poscarga: '+IntToStr(xpos)+' Importe: '+FloatToStr(importe));
-                           SwDesp:=True;
-                           swSinGuardar:=False;
-                         end;
-                         TotalLitros[i]:=StrToFloat(copy(lin,75,12))/100;
-                         DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
-                         DespliegaPosCarga(xpos,true);
-                       end;
-                     end;
-                     if nocomb=4 then begin
-                       xgrade:=lin[107];
-                       for i:=1 to nocomb do begin
-                         if TPosx[i]=4 then begin
-                           SwTotales[i]:=false;
-                           if (swSinGuardar) and (Abs((StrToFloat(copy(lin,108,12))/100) - TotalLitros[i])>0.5) then begin
-                             DMCONS.AgregaLog('Venta posterior guardada Poscarga: '+IntToStr(xpos)+' Importe: '+FloatToStr(importe));
-                             SwDesp:=True;
-                             swSinGuardar:=False;
-                           end;
-                           TotalLitros[i]:=StrToFloat(copy(lin,108,12))/100;
-                           DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
-                           DespliegaPosCarga(xpos,true);
-                         end;
-                       end;
-                     end;
-                   end;
+                 end;
+                 for i:=nocomb+1 to MCxP do
+                   SwTotales[i]:=false;
+                 if swtot then begin
+                   DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
+                   DespliegaPosCarga(xpos,true);
                  end;
                  swSinGuardar:=False;
                end;
@@ -1236,7 +1215,7 @@ begin
      'C':begin // RECIBE TOTAL DE UNA PISTOLA
            try
              xpos:=StrToIntDef(copy(lin,2,2),0);
-             if (xpos in [1..maxposcarga]) then begin
+             if PosicionValida(xpos) then begin
                xgrade:=lin[4];
                with TPosCarga[xpos] do begin
                  for i:=1 to nocomb do if IntToStr(TComb[i])=xgrade then begin
@@ -1253,7 +1232,7 @@ begin
          end;
      'V':begin
            xpos:=StrToIntDef(copy(lin,2,2),0);
-           if folioOGGen<StrToIntDef(Copy(lin,4,Length(lin)-3),0) then begin
+           if PosicionValida(xpos) and (folioOGGen<StrToIntDef(Copy(lin,4,Length(lin)-3),0)) then begin
              TPosCarga[xpos].folioOG:=StrToIntDef(Copy(lin,4,Length(lin)-3),0);
              SetFolioOG(xpos,TPosCarga[xpos].folioOG);
            end;
@@ -1339,18 +1318,21 @@ begin
             NumPaso:=3;
             StaticText5.Caption:=IntToStr(NumPaso);
             PosicionCargaActual:=0;
+            PosicionDispenActual:=0; // Totales inician desde la primera posicion
           end;
         end
         else if not SwEsperaRsp then begin
           NumPaso:=3;
           StaticText5.Caption:=IntToStr(NumPaso);
           PosicionCargaActual:=0;
+          PosicionDispenActual:=0; // Totales inician desde la primera posicion
         end;
       except
         DMCONS.AgregaLog('ERROR PASO 2');
         NumPaso:=3;
         StaticText5.Caption:=IntToStr(NumPaso);
         PosicionCargaActual:=0;
+        PosicionDispenActual:=0; // Totales inician desde la primera posicion
       end;
     end;
     // Lee Totales
@@ -1360,8 +1342,11 @@ begin
         with DMCONS do begin
           lin:='';xestado:='';xmodo:='';
           for xpos:=1 to MaxPosCarga do with TPosCarga[xpos] do begin
-            xmodo:=xmodo+ModoOpera[1];
-            if not SwDesHabilitado then begin
+            if ModoOpera<>'' then
+              xmodo:=xmodo+ModoOpera[1]
+            else
+              xmodo:=xmodo+'N'; // Posicion deshabilitada: no tiene modo de operacion
+            if (not SwDesHabilitado)and(NoComb>0) then begin
               case estatus of
                 0:xestado:=xestado+'0'; // Sin Comunicacion
                 1:xestado:=xestado+'1'; // Inactivo (Idle)
@@ -1407,7 +1392,7 @@ begin
             end;
             if PosicionCargaActual<=MaxPosCarga then begin
               with TPosCarga[PosicionCargaActual] do begin
-                if (estatus in [0,1,7]) and (swtotales[PosicionDispenActual]) then begin
+                if (NoComb>0) and (estatus in [0,1,7]) and (swtotales[PosicionDispenActual]) then begin
                   ComandoConsolaBuff('@100'+IntToClaveNum(PosicionCargaActual,2));
                   EsperaMiliSeg(100);
                   exit;
@@ -1534,12 +1519,13 @@ begin
               xpos:=StrToIntDef(ExtraeElemStrSep(TabCmnd[xcmnd].Comando,2,' '),0);
               if xpos=0 then begin
                 for xpos:=1 to MaxPosCarga do
-                  TPosCarga[xpos].ModoOpera:='Prepago';
+                  if TPosCarga[xpos].NoComb>0 then
+                    TPosCarga[xpos].ModoOpera:='Prepago';
                 ActivaModoPrepago(0);
                 ComandoConsolaBuff('U'+IntToClaveNum(0,2));
                 rsp:='OK';
               end
-              else if (xpos in [1..maxposcarga]) then begin
+              else if PosicionValida(xpos) then begin
                 TPosCarga[xpos].ModoOpera:='Prepago';
                 ActivaModoPrepago(xpos);
                 ComandoConsolaBuff('U'+IntToClaveNum(xpos,2));
@@ -1551,12 +1537,13 @@ begin
               xpos:=StrToIntDef(ExtraeElemStrSep(TabCmnd[xcmnd].Comando,2,' '),0);
               if xpos=0 then begin
                 for xpos:=1 to MaxPosCarga do
-                  TPosCarga[xpos].ModoOpera:='Normal';
+                  if TPosCarga[xpos].NoComb>0 then
+                    TPosCarga[xpos].ModoOpera:='Normal';
                 DesActivaModoPrepago(0);
                 ComandoConsolaBuff('L'+IntToClaveNum(0,2));
                 rsp:='OK';
               end
-              else if (xpos in [1..maxposcarga]) then begin
+              else if PosicionValida(xpos) then begin
                 TPosCarga[xpos].ModoOpera:='Normal';
                 DesActivaModoPrepago(xpos);
                 ComandoConsolaBuff('L'+IntToClaveNum(xpos,2));
@@ -1568,7 +1555,9 @@ begin
               SnPosCarga:=StrToIntDef(ExtraeElemStrSep(TabCmnd[xcmnd].Comando,2,' '),0);
               xpos:=SnPosCarga;
               rsp:='OK';
-              if (SnPosCarga in [1..MaxPosCarga]) then begin
+              if PosicionValida(SnPosCarga) and TPosCarga[SnPosCarga].SwDesHabilitado then
+                rsp:='Posicion Deshabilitada'
+              else if PosicionValida(SnPosCarga) then begin
                 if (TPosCarga[SnPosCarga].estatus in [1,5,7])or(TPosCarga[SnPosCarga].SwOCC) then begin
                   if not TPosCarga[SnPosCarga].swautorizando then begin
                     // Valida que se haya aplicado el PRESET
@@ -1665,7 +1654,9 @@ begin
               SnPosCarga:=StrToIntDef(ExtraeElemStrSep(TabCmnd[xcmnd].Comando,2,' '),0);
               xpos:=SnPosCarga;
               rsp:='OK';
-              if (SnPosCarga in [1..MaxPosCarga]) then begin
+              if PosicionValida(SnPosCarga) and TPosCarga[SnPosCarga].SwDesHabilitado then
+                rsp:='Posicion Deshabilitada'
+              else if PosicionValida(SnPosCarga) then begin
                 if (TPosCarga[SnPosCarga].estatus in [1,5,7])or(TPosCarga[SnPosCarga].SwOCC) then begin
                   if not TPosCarga[SnPosCarga].swautorizando then begin
                     // Valida que se haya aplicado el PRESET
@@ -1760,9 +1751,10 @@ begin
             // ORDENA FIN DE VENTA
             else if ss='FINV' then begin
               xpos:=StrToIntDef(ExtraeElemStrSep(TabCmnd[xcmnd].Comando,2,' '),0);
-              if not TPosCarga[xpos].swcargando then begin
+              // Se valida la posicion antes de consultar TPosCarga[xpos] para no salirse del arreglo
+              if (not PosicionValida(xpos)) or (not TPosCarga[xpos].swcargando) then begin
                 rsp:='OK';
-                if (xpos in [1..MaxPosCarga]) then begin
+                if PosicionValida(xpos) then begin
                   TPosCarga[xpos].tipopago:=StrToIntDef(ExtraeElemStrSep(TabCmnd[xcmnd].Comando,3,' '),0);
                   if (TPosCarga[xpos].Estatus in [1,3]) then begin // EOT
                     TPosCarga[xpos].finventa:=0;
@@ -1816,7 +1808,7 @@ begin
             else if ss='EFV' then begin
               xpos:=StrToIntDef(ExtraeElemStrSep(TabCmnd[xcmnd].Comando,2,' '),0);
               rsp:='OK';
-              if (xpos in [1..MaxPosCarga]) then
+              if PosicionValida(xpos) then
                 if (TPosCarga[xpos].Estatus=2) then
                   TPosCarga[xpos].finventa:=1
                 else rsp:='Posicion debe estar Despachando'
@@ -1826,20 +1818,20 @@ begin
             else if ss='DPC' then begin
               rsp:='OK';
               xpos:=strtointdef(ExtraeElemStrSep(TabCmnd[xcmnd].Comando,2,' '),0);
-              if xpos in [1..MaxPosCarga] then
+              if PosicionValida(xpos) then
                 TPosCarga[xpos].SwDesHabilitado:=true;
             end
             else if ss='HPC' then begin
               rsp:='OK';
               xpos:=strtointdef(ExtraeElemStrSep(TabCmnd[xcmnd].Comando,2,' '),0);
-              if xpos in [1..MaxPosCarga] then
+              if PosicionValida(xpos) then
                 TPosCarga[xpos].SwDesHabilitado:=false;
             end
             // CMND: DESAUTORIZA VENTA DE COMBUSTIBLE
             else if (ss='DVC')or(ss='PARAR') then begin
               rsp:='OK';
               xpos:=strtointdef(ExtraeElemStrSep(TabCmnd[xcmnd].Comando,2,' '),0);
-              if xpos in [1..MaxPosCarga] then begin
+              if PosicionValida(xpos) then begin
                 if (TPosCarga[xpos].estatus in [2,9]) then begin
                   ComandoConsolaBuff('E'+IntToClaveNum(xpos,2));
                   EsperaMiliSeg(100);
@@ -1850,7 +1842,7 @@ begin
                   if TPosCarga[xpos].estatus=9 then
                     TPosCarga[xpos].tipopago:=0;
                   if DMCONS.swemular then
-                    if xpos in [1..MaxPosCarga] then
+                    if PosicionValida(xpos) then
                       if EmularEstatus[xpos]='2' then
                         EmularEstatus[xpos]:='8'
                       else
@@ -1861,12 +1853,12 @@ begin
             else if (ss='REANUDAR') then begin
               rsp:='OK';
               xpos:=strtointdef(ExtraeElemStrSep(TabCmnd[xcmnd].Comando,2,' '),0);
-              if xpos in [1..MaxPosCarga] then begin
+              if PosicionValida(xpos) then begin
                 if (TPosCarga[xpos].estatus in [2,8]) then begin
                   ComandoConsolaBuff('G'+IntToClaveNum(xpos,2));
                   EsperaMiliSeg(100);
                   if DMCONS.swemular then
-                    if xpos in [1..MaxPosCarga] then
+                    if PosicionValida(xpos) then
                       if EmularEstatus[xpos]='8' then
                         EmularEstatus[xpos]:='2';
                 end;
@@ -2224,7 +2216,7 @@ begin
 end;
 
 procedure TFDISGATEWAY.EnviaPreset3(var rsp:string;xcomb:integer);
-var xpos,xc,xp:integer;
+var xpos,xc:integer;
     ss,xprodauto,NivelPrec,efv:string;
     swlitros:boolean;
 begin
@@ -2232,6 +2224,10 @@ begin
     swlitros:=SnLitros>0.01;
     rsp:='OK';
     xpos:=SnPosCarga;
+    if not PosicionValida(xpos) then begin
+      rsp:='Posicion de Carga no Existe';
+      exit;
+    end;
     if TPosCarga[xpos].SwDesHabilitado then begin
       rsp:='Posicion Deshabilitada';
       exit;
@@ -2253,9 +2249,9 @@ begin
     with TPosCarga[xpos] do begin
       if xcomb>0 then begin
         for xc:=1 to NoComb do if xc in [1..4] then begin
-          xp:=TPosx[xc];
+          // TCombx es el indice dentro de xprodauto (6 caracteres)
           if TComb[xc]=xcomb then
-            if xp in [1..6] then
+            if TCombx[xc] in [1..6] then
               xprodauto[TCombx[xc]]:='1';
         end;
       end
@@ -2321,6 +2317,10 @@ begin
   swlitros:=SnLitros>0.01;
   rsp:='OK';
   xpos:=SnPosCarga;
+  if not PosicionValida(xpos) then begin
+    rsp:='Posicion de Carga no Existe';
+    exit;
+  end;
   if TPosCarga[xpos].SwDesHabilitado then begin
     rsp:='Posicion Deshabilitada';
     exit;
@@ -2392,7 +2392,7 @@ begin
               if rr=1 then begin
                 xpos:=Random(MaxPosCarga)+1;
                 case EmularEstatus[xpos] of
-                  '1':if TPosCarga[xpos].ModoOpera<>'Prepago' then begin
+                  '1':if (TPosCarga[xpos].NoComb>0)and(TPosCarga[xpos].ModoOpera<>'Prepago') then begin
                         EmularEstatus[xpos]:='5';
                         rr:=Random(5);
                         xp:=Random(2)+1;
@@ -2545,6 +2545,27 @@ begin
         result:=TComb[i];
     end;
   end;
+end;
+
+// Regresa el indice (1..NoComb) del combustible que esta en la posicion fisica xposcarga
+// (TPosx). No siempre coinciden cuando hay mangueras deshabilitadas en DPVGBOMB.
+function TFDISGATEWAY.IndiceCombustible(xpos,xposcarga:integer):integer;
+var i:integer;
+begin
+  result:=0;
+  with TPosCarga[xpos] do
+    for i:=1 to NoComb do
+      if TPosx[i]=xposcarga then
+        result:=i;
+end;
+
+// Una posicion es valida si existe y tiene mangueras activas en DPVGBOMB (Activo='Si').
+// Las posiciones con todas sus mangueras en Activo='No' quedan con NoComb=0 y se ignoran.
+function TFDISGATEWAY.PosicionValida(xpos:integer):boolean;
+begin
+  result:=(xpos>=1)and(xpos<=MaxPosCarga);
+  if result then
+    result:=TPosCarga[xpos].NoComb>0;
 end;
 
 function TFDISGATEWAY.PosicionDeCombustible(xpos,xcomb:integer):integer;
