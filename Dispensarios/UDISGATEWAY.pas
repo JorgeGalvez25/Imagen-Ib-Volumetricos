@@ -155,6 +155,9 @@ type
     procedure EnviaPreset3(var rsp:string;xcomb:integer);
     procedure EnviaPreset(var rsp:string;xcomb:integer);
     procedure SetFolioOG(xpos,xfolioOG:Integer);
+    procedure IniciaVentaPend(xpos:integer);
+    procedure ValidaVentaPend(xpos:integer);
+    procedure DescartaVentaPend(xpos:integer);
   end;
 
 type
@@ -195,6 +198,22 @@ type
        swcargando:boolean;
        swAvanzoVenta:boolean;
        swSinGuardar:Boolean;
+       ImpDesp:real;           // Ultimo importe leido en el despacho actual
+       SwValidaTot:boolean;    // La venta requiere validacion por totalizador
+       UltVolumen,
+       UltImporte:real;        // Ultima venta guardada
+       // Venta concluida en espera de que avance el totalizador para guardarse
+       SwVentaPend,
+       VtaPrec,
+       SwTotIni:boolean;       // VtaTotIni ya contiene los totalizadores de la venta
+       VtaTotIni:array[1..MCxP] of real; // Totalizadores al iniciar la venta
+       VtaVolumen,
+       VtaImporte,
+       VtaPrecio:real;
+       VtaPosActual,
+       VtaIndice,
+       VtaTipoPago:integer;
+       VtaHora:TDateTime;
        SwActivo,
        SwOCC,SwCmndB,
        SwDesHabilitado:boolean;
@@ -226,6 +245,7 @@ const idSTX = #2;
       idNAK = #21;
       MaxEspera2=20;
       MaxEspera3=10;
+      MaxSegValidaTot=15; // Segundos maximos de espera del avance del totalizador
 
 
 var
@@ -345,6 +365,12 @@ begin
       SwAutorizada:=false;
       SwAutorizando:=false;
       swSinGuardar:=False;
+      SwVentaPend:=False;
+      SwTotIni:=False;
+      SwValidaTot:=False;
+      ImpDesp:=0;
+      UltVolumen:=0;
+      UltImporte:=0;
       for j:=1 to MCxP do begin
         SwTotales[j]:=true;
         TotalLitrosAnt[j]:=0;
@@ -705,10 +731,15 @@ begin
               T_MoviIbVolumen.AsFloat:=AjustaFloat(Volumen,3);
               T_MoviIbImporte.AsFloat:=AjustaFloat(Importe,2);
               T_MoviIbPrecio.AsFloat:=Ajustafloat(Precio,2);
-              T_MoviIbTotal01.AsFloat:=AjustaFloat(TotalLitros[1],3);
-              T_MoviIbTotal02.AsFloat:=AjustaFloat(TotalLitros[2],3);
-              T_MoviIbTotal03.AsFloat:=AjustaFloat(TotalLitros[3],3);
-              T_MoviIbTotal04.AsFloat:=AjustaFloat(TotalLitros[4],3);
+              // Totalizadores con los que inicio la venta
+              if not SwTotIni then
+                for ii:=1 to MCxP do
+                  VtaTotIni[ii]:=TotalLitros[ii];
+              SwTotIni:=false;
+              T_MoviIbTotal01.AsFloat:=AjustaFloat(VtaTotIni[1],3);
+              T_MoviIbTotal02.AsFloat:=AjustaFloat(VtaTotIni[2],3);
+              T_MoviIbTotal03.AsFloat:=AjustaFloat(VtaTotIni[3],3);
+              T_MoviIbTotal04.AsFloat:=AjustaFloat(VtaTotIni[4],3);
               xdiflts:=0;
               for ii:=1 to 4 do begin
                 xdiflts:=xdiflts+(TotalLitros[ii]-TotalLitrosAnt[ii]);
@@ -735,6 +766,8 @@ begin
               end;
 
               T_MoviIb.post;
+              UltVolumen:=volumen;
+              UltImporte:=importe;
 
               apunt:=8;
               if ModoOpera='Normal' then
@@ -751,6 +784,7 @@ begin
             T_MoviIb.Active:=false;
           end;
         end;
+        SwTotIni:=false;
       end;
     end;
   except
@@ -937,6 +971,10 @@ begin
                    2:begin              // BUSY
                        descestat:='Despachando';
                        IniciaCarga:=true;
+                       if not SwCargando then begin // Inicio de despacho
+                         ImpDesp:=0;
+                         SwValidaTot:=false;
+                       end;
                        SwCargando:=true;
                        if SwArosMag then begin
                          if (not DMCONS.ConexionArosActiva(xpos)) then with DMCONS do begin
@@ -1009,6 +1047,18 @@ begin
                        end;
                      end;
                  end;
+                 // Venta pendiente: se descarta al vencer el tiempo; con pistola levantada se siguen pidiendo totales
+                 if SwVentaPend then begin
+                   if SecondsBetween(Now,VtaHora)>MaxSegValidaTot then
+                     DescartaVentaPend(xpos)
+                   else if (estatus in [4,5]) and (SecondsBetween(Now,HoraFinv)>DMCONS.SegundosFINV) and (TotsFinv) then begin
+                     SwTotales[1]:=true;
+                     SwTotales[2]:=true;
+                     SwTotales[3]:=true;
+                     SwTotales[4]:=true;
+                     TotsFinv:=False;
+                   end;
+                 end;
                  case estatus of
                    0,6:begin
                        xestado:=xestado+'0';
@@ -1034,7 +1084,7 @@ begin
                    4,5:if (not SwDesHabilitado)and(not swautorizada)and((now-HoraOcc)>(tmsegundo*5)) then begin
                        DMCONS.AgregaLog('Pos '+IntToStr(xpos)+' ModoOpera=' + ModoOpera);
                        apeg:=16;
-                       if (SecondsBetween(UltimoCmnd,Now)>3) and (ModoOpera='Normal')and(not swarosmag) then begin
+                       if (SecondsBetween(UltimoCmnd,Now)>3) and (ModoOpera='Normal')and(not swarosmag)and(not SwVentaPend) then begin
                          apeg:=17;
                          SnImporte:=0.00;
                          SnLitros:=0;
@@ -1084,7 +1134,8 @@ begin
                    volumen:=0;
                    precio:=0;
                    if not swAvanzoVenta then
-                     swAvanzoVenta:=importe>0;
+                     swAvanzoVenta:=(ImpDesp>0) and (importe>ImpDesp);
+                   ImpDesp:=importe;
 
                    if (DMCONS.ControlAros='Si')and(importe<0.01)and(not swarosmag)and(ModoOpera='Normal') then begin
                      swarosmag:=DMCONS.ControlArosMagneticos2(xpos,aros_mang,aros_cte,aros_vehi);
@@ -1122,22 +1173,30 @@ begin
                        simp:=copy(lin,14,8);
                        spre:=copy(lin,22,5);
                        importeant:=importe;
-                       xcomb:=CombustibleEnPosicion(xpos,PosActual);
                        precio:=StrToFloat(spre)/100;
                        importe:=StrToFloat(simp)/1000;
                        DespliegaPosCarga(xpos,true);
 
                        if (not swAvanzoVenta) and (SwCargando) then begin
-                         swAvanzoVenta:=(importe<>importeant) and (importe>0) and ((importeant>0) or (importe-importeant<IfThen(xcomb=3,80,40)));
+                         // Avance: el importe crece entre dos lecturas del mismo despacho
+                         swAvanzoVenta:=(ImpDesp>0) and (importe>ImpDesp);
                          DMCONS.AgregaLog(ifthen(swAvanzoVenta,'swAvanzoVenta','NOT')+' Estatus='+IntToStr(Estatus)+' ImporteAnt: '+FloatToStr(importeant)+' Importe: '+FloatToStr(importe));
-                       end;      
+                       end;
+                       if SwCargando then begin
+                         // Trama con volumen o precio mientras despacha cuyo importe no es el que se venia leyendo
+                         if (Estatus=2) and ((volumen>0) or (precio>0)) and (Abs(importe-ImpDesp)>=0.005) then
+                           SwValidaTot:=true;
+                         ImpDesp:=importe;
+                       end;
 
                        if (SwCargando) and (Estatus in [1,3,5,9]) and (volumen>0) and (importe>0) then begin
-                         swSinGuardar:=True;
+                         // Se valida por totalizador si concluye sin pasar por Fin de Venta o repite la venta anterior
+                         if (Estatus<>3) or ((Abs(volumen-UltVolumen)<0.0005) and (Abs(importe-UltImporte)<0.005)) then
+                           SwValidaTot:=true;
+                         swSinGuardar:=False;
                          SwCargando:=False;
-                         if (swAvanzoVenta) then begin
-                           swAvanzoVenta:=False;
-                           swSinGuardar:=False;
+                         // Totalizador calculado: no hay lectura real que validar
+                         if (swAvanzoVenta) and ((not SwValidaTot) or (UpperCase(DMCONS.TotalCalculado)='SI')) then begin
                            swdesp:=true;
                            DespliegaPosCarga(xpos,true);
                            if UpperCase(DMCONS.TotalCalculado)='SI' then begin
@@ -1147,7 +1206,13 @@ begin
                                TotalLitros[xc]:=TotalLitros[xc]+volumen;
                              DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
                            end;
-                         end;
+                         end
+                         else if UpperCase(DMCONS.TotalCalculado)='SI' then
+                           swSinGuardar:=True
+                         else
+                           IniciaVentaPend(xpos);
+                         swAvanzoVenta:=False;
+                         SwValidaTot:=False;
                        end;
 
 
@@ -1182,6 +1247,9 @@ begin
                  // Se busca por TPosx para no depender de que las mangueras sean consecutivas
                  // (puede haber mangueras deshabilitadas en DPVGBOMB).
                  swtot:=false;
+                 if swSinGuardar then // Totalizadores antes de esta lectura
+                   for xp:=1 to MCxP do
+                     VtaTotIni[xp]:=TotalLitros[xp];
                  for xp:=1 to MCxP do begin
                    xc:=9+(xp-1)*33; // inicio del total del bloque xp
                    if length(lin)<xc+11 then
@@ -1192,6 +1260,7 @@ begin
                        if (swSinGuardar) and (Abs((StrToFloat(copy(lin,xc,12))/100)-TotalLitros[i])>0.5) then begin
                          DMCONS.AgregaLog('Venta posterior guardada Poscarga: '+IntToStr(xpos)+' Importe: '+FloatToStr(importe));
                          SwDesp:=True;
+                         SwTotIni:=True;
                          swSinGuardar:=False;
                        end;
                        TotalLitros[i]:=StrToFloat(copy(lin,xc,12))/100;
@@ -1201,6 +1270,8 @@ begin
                  end;
                  for i:=nocomb+1 to MCxP do
                    SwTotales[i]:=false;
+                 if swtot then
+                   ValidaVentaPend(xpos);
                  if swtot then begin
                    DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
                    DespliegaPosCarga(xpos,true);
@@ -1221,6 +1292,7 @@ begin
                  for i:=1 to nocomb do if IntToStr(TComb[i])=xgrade then begin
                    SwTotales[i]:=false;
                    TotalLitros[i]:=StrToFloat(copy(lin,6,10))/100;
+                   ValidaVentaPend(xpos);
                    DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
                    DespliegaPosCarga(xpos,true);
                  end;
@@ -1392,7 +1464,7 @@ begin
             end;
             if PosicionCargaActual<=MaxPosCarga then begin
               with TPosCarga[PosicionCargaActual] do begin
-                if (NoComb>0) and (estatus in [0,1,7]) and (swtotales[PosicionDispenActual]) then begin
+                if (NoComb>0) and ((estatus in [0,1,7]) or (SwVentaPend and (estatus in [4,5]))) and (swtotales[PosicionDispenActual]) then begin
                   ComandoConsolaBuff('@100'+IntToClaveNum(PosicionCargaActual,2));
                   EsperaMiliSeg(100);
                   exit;
@@ -1559,7 +1631,7 @@ begin
                 rsp:='Posicion Deshabilitada'
               else if PosicionValida(SnPosCarga) then begin
                 if (TPosCarga[SnPosCarga].estatus in [1,5,7])or(TPosCarga[SnPosCarga].SwOCC) then begin
-                  if not TPosCarga[SnPosCarga].swautorizando then begin
+                  if not (TPosCarga[SnPosCarga].swautorizando or TPosCarga[SnPosCarga].SwVentaPend) then begin
                     // Valida que se haya aplicado el PRESET
                     if TabCmnd[xcmnd].SwNuevo then begin
                       TPosCarga[SnPosCarga].SwOCC:=false;
@@ -1658,7 +1730,7 @@ begin
                 rsp:='Posicion Deshabilitada'
               else if PosicionValida(SnPosCarga) then begin
                 if (TPosCarga[SnPosCarga].estatus in [1,5,7])or(TPosCarga[SnPosCarga].SwOCC) then begin
-                  if not TPosCarga[SnPosCarga].swautorizando then begin
+                  if not (TPosCarga[SnPosCarga].swautorizando or TPosCarga[SnPosCarga].SwVentaPend) then begin
                     // Valida que se haya aplicado el PRESET
                     if TabCmnd[xcmnd].SwNuevo then begin
                       TPosCarga[SnPosCarga].SwOCC:=false;
@@ -2566,6 +2638,75 @@ begin
   result:=(xpos>=1)and(xpos<=MaxPosCarga);
   if result then
     result:=TPosCarga[xpos].NoComb>0;
+end;
+
+// Retiene la venta concluida hasta que la lectura de totales confirme que el totalizador avanzo.
+// Mientras esta pendiente no se autoriza la posicion.
+procedure TFDISGATEWAY.IniciaVentaPend(xpos:integer);
+var j:integer;
+begin
+  with TPosCarga[xpos] do begin
+    if SwVentaPend then
+      DescartaVentaPend(xpos);
+    VtaIndice:=IndiceCombustible(xpos,PosActual);
+    if not (VtaIndice in [1..MCxP]) then begin
+      // Sin manguera identificable no hay totalizador que comparar
+      SwDesp:=true;
+      DespliegaPosCarga(xpos,true);
+      exit;
+    end;
+    VtaVolumen:=volumen;
+    VtaImporte:=importe;
+    VtaPrecio:=precio;
+    VtaPosActual:=PosActual;
+    VtaTipoPago:=TipoPago;
+    VtaPrec:=swprec;
+    for j:=1 to MCxP do
+      VtaTotIni[j]:=TotalLitros[j];
+    VtaHora:=Now;
+    HoraFinv:=Now;
+    TotsFinv:=True;
+    SwVentaPend:=true;
+  end;
+end;
+
+// Se llama despues de actualizar TotalLitros con una lectura de la consola.
+// Si el totalizador avanzo se restaura la venta retenida y se marca para guardarse.
+procedure TFDISGATEWAY.ValidaVentaPend(xpos:integer);
+begin
+  with TPosCarga[xpos] do begin
+    if not SwVentaPend then
+      exit;
+    // Total inicial en cero: aun no habia lectura previa contra la cual comparar
+    if (VtaTotIni[VtaIndice]<=0) or (TotalLitros[VtaIndice]-VtaTotIni[VtaIndice]>0.005) then begin
+      SwVentaPend:=false;
+      volumen:=VtaVolumen;
+      importe:=VtaImporte;
+      precio:=VtaPrecio;
+      PosActual:=VtaPosActual;
+      TipoPago:=VtaTipoPago;
+      swprec:=VtaPrec;
+      SwTotIni:=true;
+      SwDesp:=true;
+    end
+    else begin
+      // Sin avance todavia: se vuelve a pedir la lectura hasta vencer MaxSegValidaTot
+      HoraFinv:=Now;
+      TotsFinv:=True;
+    end;
+  end;
+end;
+
+procedure TFDISGATEWAY.DescartaVentaPend(xpos:integer);
+begin
+  with TPosCarga[xpos] do begin
+    SwVentaPend:=false;
+    DMCONS.AgregaLog('Venta descartada, sin avance de totalizador Pos '+IntToStr(xpos)+' Vol: '+FloatToStr(VtaVolumen)+
+                     ' Importe: '+FloatToStr(VtaImporte)+' Precio: '+FloatToStr(VtaPrecio)+
+                     ' TotalBase: '+FloatToStr(VtaTotIni[VtaIndice])+' Total: '+FloatToStr(TotalLitros[VtaIndice]));
+  end;
+  Button1Click(nil);
+  Button3Click(nil);
 end;
 
 function TFDISGATEWAY.PosicionDeCombustible(xpos,xcomb:integer):integer;
