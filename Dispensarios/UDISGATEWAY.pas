@@ -1047,11 +1047,14 @@ begin
                        end;
                      end;
                  end;
-                 // Venta pendiente: se descarta al vencer el tiempo; con pistola levantada se siguen pidiendo totales
+                 // Venta pendiente: se descarta al vencer el tiempo; en Fin de Venta o con pistola levantada se siguen pidiendo totales.
+                 // En Fin de Venta (esperando FINV) no corre el tiempo: cuenta a partir de que se libera la posicion.
                  if SwVentaPend then begin
+                   if estatus=3 then
+                     VtaHora:=Now;
                    if SecondsBetween(Now,VtaHora)>MaxSegValidaTot then
                      DescartaVentaPend(xpos)
-                   else if (estatus in [4,5]) and (SecondsBetween(Now,HoraFinv)>DMCONS.SegundosFINV) and (TotsFinv) then begin
+                   else if (estatus in [3,4,5]) and (SecondsBetween(Now,HoraFinv)>DMCONS.SegundosFINV) and (TotsFinv) then begin
                      SwTotales[1]:=true;
                      SwTotales[2]:=true;
                      SwTotales[3]:=true;
@@ -1270,9 +1273,8 @@ begin
                  end;
                  for i:=nocomb+1 to MCxP do
                    SwTotales[i]:=false;
-                 if swtot then
-                   ValidaVentaPend(xpos);
                  if swtot then begin
+                   ValidaVentaPend(xpos);
                    DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
                    DespliegaPosCarga(xpos,true);
                  end;
@@ -1836,7 +1838,13 @@ begin
                     if DMCONS.swemular then
                       EmularEstatus[xpos]:='1';
 
-                    try
+                    // Venta retenida por validacion de totalizador: aun no esta en DPVGMOVI,
+                    // el tipo de pago se guarda con ella en lugar de aplicarse a la venta anterior
+                    if TPosCarga[xpos].SwVentaPend then begin
+                      TPosCarga[xpos].VtaTipoPago:=TPosCarga[xpos].tipopago;
+                      TPosCarga[xpos].tipopago:=0;
+                    end
+                    else try
                       EsperaMiliSeg(100);
                       try
                         if not DBGASCON.Connected then
