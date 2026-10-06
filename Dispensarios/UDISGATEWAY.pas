@@ -1464,7 +1464,7 @@ begin
             end;
             if PosicionCargaActual<=MaxPosCarga then begin
               with TPosCarga[PosicionCargaActual] do begin
-                if (NoComb>0) and ((estatus in [0,1,7]) or (SwVentaPend and (estatus in [4,5]))) and (swtotales[PosicionDispenActual]) then begin
+                if (NoComb>0) and (swtotales[PosicionDispenActual]) then begin
                   ComandoConsolaBuff('@100'+IntToClaveNum(PosicionCargaActual,2));
                   EsperaMiliSeg(100);
                   exit;
