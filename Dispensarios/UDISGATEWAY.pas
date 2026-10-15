@@ -213,7 +213,8 @@ type
        VtaPosActual,
        VtaIndice,
        VtaTipoPago:integer;
-       VtaHora:TDateTime;
+       VtaHora,
+       VtaHoraIni:TDateTime;  // Inicio de la retencion de la venta
        SwActivo,
        SwOCC,SwCmndB,
        SwDesHabilitado:boolean;
@@ -1826,7 +1827,11 @@ begin
             else if ss='FINV' then begin
               xpos:=StrToIntDef(ExtraeElemStrSep(TabCmnd[xcmnd].Comando,2,' '),0);
               // Se valida la posicion antes de consultar TPosCarga[xpos] para no salirse del arreglo
-              if (not PosicionValida(xpos)) or (not TPosCarga[xpos].swcargando) then begin
+              // Venta retenida por validacion de totalizador: el FINV espera a que la venta se guarde en DPVGMOVI
+              // para que el tipo de pago y la impresion la encuentren, a lo mas MaxSegValidaTot segundos
+              if PosicionValida(xpos) and TPosCarga[xpos].SwVentaPend and (SecondsBetween(Now,TPosCarga[xpos].VtaHoraIni)<=MaxSegValidaTot) then
+                SwAplicaCmnd:=False
+              else if (not PosicionValida(xpos)) or (not TPosCarga[xpos].swcargando) then begin
                 rsp:='OK';
                 if PosicionValida(xpos) then begin
                   TPosCarga[xpos].tipopago:=StrToIntDef(ExtraeElemStrSep(TabCmnd[xcmnd].Comando,3,' '),0);
@@ -2672,6 +2677,7 @@ begin
     for j:=1 to MCxP do
       VtaTotIni[j]:=TotalLitros[j];
     VtaHora:=Now;
+    VtaHoraIni:=Now;
     HoraFinv:=Now;
     TotsFinv:=True;
     SwVentaPend:=true;
