@@ -302,7 +302,6 @@ type
     SwEsperaPv:boolean;
     SwTimer1:boolean;
     ContTimer1:integer;
-    folioOGGen:Integer;
     entOG:TDateTime;
     horaLog:TDateTime;
     function CalculaAgua(VolTotal,Diametro,AlturaAgua:real):real;
@@ -358,7 +357,9 @@ type TipoTanque = record
 
        EstadoActivo     :boolean;
        FechaHoraActivo :TDateTime;
-       folioOG:Integer;
+       folioOG:Integer;       // Último IDRECEPCIONOG asignado
+       folioPendOG:Integer;   // Folio de DPVGETAN pendiente de relacionar con OpenGas
+       SwPendOG:boolean;      // Falta enviar el comando R al Gateway
      end;
 
 var
@@ -674,13 +675,18 @@ begin
         end;
       end
       else if copy(lin,1,1)='R' then begin
+        // Respuesta del Gateway al comando R: 'R' + tanque(2) + folio de recepción en OpenGas
         xtan:=StrToIntDef(copy(lin,2,2),0);
-        if folioOGGen<StrToInt64Def(Copy(lin,4,10),0) then begin
-          TTanques[xtan].folioOG:=StrToInt64Def(Copy(lin,4,10),0);
-          SetFolioOG(xtan,TTanques[xtan].folioOG);
-        end
-        else
-          ComandoConsolaSocket('R'+IntToClaveNum(xtan,2));
+        ss:='';
+        xnum:=4;
+        while (xnum<=Length(lin))and(lin[xnum] in ['0'..'9']) do begin
+          ss:=ss+lin[xnum];
+          inc(xnum);
+        end;
+        folioNuevo:=StrToIntDef(ss,0);
+        AgregaLog('Respuesta OpenGas tanque '+IntToStr(xtan)+' folio OG: '+IntToStr(folioNuevo));
+        if (xtan in [1..NumTanques])and(folioNuevo>0) then
+          SetFolioOG(xtan,folioNuevo);
       end;
     except
     end;
@@ -2275,6 +2281,13 @@ begin
         DMCONS.DBGASCON.Connected:=false;
       end;
     end;
+    // Comando R al Gateway en un ciclo propio, sin encimarse con las consultas de inventario
+    if (TipoTanques=8)or(DMCONS.SwEmular) then
+      for i:=1 to NumTanques do if TTanques[i].SwPendOG then begin
+        TTanques[i].SwPendOG:=false;
+        ComandoConsolaSocket('R'+IntToClaveNum(i,2));
+        exit;
+      end;
     if TipoTanques=5 then begin // Petro vend
       SwPetroVend:=true;
       if ((not swesperapv)or((now-tiempopv)>5*tmsegundo)) then begin
@@ -2506,9 +2519,15 @@ begin
                          ' and '+QuotedStr(FormatDateTime('mm/dd/yyyy hh:nn:ss',Now))+' and IDRECEPCIONOG is null group by Entero2 order by Entero1');
           Q_Auxi.Open;
 
-          if not Q_Auxi.IsEmpty then begin
-            ComandoConsolaSocket('R'+IntToClaveNum(Q_AuxiEntero2.AsInteger,2));
-            AgregaLog('Se encontraron entradas sin relacion con OpenGas');
+          // Marca los tanques con entradas pendientes; el comando R se envía en su propio ciclo
+          while not Q_Auxi.Eof do begin
+            i:=Q_AuxiEntero2.AsInteger;
+            if i in [1..NumTanques] then begin
+              TTanques[i].folioPendOG:=Q_AuxiEntero1.AsInteger;
+              TTanques[i].SwPendOG:=true;
+              AgregaLog('Se encontraron entradas sin relacion con OpenGas: tanque '+IntToStr(i)+' folio '+IntToStr(TTanques[i].folioPendOG));
+            end;
+            Q_Auxi.Next;
           end;
         except
           on e:Exception do begin
@@ -3393,17 +3412,38 @@ begin
 end;
 
 procedure TFTANMENU.SetFolioOG(tanque, xfolioOG: Integer);
+var xfolio,xdesc:string;
 begin
   with DMCONS do begin
     try
+      // Relaciona la entrada pendiente detectada; si no hay, la última del tanque sin relacionar
+      if TTanques[tanque].folioPendOG>0 then begin
+        xfolio:=IntToStr(TTanques[tanque].folioPendOG);
+        xdesc:='entrada '+xfolio;
+      end
+      else begin
+        xfolio:='(SELECT MAX(FOLIO) FROM DPVGETAN WHERE TANQUE='+IntToStr(tanque)+' AND IDRECEPCIONOG IS NULL)';
+        xdesc:='última entrada pendiente';
+      end;
       Q_Auxi.Close;
       Q_Auxi.SQL.Clear;
-      Q_Auxi.SQL.Add('UPDATE DPVGETAN SET IDRECEPCIONOG='+IntToStr(xfolioOG)+' WHERE FOLIO=(SELECT MAX(FOLIO) FROM DPVGETAN WHERE TANQUE='+IntToStr(tanque)+')');
+      // No reutiliza una recepción de OpenGas que ya esté asignada a otra entrada
+      Q_Auxi.SQL.Add('UPDATE DPVGETAN SET IDRECEPCIONOG='+IntToStr(xfolioOG)+
+                     ' WHERE FOLIO='+xfolio+' AND TANQUE='+IntToStr(tanque)+' AND IDRECEPCIONOG IS NULL'+
+                     ' AND NOT EXISTS(SELECT 1 FROM DPVGETAN D WHERE D.IDRECEPCIONOG='+IntToStr(xfolioOG)+')');
       Q_Auxi.ExecSQL;
-    finally
-      folioOGGen:=xfolioOG;
-      Q_Auxi.Close;
+      if Q_Auxi.RowsAffected>0 then begin
+        TTanques[tanque].folioOG:=xfolioOG;
+        TTanques[tanque].folioPendOG:=0;
+        AgregaLog('SetFolioOG: tanque '+IntToStr(tanque)+' '+xdesc+' relacionada con folio OG '+IntToStr(xfolioOG));
+      end
+      else
+        AgregaLog('SetFolioOG: tanque '+IntToStr(tanque)+' folio OG '+IntToStr(xfolioOG)+' no aplicado a '+xdesc+' (ya asignado o sin pendiente), se reintentará');
+    except
+      on e:Exception do
+        AgregaLog('Error SetFolioOG: '+e.Message+' '+Q_Auxi.SQL.Text);
     end;
+    Q_Auxi.Close;
   end;
 end;
 
