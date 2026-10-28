@@ -277,7 +277,7 @@ var
 
 implementation
 
-uses ULIBGRAL, ULIBLICENCIAS, DDMCONS, UDISMENU, StrUtils, Math;
+uses ULIBGRAL, ULIBLICENCIAS, DDMCONS, UDISMENU, StrUtils, Math, UVersionModulo;
 
 {$R *.DFM}
 
@@ -2637,7 +2637,7 @@ end;
   
 procedure TFDISGATEWAY.Button1Click(Sender: TObject);
 begin
-  DMCONS.AgregaLog('Version: 39d6747d1df1233c8529f2d4f1dc632822d25654');
+  DMCONS.AgregaLog(InfoVersionModulo('UDISGATEWAY'));
   DMCONS.ListaLog.SaveToFile('\ImagenCo\Log'+FiltraStrNum(FechaHoraToStr(Now))+'.Txt');
 end;
 
@@ -2783,6 +2783,7 @@ end;
 
 procedure TFDISGATEWAY.Button3Click(Sender: TObject);
 begin
+  DMCONS.AgregaLogCmnd(InfoVersionModulo('UDISGATEWAY'));
   DMCONS.ListaLogCmnd.SaveToFile('\ImagenCo\LogCmnd'+FiltraStrNum(FechaHoraToStr(Now))+'.Txt');
 end;
 

@@ -19,6 +19,7 @@ uses
   SrvDispensarios_Impl in 'SrvDispensarios_Impl.pas' {SrvDispensarios: TRORemoteDataModule},
   UDISPAM10002 in 'UDISPAM10002.pas' {FDISPAM10002},
   Hashes in 'Hashes.pas',
+  UVersionModulo in 'UVersionModulo.pas',
   UDISGILBARCO in 'UDISGILBARCO.pas' {FDISGILBARCO},
   UDISGATEWAY in 'UDISGATEWAY.pas' {FDISGATEWAY},
   UDISWAYNE2W in 'UDISWAYNE2W.pas' {FDISWAYNE2W};
