@@ -158,6 +158,7 @@ type
     procedure IniciaVentaPend(xpos:integer);
     procedure ValidaVentaPend(xpos:integer);
     procedure DescartaVentaPend(xpos:integer);
+    procedure VerificaTotVenta(xpos:integer);
   end;
 
 type
@@ -215,6 +216,11 @@ type
        VtaTipoPago:integer;
        VtaHora,
        VtaHoraIni:TDateTime;  // Inicio de la retencion de la venta
+       // Venta guardada en espera de que la lectura de totales refleje su volumen
+       SwVerificaTot:boolean;
+       VerTotIndice:integer;
+       VerTotBase:real;        // Totalizador con el que inicio la venta guardada
+       VerTotHora:TDateTime;
        SwActivo,
        SwOCC,SwCmndB,
        SwDesHabilitado:boolean;
@@ -247,6 +253,7 @@ const idSTX = #2;
       MaxEspera2=20;
       MaxEspera3=10;
       MaxSegValidaTot=15; // Segundos maximos de espera del avance del totalizador
+      MaxSegVerificaTot=60; // Segundos maximos para volver a pedir totales despues de guardar una venta
 
 
 var
@@ -369,6 +376,7 @@ begin
       SwVentaPend:=False;
       SwTotIni:=False;
       SwValidaTot:=False;
+      SwVerificaTot:=False;
       ImpDesp:=0;
       UltVolumen:=0;
       UltImporte:=0;
@@ -769,6 +777,17 @@ begin
               T_MoviIb.post;
               UltVolumen:=volumen;
               UltImporte:=importe;
+              // La consola puede responder con los totales previos a la venta: se verifica que la lectura la refleje
+              if UpperCase(TotalCalculado)<>'SI' then begin
+                if SwVerificaTot then
+                  AgregaLog('Venta guardada con total sin actualizar Pos '+IntToStr(i)+' Total: '+FloatToStr(VerTotBase));
+                VerTotIndice:=IndiceCombustible(i,PosActual);
+                SwVerificaTot:=VerTotIndice in [1..MCxP];
+                if SwVerificaTot then begin
+                  VerTotBase:=VtaTotIni[VerTotIndice];
+                  VerTotHora:=Now;
+                end;
+              end;
 
               apunt:=8;
               if ModoOpera='Normal' then
@@ -1276,6 +1295,7 @@ begin
                    SwTotales[i]:=false;
                  if swtot then begin
                    ValidaVentaPend(xpos);
+                   VerificaTotVenta(xpos);
                    DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
                    DespliegaPosCarga(xpos,true);
                  end;
@@ -1296,6 +1316,7 @@ begin
                    SwTotales[i]:=false;
                    TotalLitros[i]:=StrToFloat(copy(lin,6,10))/100;
                    ValidaVentaPend(xpos);
+                   VerificaTotVenta(xpos);
                    DMCONS.RegistraTotales_BD4(xpos,TotalLitros[1],TotalLitros[2],TotalLitros[3],TotalLitros[4]);
                    DespliegaPosCarga(xpos,true);
                  end;
@@ -2705,6 +2726,28 @@ begin
     end
     else begin
       // Sin avance todavia: se vuelve a pedir la lectura hasta vencer MaxSegValidaTot
+      HoraFinv:=Now;
+      TotsFinv:=True;
+    end;
+  end;
+end;
+
+// Se llama despues de actualizar TotalLitros con una lectura de la consola.
+// Si la lectura aun no refleja la venta guardada se vuelven a pedir totales, a lo mas MaxSegVerificaTot segundos,
+// para que la siguiente venta no inicie con un totalizador desactualizado.
+procedure TFDISGATEWAY.VerificaTotVenta(xpos:integer);
+begin
+  with TPosCarga[xpos] do begin
+    if not SwVerificaTot then
+      exit;
+    if (VerTotBase<=0) or (TotalLitros[VerTotIndice]-VerTotBase>0.005) then
+      SwVerificaTot:=false
+    else if SecondsBetween(Now,VerTotHora)>MaxSegVerificaTot then begin
+      SwVerificaTot:=false;
+      DMCONS.AgregaLog('Totales sin avance despues de guardar venta Pos '+IntToStr(xpos)+' Total: '+FloatToStr(TotalLitros[VerTotIndice]));
+    end
+    else begin
+      // Sin avance todavia: se vuelve a pedir la lectura
       HoraFinv:=Now;
       TotsFinv:=True;
     end;
