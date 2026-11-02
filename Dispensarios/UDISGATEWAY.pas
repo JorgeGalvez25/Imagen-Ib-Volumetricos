@@ -1067,14 +1067,14 @@ begin
                        end;
                      end;
                  end;
-                 // Venta pendiente: se descarta al vencer el tiempo; en Fin de Venta o con pistola levantada se siguen pidiendo totales.
+                 // Venta pendiente: se descarta al vencer el tiempo; mientras no despacha se siguen pidiendo totales.
                  // En Fin de Venta (esperando FINV) no corre el tiempo: cuenta a partir de que se libera la posicion.
                  if SwVentaPend then begin
                    if estatus=3 then
                      VtaHora:=Now;
                    if SecondsBetween(Now,VtaHora)>MaxSegValidaTot then
                      DescartaVentaPend(xpos)
-                   else if (estatus in [3,4,5]) and (SecondsBetween(Now,HoraFinv)>DMCONS.SegundosFINV) and (TotsFinv) then begin
+                   else if (estatus in [1,3,4,5,7,9]) and (SecondsBetween(Now,HoraFinv)>DMCONS.SegundosFINV) and (TotsFinv) then begin
                      SwTotales[1]:=true;
                      SwTotales[2]:=true;
                      SwTotales[3]:=true;
