@@ -774,10 +774,8 @@ begin
                 swprec:=false;
               end;
 
-              T_MoviIb.post;
-              UltVolumen:=volumen;
-              UltImporte:=importe;
-              // La consola puede responder con los totales previos a la venta: se verifica que la lectura la refleje
+              // La consola puede responder con los totales previos a la venta: se verifica que la lectura la refleje.
+              // Se arma antes del post para que no se pierda si el post genera excepcion despues de insertar.
               if UpperCase(TotalCalculado)<>'SI' then begin
                 if SwVerificaTot then
                   AgregaLog('Venta guardada con total sin actualizar Pos '+IntToStr(i)+' Total: '+FloatToStr(VerTotBase));
@@ -788,6 +786,10 @@ begin
                   VerTotHora:=Now;
                 end;
               end;
+
+              T_MoviIb.post;
+              UltVolumen:=volumen;
+              UltImporte:=importe;
 
               apunt:=8;
               if ModoOpera='Normal' then
@@ -1079,6 +1081,22 @@ begin
                      SwTotales[2]:=true;
                      SwTotales[3]:=true;
                      SwTotales[4]:=true;
+                     TotsFinv:=False;
+                   end;
+                 end;
+                 // Venta guardada cuya lectura de totales aun no la refleja: se siguen pidiendo totales
+                 // fuera del despacho, aunque no haya llegado respuesta, hasta vencer MaxSegVerificaTot.
+                 if SwVerificaTot then begin
+                   if SecondsBetween(Now,VerTotHora)>MaxSegVerificaTot then begin
+                     SwVerificaTot:=false;
+                     DMCONS.AgregaLog('Totales sin avance despues de guardar venta Pos '+IntToStr(xpos)+' Total: '+FloatToStr(TotalLitros[VerTotIndice]));
+                   end
+                   else if (estatus in [1,3,4,5,7,9]) and (SecondsBetween(Now,HoraFinv)>DMCONS.SegundosFINV) then begin
+                     SwTotales[1]:=true;
+                     SwTotales[2]:=true;
+                     SwTotales[3]:=true;
+                     SwTotales[4]:=true;
+                     HoraFinv:=Now;
                      TotsFinv:=False;
                    end;
                  end;
