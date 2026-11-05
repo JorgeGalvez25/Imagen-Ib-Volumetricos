@@ -986,14 +986,15 @@ begin
                          SwArosMag:=false;
                          SwOcc:=false;
                          ContOcc:=0;
-                         if not swAvanzoVenta then
-                           SwCargando:=False;
                        end;
                      end;
                    2:begin              // BUSY
                        descestat:='Despachando';
                        IniciaCarga:=true;
                        if not SwCargando then begin // Inicio de despacho
+                         // Retenida sin lectura: el totalizador ya mezclaria las dos ventas
+                         if (SwVentaPend) and (VtaVolumen=0) then
+                           DescartaVentaPend(xpos);
                          ImpDesp:=0;
                          SwValidaTot:=false;
                        end;
@@ -1125,7 +1126,7 @@ begin
                    4,5:if (not SwDesHabilitado)and(not swautorizada)and((now-HoraOcc)>(tmsegundo*5)) then begin
                        DMCONS.AgregaLog('Pos '+IntToStr(xpos)+' ModoOpera=' + ModoOpera);
                        apeg:=16;
-                       if (SecondsBetween(UltimoCmnd,Now)>3) and (ModoOpera='Normal')and(not swarosmag)and(not SwVentaPend) then begin
+                       if (SecondsBetween(UltimoCmnd,Now)>3) and (ModoOpera='Normal')and(not swarosmag)and(not (SwVentaPend and (VtaVolumen>0))) then begin
                          apeg:=17;
                          SnImporte:=0.00;
                          SnLitros:=0;
@@ -1254,6 +1255,25 @@ begin
                            IniciaVentaPend(xpos);
                          swAvanzoVenta:=False;
                          SwValidaTot:=False;
+                       end;
+
+                       if (SwCargando) and (Estatus in [1,7]) then begin
+                         // Despacho concluido sin lectura de venta: se retiene hasta confirmar con totalizador
+                         SwCargando:=False;
+                         swAvanzoVenta:=False;
+                         SwValidaTot:=False;
+                         // Con totalizador calculado no hay lectura real con que confirmar
+                         if (UpperCase(DMCONS.TotalCalculado)<>'SI') and (IndiceCombustible(xpos,PosActual) in [1..MCxP]) then
+                           IniciaVentaPend(xpos);
+                       end
+                       else if (SwVentaPend) and (VtaVolumen=0) and (Estatus in [1,7]) and (volumen>0) and (importe>0)
+                               and (IndiceCombustible(xpos,PosActual) in [1..MCxP]) then begin
+                         // Lectura de la venta retenida que llega despues de liberarse la posicion
+                         VtaIndice:=IndiceCombustible(xpos,PosActual);
+                         VtaVolumen:=volumen;
+                         VtaImporte:=importe;
+                         VtaPrecio:=precio;
+                         VtaPosActual:=PosActual;
                        end;
 
 
@@ -1417,7 +1437,7 @@ begin
           repeat
             Inc(PosicionCargaActual);
             with TPosCarga[PosicionCargaActual] do if NoComb>0 then begin
-              if (estatus<>estatusant)or(estatus>1) or ((swinicio2)and(estatus>0)) or (SwCargando) then begin //CAMBIO
+              if (estatus<>estatusant)or(estatus>1) or ((swinicio2)and(estatus>0)) or (SwCargando) or ((SwVentaPend)and(VtaVolumen=0)) then begin //CAMBIO
                 if (estatus in [1,2,3,7,8]) then begin
                   ComandoConsolaBuff('A'+IntToClaveNum(PosicionCargaActual,2));
                   exit;
@@ -1673,7 +1693,7 @@ begin
                 rsp:='Posicion Deshabilitada'
               else if PosicionValida(SnPosCarga) then begin
                 if (TPosCarga[SnPosCarga].estatus in [1,5,7])or(TPosCarga[SnPosCarga].SwOCC) then begin
-                  if not (TPosCarga[SnPosCarga].swautorizando or TPosCarga[SnPosCarga].SwVentaPend) then begin
+                  if not (TPosCarga[SnPosCarga].swautorizando or (TPosCarga[SnPosCarga].SwVentaPend and (TPosCarga[SnPosCarga].VtaVolumen>0))) then begin
                     // Valida que se haya aplicado el PRESET
                     if TabCmnd[xcmnd].SwNuevo then begin
                       TPosCarga[SnPosCarga].SwOCC:=false;
@@ -1772,7 +1792,7 @@ begin
                 rsp:='Posicion Deshabilitada'
               else if PosicionValida(SnPosCarga) then begin
                 if (TPosCarga[SnPosCarga].estatus in [1,5,7])or(TPosCarga[SnPosCarga].SwOCC) then begin
-                  if not (TPosCarga[SnPosCarga].swautorizando or TPosCarga[SnPosCarga].SwVentaPend) then begin
+                  if not (TPosCarga[SnPosCarga].swautorizando or (TPosCarga[SnPosCarga].SwVentaPend and (TPosCarga[SnPosCarga].VtaVolumen>0))) then begin
                     // Valida que se haya aplicado el PRESET
                     if TabCmnd[xcmnd].SwNuevo then begin
                       TPosCarga[SnPosCarga].SwOCC:=false;
@@ -1868,7 +1888,7 @@ begin
               // Se valida la posicion antes de consultar TPosCarga[xpos] para no salirse del arreglo
               // Venta retenida por validacion de totalizador: el FINV espera a que la venta se guarde en DPVGMOVI
               // para que el tipo de pago y la impresion la encuentren, a lo mas MaxSegValidaTot segundos
-              if PosicionValida(xpos) and TPosCarga[xpos].SwVentaPend and (SecondsBetween(Now,TPosCarga[xpos].VtaHoraIni)<=MaxSegValidaTot) then
+              if PosicionValida(xpos) and TPosCarga[xpos].SwVentaPend and (TPosCarga[xpos].VtaVolumen>0) and (SecondsBetween(Now,TPosCarga[xpos].VtaHoraIni)<=MaxSegValidaTot) then
                 SwAplicaCmnd:=False
               else if (not PosicionValida(xpos)) or (not TPosCarga[xpos].swcargando) then begin
                 rsp:='OK';
@@ -1884,7 +1904,7 @@ begin
 
                     // Venta retenida por validacion de totalizador: aun no esta en DPVGMOVI,
                     // el tipo de pago se guarda con ella en lugar de aplicarse a la venta anterior
-                    if TPosCarga[xpos].SwVentaPend then begin
+                    if TPosCarga[xpos].SwVentaPend and (TPosCarga[xpos].VtaVolumen>0) then begin
                       TPosCarga[xpos].VtaTipoPago:=TPosCarga[xpos].tipopago;
                       TPosCarga[xpos].tipopago:=0;
                     end
@@ -2731,7 +2751,12 @@ begin
     if not SwVentaPend then
       exit;
     // Total inicial en cero: aun no habia lectura previa contra la cual comparar
-    if (VtaTotIni[VtaIndice]<=0) or (TotalLitros[VtaIndice]-VtaTotIni[VtaIndice]>0.005) then begin
+    if ((VtaTotIni[VtaIndice]<=0) and (VtaVolumen>0)) or ((VtaTotIni[VtaIndice]>0) and (TotalLitros[VtaIndice]-VtaTotIni[VtaIndice]>0.005)) then begin
+      if VtaVolumen<=0 then begin
+        // Sin lectura de la venta: el volumen es el avance del totalizador
+        VtaVolumen:=TotalLitros[VtaIndice]-VtaTotIni[VtaIndice];
+        VtaImporte:=Round(VtaVolumen*VtaPrecio*100)/100;
+      end;
       SwVentaPend:=false;
       volumen:=VtaVolumen;
       importe:=VtaImporte;
@@ -2779,9 +2804,12 @@ begin
     DMCONS.AgregaLog('Venta descartada, sin avance de totalizador Pos '+IntToStr(xpos)+' Vol: '+FloatToStr(VtaVolumen)+
                      ' Importe: '+FloatToStr(VtaImporte)+' Precio: '+FloatToStr(VtaPrecio)+
                      ' TotalBase: '+FloatToStr(VtaTotIni[VtaIndice])+' Total: '+FloatToStr(TotalLitros[VtaIndice]));
+    // Sin lectura de venta casi siempre es manguera levantada sin despacho: no se guardan los logs
+    if VtaVolumen>0 then begin
+      Button1Click(nil);
+      Button3Click(nil);
+    end;
   end;
-  Button1Click(nil);
-  Button3Click(nil);
 end;
 
 function TFDISGATEWAY.PosicionDeCombustible(xpos,xcomb:integer):integer;
