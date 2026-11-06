@@ -787,23 +787,46 @@ begin
                 end;
               end;
 
-              T_MoviIb.post;
+              // El BDE genera excepcion (12292) al releer el registro porque FOLIO lo asigna el trigger,
+              // aunque la venta si se inserta
               UltVolumen:=volumen;
               UltImporte:=importe;
-
-              apunt:=8;
               if ModoOpera='Normal' then
                 SwPreset:=false;
-              if (lcLicTemporal)and(date>lcLicVence) then begin
-                MensajeErr('Licencia vencida. Llame a su distribuidor');
-                swcerrar:=true; FDISGATEWAY.Close;
-              end;
+
+              apunt:=8;
+              T_MoviIb.post;
             except
+              on e:EDBEngineError do
+                if e.Errors[0].ErrorCode=12292 then begin
+                  // DPVGCONS guarda el folio de la ultima venta de cada posicion (DPVGMOVITRIGGER2)
+                  try
+                    try
+                      Q_Auxi.Active:=false;
+                      Q_AuxiEntero1.FieldKind:=fkInternalCalc;
+                      Q_Auxi.SQL.Clear;
+                      Q_Auxi.SQL.Add('Select Folio as Entero1 from DPVGCONS');
+                      Q_Auxi.SQL.Add('Where PosCarga='+inttostr(i));
+                      Q_Auxi.Active:=true;
+                      AgregaLog('Venta registrada Pos '+IntToStr(i)+' Folio: '+IntToStr(Q_AuxiEntero1.AsInteger));
+                    finally
+                      Q_Auxi.Active:=false;
+                    end;
+                  except
+                    AgregaLog('Venta registrada Pos '+IntToStr(i));
+                  end;
+                end
+                else
+                  AgregaLog('Error al guardar venta: '+e.Message);
               on e:Exception do
                 AgregaLog('Error al guardar venta: '+e.Message);
             end;
           finally
             T_MoviIb.Active:=false;
+          end;
+          if (lcLicTemporal)and(date>lcLicVence) then begin
+            MensajeErr('Licencia vencida. Llame a su distribuidor');
+            swcerrar:=true; FDISGATEWAY.Close;
           end;
         end;
         SwTotIni:=false;
