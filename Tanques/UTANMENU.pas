@@ -305,6 +305,7 @@ type
     entOG:TDateTime;
     horaLog:TDateTime;
     function CalculaAgua(VolTotal,Diametro,AlturaAgua:real):real;
+    procedure LogDiagnosticoPuerto;
   public
     { Public declarations }
     procedure IniciaBaseDeDatos;
@@ -374,6 +375,56 @@ implementation
 uses DDMCONS, UAutoriza2;
 
 {$R *.dfm}
+
+function ProcessIdToSessionId(dwProcessId: DWORD; var pSessionId: DWORD): BOOL; stdcall; external kernel32;
+function WTSGetActiveConsoleSessionId: DWORD; stdcall; external kernel32;
+
+// Registra con que usuario y sesion corre el modulo, a que dispositivo apunta el COM y los puertos globales del sistema
+procedure TFTANMENU.LogDiagnosticoPuerto;
+var usuario:array[0..255] of Char;
+    destino:array[0..1023] of Char;
+    tam,sesion:DWORD;
+    puerto:string;
+    lista:TStringList;
+    reg:TRegistry;
+    i:integer;
+begin
+  try
+    tam:=SizeOf(usuario);
+    if not GetUserName(usuario,tam) then
+      usuario[0]:=#0;
+    if not ProcessIdToSessionId(GetCurrentProcessId,sesion) then
+      sesion:=DWORD(-1);
+    DMCONS.AgregaLog('Diagnostico puerto: Usuario '+usuario+' | Sesion '+IntToStr(sesion)+
+                     ' | Sesion consola '+IntToStr(WTSGetActiveConsoleSessionId)+' | Ejecutable '+ParamStr(0));
+    puerto:='COM'+IntToStr(ApdComPort1.ComNumber);
+    DMCONS.AgregaLog('Diagnostico puerto: '+Format('%s,%d,%s,%d,%d',[puerto,ApdComPort1.Baud,
+                     Copy('NOEMS',Ord(ApdComPort1.Parity)+1,1),ApdComPort1.DataBits,ApdComPort1.StopBits]));
+    if QueryDosDevice(PChar(puerto),destino,SizeOf(destino))>0 then
+      DMCONS.AgregaLog('Diagnostico puerto: '+puerto+' -> '+destino)
+    else
+      DMCONS.AgregaLog('Diagnostico puerto: QueryDosDevice '+puerto+' error '+IntToStr(GetLastError));
+    lista:=TStringList.Create;
+    reg:=TRegistry.Create(KEY_READ);
+    try
+      reg.RootKey:=HKEY_LOCAL_MACHINE;
+      if reg.OpenKeyReadOnly('HARDWARE\DEVICEMAP\SERIALCOMM') then begin
+        reg.GetValueNames(lista);
+        for i:=0 to lista.Count-1 do
+          DMCONS.AgregaLog('Diagnostico puerto: SERIALCOMM '+lista[i]+' = '+reg.ReadString(lista[i]));
+      end
+      else
+        DMCONS.AgregaLog('Diagnostico puerto: no se pudo leer SERIALCOMM');
+    finally
+      reg.Free;
+      lista.Free;
+    end;
+    DMCONS.ListaLog.SaveToFile('\ImagenCo\LogTanquesPuerto'+FiltraStrNum(FechaHoraToStr(Now))+'.Txt');
+  except
+    on e:Exception do
+      DMCONS.AgregaLog('Diagnostico puerto: '+e.Message);
+  end;
+end;
 
 procedure TFTANMENU.ReConectaBaseDatos;
 begin
@@ -1515,6 +1566,7 @@ begin
         ApdComPort1.DataBits:=ptBitsDatos;
         ApdComPort1.StopBits:=ptBitsParada;
         ApdComPort1.Open:=true;
+        LogDiagnosticoPuerto;
       end;
       CalculaFechasCorte;
       DMCONS.DBGASCON.Connected:=true;
