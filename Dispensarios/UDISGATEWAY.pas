@@ -159,6 +159,7 @@ type
     procedure ValidaVentaPend(xpos:integer);
     procedure DescartaVentaPend(xpos:integer);
     procedure VerificaTotVenta(xpos:integer);
+    function ProductoCompartido(xpos,xindice:integer):boolean;
   end;
 
 type
@@ -799,13 +800,12 @@ begin
             except
               on e:EDBEngineError do
                 if e.Errors[0].ErrorCode=12292 then begin
-                  // DPVGCONS guarda el folio de la ultima venta de cada posicion (DPVGMOVITRIGGER2)
                   try
                     try
                       Q_Auxi.Active:=false;
                       Q_AuxiEntero1.FieldKind:=fkInternalCalc;
                       Q_Auxi.SQL.Clear;
-                      Q_Auxi.SQL.Add('Select Folio as Entero1 from DPVGCONS');
+                      Q_Auxi.SQL.Add('Select Max(Folio) as Entero1 from DPVGMOVI');
                       Q_Auxi.SQL.Add('Where PosCarga='+inttostr(i));
                       Q_Auxi.Active:=true;
                       AgregaLog('Venta registrada Pos '+IntToStr(i)+' Folio: '+IntToStr(Q_AuxiEntero1.AsInteger));
@@ -1255,8 +1255,10 @@ begin
                        end;
 
                        if (SwCargando) and (Estatus in [1,3,5,9]) and (volumen>0) and (importe>0) then begin
-                         // Se valida por totalizador si concluye sin pasar por Fin de Venta o repite la venta anterior
-                         if (Estatus<>3) or ((Abs(volumen-UltVolumen)<0.0005) and (Abs(importe-UltImporte)<0.005)) then
+                         // Se valida por totalizador si concluye sin pasar por Fin de Venta, repite la venta anterior
+                         // o el grado no identifica la manguera
+                         if (Estatus<>3) or ((Abs(volumen-UltVolumen)<0.0005) and (Abs(importe-UltImporte)<0.005))
+                            or ProductoCompartido(xpos,IndiceCombustible(xpos,PosActual)) then
                            SwValidaTot:=true;
                          swSinGuardar:=False;
                          SwCargando:=False;
@@ -2735,6 +2737,19 @@ begin
     result:=TPosCarga[xpos].NoComb>0;
 end;
 
+// La consola reporta el grado con el producto (TCombx): si otra manguera de la posicion tiene el mismo
+// producto, el grado no identifica la manguera que despacho.
+function TFDISGATEWAY.ProductoCompartido(xpos,xindice:integer):boolean;
+var i:integer;
+begin
+  result:=false;
+  with TPosCarga[xpos] do
+    if xindice in [1..NoComb] then
+      for i:=1 to NoComb do
+        if (i<>xindice) and (TCombx[i]=TCombx[xindice]) then
+          result:=true;
+end;
+
 // Retiene la venta concluida hasta que la lectura de totales confirme que el totalizador avanzo.
 // Mientras esta pendiente no se autoriza la posicion.
 procedure TFDISGATEWAY.IniciaVentaPend(xpos:integer);
@@ -2769,10 +2784,19 @@ end;
 // Se llama despues de actualizar TotalLitros con una lectura de la consola.
 // Si el totalizador avanzo se restaura la venta retenida y se marca para guardarse.
 procedure TFDISGATEWAY.ValidaVentaPend(xpos:integer);
+var j:integer;
 begin
   with TPosCarga[xpos] do begin
     if not SwVentaPend then
       exit;
+    // Si no avanzo el totalizador de la manguera del grado, se toma la manguera con el mismo producto que si avanzo
+    if (VtaTotIni[VtaIndice]>0) and (TotalLitros[VtaIndice]-VtaTotIni[VtaIndice]<=0.005) then
+      for j:=1 to NoComb do
+        if (j<>VtaIndice) and (TCombx[j]=TCombx[VtaIndice]) and (VtaTotIni[j]>0) and (TotalLitros[j]-VtaTotIni[j]>0.005) then begin
+          VtaIndice:=j;
+          VtaPosActual:=TPosx[j];
+          Break;
+        end;
     // Total inicial en cero: aun no habia lectura previa contra la cual comparar
     if ((VtaTotIni[VtaIndice]<=0) and (VtaVolumen>0)) or ((VtaTotIni[VtaIndice]>0) and (TotalLitros[VtaIndice]-VtaTotIni[VtaIndice]>0.005)) then begin
       if VtaVolumen<=0 then begin
